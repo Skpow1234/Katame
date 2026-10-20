@@ -16,7 +16,7 @@ const (
 	bundlesSubdir = "bundles"
 )
 
-// Config is the marshalled repo.json document.
+// Config is the marshaled repo.json document.
 type Config struct {
 	Schema         int    `json:"schema"`
 	CreatedAt      string `json:"created_at"`

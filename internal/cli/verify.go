@@ -106,9 +106,9 @@ func newVerifyCmd() *cobra.Command {
 			if plugin.GlobalRegistry().SignAlgo(signAlgo) != "" {
 				valid, err = plugin.GlobalRegistry().Verify(signAlgo, pubKey, sigMsg, br.Signature)
 			} else {
-				pub, _, err := crypto.LoadAnyPublicKey(pubKey)
-				if err != nil {
-					return fmt.Errorf("load public key: %w", err)
+				pub, _, loadErr := crypto.LoadAnyPublicKey(pubKey)
+				if loadErr != nil {
+					return fmt.Errorf("load public key: %w", loadErr)
 				}
 				valid, err = crypto.VerifySignature(pub, signAlgo, sigMsg, br.Signature)
 			}

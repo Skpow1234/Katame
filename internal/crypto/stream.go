@@ -80,7 +80,6 @@ func EncryptStream(r io.Reader, w io.Writer, key, aad []byte, chunkSize int, cip
 					return nil, fmt.Errorf("write chunk %d: %w", chunkIdx, wErr)
 				}
 				totalWritten += int64(written)
-				lastTag = sealed[len(sealed)-tagSize:]
 				chunkIdx++
 			}
 		}

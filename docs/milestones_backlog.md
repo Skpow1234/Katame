@@ -256,15 +256,15 @@ see [milestones.md](milestones.md).
 | **M278** | VCS revision in /v1/version |
 | **M279** | Structured /healthz detail payload |
 | **M280** | Fuzz targets for hybrid/KDF/SSS/policy/ZIP |
-| **M281** | Fix Makefile fuzz recursive package paths |
-| **M282** | Run golangci-lint in GitHub Actions |
-| **M283** | Enable -race in CI test job |
-| **M284** | Add linux/arm64 to CI build matrix |
-| **M285** | Add windows/arm64 to CI build matrix |
-| **M286** | Publish fuzz crashers as CI artifacts |
+| **M281** | Fix Makefile fuzz recursive package paths — **done** (Makefile + CI use single-package paths) |
+| **M282** | Run golangci-lint in GitHub Actions — **done** (`.golangci.yml` + `ci.yml` lint job) |
+| **M283** | Enable -race in CI test job — **done** (Unix runners; Windows remains non-race) |
+| **M284** | Add linux/arm64 to CI build matrix — **done** |
+| **M285** | Add windows/arm64 to CI build matrix — **done** |
+| **M286** | Publish fuzz crashers as CI artifacts — **done** (upload on fuzz job failure) |
 | **M287** | Coverage threshold for crypto/vpackop |
 | **M288** | Bindings smoke in CI |
-| **M289** | Dependabot for Go modules and Actions |
+| **M289** | Dependabot for Go modules and Actions — **done** (`.github/dependabot.yml`) |
 | **M290** | Snap packaging |
 | **M291** | Flatpak packaging |
 | **M292** | macOS notarization |

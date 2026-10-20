@@ -1,0 +1,35 @@
+﻿# Curated high-signal set for CI. Expand as backlog issues (errcheck/unused/SA1019) are fixed.
+# gofmt is intentionally omitted: Windows checkouts with core.autocrlf=true make local
+# formatting checks noisy; Linux CI + `make fmt` remain the source of truth for style.
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: none
+  enable:
+    - bidichk
+    - durationcheck
+    - govet
+    - ineffassign
+    - makezero
+    - misspell
+    - nilerr
+    - unconvert
+  settings:
+    govet:
+      disable:
+        - inline
+    misspell:
+      locale: US
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

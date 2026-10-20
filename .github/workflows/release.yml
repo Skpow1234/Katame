@@ -11,6 +11,10 @@ on:
         required: false
         default: "false"
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
   packages: write
@@ -23,9 +27,37 @@ env:
   GOTOOLCHAIN: local
 
 jobs:
+  # Fail fast before signing or publishing if the tree is unhealthy.
+  preflight:
+    name: Preflight (test + govulncheck)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Verify modules
+        run: go mod verify
+
+      - name: Test (race)
+        run: go test -race -count=1 -timeout 180s ./...
+
+      - name: govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+
   goreleaser:
     name: GoReleaser (cosign-signed)
+    needs: [preflight]
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
@@ -37,7 +69,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.26.10"
+          go-version-file: go.mod
+          cache: true
 
       - name: Install syft (SBOM generation)
         uses: anchore/sbom-action/download-syft@v0
@@ -74,6 +107,25 @@ jobs:
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
           SCOOP_BUCKET_GITHUB_TOKEN: ${{ secrets.SCOOP_BUCKET_GITHUB_TOKEN }}
           WINGET_PUBLISH_TOKEN: ${{ secrets.WINGET_PUBLISH_TOKEN }}
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+
+      - name: Spot-check cosign signature (linux amd64 archive)
+        if: github.event.inputs.snapshot != 'true'
+        run: |
+          set -euo pipefail
+          archive=$(ls dist/vaultpack-linux-amd64.tar.gz 2>/dev/null | head -n1 || true)
+          if [ -z "$archive" ]; then
+            echo "linux amd64 archive not found; listing dist/"
+            ls -la dist/ || true
+            exit 1
+          fi
+          cosign verify-blob \
+            --certificate "${archive}.pem" \
+            --signature "${archive}.sig" \
+            --certificate-identity-regexp 'https://github.com/Skpow1234/Vaultpack' \
+            --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
+            "$archive"
+          echo "cosign verify-blob ok for $archive"
 
       - name: Upload release artifacts (snapshot)
         if: github.event.inputs.snapshot == 'true'
@@ -87,6 +139,8 @@ jobs:
             dist/*.pem
             dist/*.sbom.json
             dist/checksums-sha256.txt
+          retention-days: 14
+          if-no-files-found: error
 
   # Chocolatey needs the `choco` CLI, which only runs on Windows.
   chocolatey:
@@ -94,6 +148,7 @@ jobs:
     needs: goreleaser
     if: github.event.inputs.snapshot != 'true'
     runs-on: windows-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -103,7 +158,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.26.10"
+          go-version-file: go.mod
+          cache: true
 
       - name: Run GoReleaser (chocolatey only)
         uses: goreleaser/goreleaser-action@v6
