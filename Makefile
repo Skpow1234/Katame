@@ -23,8 +23,9 @@ vet:
 	go vet ./...
 
 ## vulncheck: Run govulncheck for known vulnerabilities
+## Pinned to v1.7.0 — v1.8.0+ needs Go >= 1.26; this repo pins Go 1.25.x.
 vulncheck:
-	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+	go run golang.org/x/vuln/cmd/govulncheck@v1.7.0 ./...
 
 ## fuzz: Run all fuzz targets for 30s each
 fuzz:
