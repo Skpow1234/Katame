@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        go: ["1.25.11"]
+        go: ["1.26.10"]
 
     steps:
       - uses: actions/checkout@v4
@@ -55,12 +55,10 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.25.11"
+          go-version: "1.26.10"
 
-      # Pin govulncheck: v1.8.0+ requires Go >= 1.26, but CI uses 1.25.11 with
-      # GOTOOLCHAIN=local. Bump this pin when the runner Go version is bumped.
       - name: Install govulncheck
-        run: go install golang.org/x/vuln/cmd/govulncheck@v1.7.0
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
 
       - name: Run govulncheck
         run: govulncheck ./...
@@ -94,7 +92,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.25.11"
+          go-version: "1.26.10"
 
       - name: Fuzz ${{ matrix.target }}
         run: go test -fuzz=${{ matrix.target }} -fuzztime=30s ${{ matrix.package }}
@@ -121,7 +119,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.25.11"
+          go-version: "1.26.10"
 
       - name: Build
         env:

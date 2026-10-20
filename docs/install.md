@@ -2,7 +2,7 @@
 
 Pre-built binaries are published for **Linux** (amd64, arm64), **macOS** (amd64, arm64), and **Windows** (amd64, arm64) on [Releases](https://github.com/Skpow1234/Vaultpack/releases). Each release includes checksums and SBOMs.
 
-Requires **Go 1.25+** when building from source (see `go.mod` / `toolchain`).
+Requires **Go 1.26+** when building from source (see `go.mod` / `toolchain`).
 
 ## One-command install (curl)
 
