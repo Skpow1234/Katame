@@ -97,12 +97,12 @@ func ParseMLKEMPublicKeyPEM(block *pem.Block) (*MLKEMPublicKey, error) {
 	if block == nil {
 		return nil, nil
 	}
-	_, schemeName, err := getMLKEMSchemeFromPEMType(block.Type)
-	if err != nil {
-		return nil, nil
-	}
 	if block.Type != pemTypeMLKEM768Pub && block.Type != pemTypeMLKEM1024Pub {
 		return nil, nil
+	}
+	_, schemeName, err := getMLKEMSchemeFromPEMType(block.Type)
+	if err != nil {
+		return nil, err
 	}
 	return &MLKEMPublicKey{Scheme: schemeName, Pub: block.Bytes}, nil
 }
@@ -112,12 +112,12 @@ func ParseMLKEMPrivateKeyPEM(block *pem.Block) (*MLKEMPrivateKey, error) {
 	if block == nil {
 		return nil, nil
 	}
-	_, schemeName, err := getMLKEMSchemeFromPEMType(block.Type)
-	if err != nil {
-		return nil, nil
-	}
 	if block.Type != pemTypeMLKEM768Priv && block.Type != pemTypeMLKEM1024Priv {
 		return nil, nil
+	}
+	_, schemeName, err := getMLKEMSchemeFromPEMType(block.Type)
+	if err != nil {
+		return nil, err
 	}
 	return &MLKEMPrivateKey{Scheme: schemeName, Priv: block.Bytes}, nil
 }

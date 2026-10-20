@@ -123,7 +123,7 @@ func (m *Metrics) writeRequestsTotal(w io.Writer) {
 	}
 	m.requestsMu.Unlock()
 
-	fmt.Fprintf(w, "# HELP vaultpack_http_requests_total Total HTTP requests served, labelled by path and status.\n")
+	fmt.Fprintf(w, "# HELP vaultpack_http_requests_total Total HTTP requests served, labeled by path and status.\n")
 	fmt.Fprintf(w, "# TYPE vaultpack_http_requests_total counter\n")
 
 	// Deterministic ordering for diffability + tests.

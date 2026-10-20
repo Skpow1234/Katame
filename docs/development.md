@@ -12,7 +12,7 @@ make docker-build
 make release-snapshot
 ```
 
-Requires Go **1.26.x** (see `go.mod` `toolchain`). CI pins `GOTOOLCHAIN=local` with setup-go `1.26.10`.
+Requires Go **1.26.x** (see `go.mod` `toolchain`). CI uses `setup-go` with `go-version-file: go.mod` and `GOTOOLCHAIN=local` so the patched stdlib from the `toolchain` directive is used without auto-download drift.
 
 ## Project structure
 
@@ -42,4 +42,15 @@ docs/                   # This documentation
 
 ## Tests
 
-~70+ `*_test.go` files including fuzz targets under `internal/crypto` and `internal/bundle`. CI runs unit tests on Linux/macOS/Windows, govulncheck, short fuzz, and cross-builds.
+~70+ `*_test.go` files including fuzz targets under `internal/crypto` and `internal/bundle`.
+
+### CI pipeline (`.github/workflows/`)
+
+| Workflow | What it does |
+|----------|----------------|
+| `ci.yml` | `go mod tidy`/`verify`, golangci-lint, race tests (Unix) + Windows tests, coverage artifact, govulncheck, short fuzz (crashers uploaded on failure), cross-build matrix (linux/darwin/windows × amd64/arm64) with linux/amd64 smoke, Docker image build+smoke, and a single **CI success** gate job for branch protection |
+| `codeql.yml` | CodeQL `security-extended` on push/PR + weekly schedule |
+| `release.yml` | Preflight (race tests + govulncheck) → GoReleaser (SBOM + cosign) → cosign spot-check → Chocolatey |
+| Dependabot | Weekly Go modules + Actions; monthly Docker base image |
+
+Local parity: `make test`, `make lint`, `make vulncheck`, `make fuzz`.

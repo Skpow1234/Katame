@@ -81,7 +81,7 @@ func (m *mockRekorServer) handleEntries(w http.ResponseWriter, r *http.Request) 
 	m.nextIndex++
 	idx := m.nextIndex
 	m.mu.Unlock()
-	ts := int64(1700000000 + idx)
+	ts := 1700000000 + idx
 	canon := canonicalSETForTests(bodyB64, ts, m.logID, idx)
 	sum := sha256.Sum256(canon)
 	sig, err := ecdsa.SignASN1(rand.Reader, m.logKey, sum[:])

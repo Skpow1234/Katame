@@ -63,7 +63,7 @@ func newMockRekor(t *testing.T) *mockRekor {
 		bodyB64 := base64.StdEncoding.EncodeToString(body)
 		m.nextIndex++
 		idx := m.nextIndex
-		ts := int64(1700000000 + idx)
+		ts := 1700000000 + idx
 		canonical := mustCanonicalSET(bodyB64, ts, m.logID, idx)
 		sum := sha256.Sum256(canonical)
 		sig, err := ecdsa.SignASN1(rand.Reader, m.logKey, sum[:])

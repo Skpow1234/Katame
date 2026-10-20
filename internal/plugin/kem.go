@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 )
 
@@ -25,10 +24,6 @@ func (r *Registry) KeygenKEM(scheme, outPrefix string) error {
 	path := r.KEMScheme(scheme)
 	if path == "" {
 		return fmt.Errorf("plugin: no plugin for KEM scheme %q", scheme)
-	}
-	privPath := outPrefix
-	if filepath.Ext(privPath) != ".key" {
-		privPath = outPrefix + ".key"
 	}
 	cmd := exec.Command(path, "keygen", "--type", "kem", "--algo", scheme, "--out", outPrefix)
 	cmd.Stdout = os.Stdout

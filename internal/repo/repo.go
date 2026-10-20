@@ -23,7 +23,7 @@ import (
 type Repo struct {
 	dir    string
 	cfg    Config
-	mu     sync.Mutex // serialises Add operations
+	mu     sync.Mutex // serializes Add operations
 	tree   *MerkleTree
 	tail   *Root // last root, or nil if empty
 	signer stdcrypto.Signer
@@ -420,7 +420,7 @@ func (r *Repo) replayRoots() error {
 		last := roots[len(roots)-1]
 		r.tail = &last
 	}
-	if int(r.tree.Size()) != len(roots) {
+	if r.tree.Size() != len(roots) {
 		return fmt.Errorf("repo open: %d entries but %d roots", r.tree.Size(), len(roots))
 	}
 	return nil

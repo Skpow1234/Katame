@@ -84,7 +84,6 @@ Example:
 
 			// Remote output: write to temp dir, upload after.
 			remoteOutURI := ""
-			localOutDir := outDir
 			if isRemoteURI(outDir) {
 				if !cloud.IsWritable(outDir) {
 					return fmt.Errorf("output scheme is read-only: %q", outDir)
@@ -95,8 +94,7 @@ Example:
 					return fmt.Errorf("create temp output dir: %w", err)
 				}
 				defer os.RemoveAll(tmpOut)
-				localOutDir = tmpOut
-				outDir = localOutDir
+				outDir = tmpOut
 			}
 			_ = remoteSrcURI
 
