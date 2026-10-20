@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
 func TestCompressProtectDecrypt_Gzip(t *testing.T) {
@@ -20,7 +20,7 @@ func testCompressRoundTrip(t *testing.T, algo string) {
 	t.Helper()
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	outVpack := filepath.Join(dir, "data.vpack")
+	outKatame := filepath.Join(dir, "data.katame")
 	keyFile := filepath.Join(dir, "data.key")
 	decFile := filepath.Join(dir, "data.dec.txt")
 
@@ -38,7 +38,7 @@ func testCompressRoundTrip(t *testing.T, algo string) {
 	root.SetArgs([]string{
 		"protect",
 		"--in", inFile,
-		"--out", outVpack,
+		"--out", outKatame,
 		"--key-out", keyFile,
 		"--compress", algo,
 	})
@@ -47,7 +47,7 @@ func testCompressRoundTrip(t *testing.T, algo string) {
 	}
 
 	// Inspect: verify compression metadata.
-	br, err := bundle.Read(outVpack)
+	br, err := bundle.Read(outKatame)
 	if err != nil {
 		t.Fatalf("read bundle: %v", err)
 	}
@@ -65,7 +65,7 @@ func testCompressRoundTrip(t *testing.T, algo string) {
 	root2 := NewRootCmd()
 	root2.SetArgs([]string{
 		"decrypt",
-		"--in", outVpack,
+		"--in", outKatame,
 		"--out", decFile,
 		"--key", keyFile,
 	})
@@ -86,7 +86,7 @@ func testCompressRoundTrip(t *testing.T, algo string) {
 func TestCompressProtect_ManifestVersion(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	outVpack := filepath.Join(dir, "data.vpack")
+	outKatame := filepath.Join(dir, "data.katame")
 	keyFile := filepath.Join(dir, "data.key")
 
 	os.WriteFile(inFile, []byte("hello"), 0o600)
@@ -96,7 +96,7 @@ func TestCompressProtect_ManifestVersion(t *testing.T) {
 	root.SetArgs([]string{
 		"protect",
 		"--in", inFile,
-		"--out", outVpack,
+		"--out", outKatame,
 		"--key-out", keyFile,
 		"--compress", "gzip",
 	})
@@ -104,7 +104,7 @@ func TestCompressProtect_ManifestVersion(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	br, err := bundle.Read(outVpack)
+	br, err := bundle.Read(outKatame)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,7 +116,7 @@ func TestCompressProtect_ManifestVersion(t *testing.T) {
 func TestNoCompress_ManifestVersionV1(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	outVpack := filepath.Join(dir, "data.vpack")
+	outKatame := filepath.Join(dir, "data.katame")
 	keyFile := filepath.Join(dir, "data.key")
 
 	os.WriteFile(inFile, []byte("hello"), 0o600)
@@ -126,14 +126,14 @@ func TestNoCompress_ManifestVersionV1(t *testing.T) {
 	root.SetArgs([]string{
 		"protect",
 		"--in", inFile,
-		"--out", outVpack,
+		"--out", outKatame,
 		"--key-out", keyFile,
 	})
 	if err := root.Execute(); err != nil {
 		t.Fatal(err)
 	}
 
-	br, err := bundle.Read(outVpack)
+	br, err := bundle.Read(outKatame)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -145,7 +145,7 @@ func TestNoCompress_ManifestVersionV1(t *testing.T) {
 func TestInspect_CompressedBundle(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	outVpack := filepath.Join(dir, "data.vpack")
+	outKatame := filepath.Join(dir, "data.katame")
 	keyFile := filepath.Join(dir, "data.key")
 
 	os.WriteFile(inFile, []byte("compress me"), 0o600)
@@ -154,7 +154,7 @@ func TestInspect_CompressedBundle(t *testing.T) {
 	root.SetArgs([]string{
 		"protect",
 		"--in", inFile,
-		"--out", outVpack,
+		"--out", outKatame,
 		"--key-out", keyFile,
 		"--compress", "zstd",
 	})
@@ -164,7 +164,7 @@ func TestInspect_CompressedBundle(t *testing.T) {
 
 	// Inspect should succeed.
 	root2 := NewRootCmd()
-	root2.SetArgs([]string{"inspect", "--in", outVpack})
+	root2.SetArgs([]string{"inspect", "--in", outKatame})
 	if err := root2.Execute(); err != nil {
 		t.Fatalf("inspect: %v", err)
 	}

@@ -1,9 +1,9 @@
 openapi: 3.1.0
 info:
-  title: VaultPack HTTP API
+  title: Katame HTTP API
   version: v1
   description: |
-    JSON-in / JSON-out API exposed by `vaultpack serve`.
+    JSON-in / JSON-out API exposed by `katame serve`.
     Envelope: `{"ok": true|false, ...}`. Auth required on `/v1/*` unless `--auth-disabled`.
 servers:
   - url: https://vp.example.com
@@ -50,7 +50,7 @@ paths:
                   api_version: { type: string }
   /v1/protect:
     post:
-      summary: Encrypt plaintext into a .vpack bundle
+      summary: Encrypt plaintext into a .katame bundle
       security:
         - bearerAuth: []
       requestBody:
@@ -68,7 +68,7 @@ paths:
                 $ref: "#/components/schemas/ProtectResponse"
   /v1/decrypt:
     post:
-      summary: Decrypt a .vpack bundle
+      summary: Decrypt a .katame bundle
       security:
         - bearerAuth: []
       requestBody:

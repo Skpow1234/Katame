@@ -3,18 +3,18 @@
 ## Quick examples
 
 ```bash
-vaultpack protect --in config.json
-vaultpack protect --in config.json --cipher chacha20-poly1305
-vaultpack protect --in config.json --password "pass" --kdf scrypt
-vaultpack decrypt --in config.json.vpack --out config.json --key config.json.key
+katame protect --in config.json
+katame protect --in config.json --cipher chacha20-poly1305
+katame protect --in config.json --password "pass" --kdf scrypt
+katame decrypt --in config.json.katame --out config.json --key config.json.key
 
-vaultpack keygen --out alice --algo x25519-aes-256-gcm
-vaultpack protect --in config.json --recipient alice.pub
-vaultpack decrypt --in config.json.vpack --out config.json --privkey alice.key
+katame keygen --out alice --algo x25519-aes-256-gcm
+katame protect --in config.json --recipient alice.pub
+katame decrypt --in config.json.katame --out config.json --privkey alice.key
 
-vaultpack protect --in config.json --kms-provider aws --kms-key-id alias/my-key
-vaultpack inspect --in config.json.vpack
-vaultpack verify-integrity --in config.json.vpack --key config.json.key
+katame protect --in config.json --kms-provider aws --kms-key-id alias/my-key
+katame inspect --in config.json.katame
+katame verify-integrity --in config.json.katame --key config.json.key
 ```
 
 ## Global flags
@@ -24,24 +24,24 @@ vaultpack verify-integrity --in config.json.vpack --key config.json.key
 | `--json` | Output results as JSON |
 | `--quiet` | Minimal output (errors only) |
 | `--verbose` | Debug logging |
-| `--audit-log` | Audit log file (or `VAULTPACK_AUDIT_LOG`) |
-| `--config` | Config file (or `VPACK_CONFIG`) |
-| `--profile` | Profile: `dev`, `staging`, `prod` (or `VPACK_PROFILE`) |
-| `--policy` | Policy file (or `VAULTPACK_POLICY`) |
+| `--audit-log` | Audit log file (or `KATAME_AUDIT_LOG`) |
+| `--config` | Config file (or `KATAME_CONFIG`) |
+| `--profile` | Profile: `dev`, `staging`, `prod` (or `KATAME_PROFILE`) |
+| `--policy` | Policy file (or `KATAME_POLICY`) |
 | `--version` | Print version |
 
 Cloud flags (`--azure-account`, `--aws-region`, …) are documented in [cloud.md](cloud.md). Transparency flags are in [transparency.md](transparency.md).
 
 ## Configuration
 
-Search order: `--config` / `VPACK_CONFIG` → `~/.vpack.yaml` → `./.vpack.yaml`.
+Search order: `--config` / `KATAME_CONFIG` → `~/.katame.yaml` → `./.katame.yaml`.
 
 Precedence: CLI flags > environment > config/profile > defaults.
 
 ```bash
-vaultpack config
-vaultpack config --json
-vaultpack --config ./vpack.yaml --profile prod protect --in data.csv
+katame config
+katame config --json
+katame --config ./katame.yaml --profile prod protect --in data.csv
 ```
 
 YAML keys: `audit_log`, `cipher`, `chunk_size`, `output_dir`, `default_key_path`, `default_pubkey_path`, `recipients`, plus `profiles.<name>.*`.
@@ -50,12 +50,12 @@ YAML keys: `audit_log`, `cipher`, `chunk_size`, `output_dir`, `default_key_path`
 
 ### `protect`
 
-Encrypt a file into a `.vpack` bundle.
+Encrypt a file into a `.katame` bundle.
 
 | Flag | Default | Description |
 | ---- | ------- | ----------- |
 | `--in` | (required) | Input file |
-| `--out` | `<input>.vpack` | Output bundle |
+| `--out` | `<input>.katame` | Output bundle |
 | `--key-out` | `<input>.key` | Generated key path |
 | `--key` | | Existing key (skip generation) |
 | `--aad` | | Additional authenticated data |
@@ -92,23 +92,23 @@ Encryption keygen: X25519, ECIES-P256, RSA-OAEP 2048/4096, ML-KEM-768/1024 (+ pl
 ### Shamir: `split-key` / `combine-key`
 
 ```bash
-vaultpack split-key --in data.key --shares 5 --threshold 3
-vaultpack combine-key --share data.key.share1 --share data.key.share3 --share data.key.share5 --out recovered.key
+katame split-key --in data.key --shares 5 --threshold 3
+katame combine-key --share data.key.share1 --share data.key.share3 --share data.key.share5 --out recovered.key
 ```
 
 ### Batch
 
 ```bash
-vaultpack batch-protect --dir ./exports/ --out-dir ./encrypted/ --workers 4
-vaultpack batch-decrypt --dir ./encrypted/ --out-dir ./decrypted/ --key ./encrypted/batch.key
-vaultpack batch-inspect --dir ./encrypted/
+katame batch-protect --dir ./exports/ --out-dir ./encrypted/ --workers 4
+katame batch-decrypt --dir ./encrypted/ --out-dir ./decrypted/ --key ./encrypted/batch.key
+katame batch-inspect --dir ./encrypted/
 ```
 
 ### UX / ops
 
-- `vaultpack doctor` — runtime diagnostics
-- `vaultpack menu` — interactive TUI
-- `vaultpack completion bash|zsh|fish|powershell`
+- `katame doctor` — runtime diagnostics
+- `katame menu` — interactive TUI
+- `katame completion bash|zsh|fish|powershell`
 
 ## Exit codes
 

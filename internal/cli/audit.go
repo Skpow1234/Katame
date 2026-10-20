@@ -3,7 +3,7 @@ package cli
 import (
 	"sync"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
+	"github.com/Skpow1234/Katame/internal/audit"
 )
 
 var (

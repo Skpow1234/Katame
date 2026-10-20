@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/plugin"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/plugin"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +26,7 @@ func newVerifyIntegrityCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "verify-integrity",
 		Short: "Decrypt and verify that plaintext hash matches the manifest",
-		Long: `Decrypt the .vpack bundle, re-hash the recovered plaintext, and compare it
+		Long: `Decrypt the .katame bundle, re-hash the recovered plaintext, and compare it
 with the plaintext_hash recorded in the manifest. This confirms end-to-end integrity:
 the decrypted content is exactly what was originally protected.
 
@@ -278,7 +278,7 @@ Requires one of --key, --password, or --privkey.`,
 		},
 	}
 
-	cmd.Flags().StringVar(&inFile, "in", "", "input .vpack bundle (required)")
+	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle (required)")
 	cmd.Flags().StringVar(&keyFile, "key", "", "decryption key file")
 	cmd.Flags().StringVar(&password, "password", "", "password for password-protected bundles")
 	cmd.Flags().StringVar(&passwordFile, "password-file", "", "read password from file")

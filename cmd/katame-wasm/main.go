@@ -1,22 +1,22 @@
 //go:build js && wasm
 
-// Package main builds a WebAssembly module that exposes the VaultPack SDK
+// Package main builds a WebAssembly module that exposes the Katame SDK
 // to JavaScript / TypeScript callers.
 //
 // Build:
 //
-//	GOOS=js GOARCH=wasm go build -o vaultpack.wasm ./cmd/vaultpack-wasm
+//	GOOS=js GOARCH=wasm go build -o katame.wasm ./cmd/katame-wasm
 //
 // The Go runtime's `wasm_exec.js` is required to instantiate the module.
 // After `go.run(instance)`, the module installs a global object
-// `globalThis.Vaultpack` with the following methods:
+// `globalThis.Katame` with the following methods:
 //
-//	Vaultpack.version()                         -> string
-//	Vaultpack.protect(optsObject)               -> resultObject
-//	Vaultpack.decrypt(optsObject)               -> resultObject
-//	Vaultpack.inspect(bundleBytes:Uint8Array)   -> resultObject
-//	Vaultpack.sign(optsObject)                  -> resultObject (in-memory)
-//	Vaultpack.verify(optsObject)                -> resultObject
+//	Katame.version()                         -> string
+//	Katame.protect(optsObject)               -> resultObject
+//	Katame.decrypt(optsObject)               -> resultObject
+//	Katame.inspect(bundleBytes:Uint8Array)   -> resultObject
+//	Katame.sign(optsObject)                  -> resultObject (in-memory)
+//	Katame.verify(optsObject)                -> resultObject
 //
 // Every method takes plain JS objects, never file paths — the WASM
 // sandbox has no filesystem. Binary blobs are passed as Uint8Array.
@@ -28,7 +28,7 @@ import (
 	"errors"
 	"syscall/js"
 
-	"github.com/Skpow1234/Vaultpack/pkg/vaultpack"
+	"github.com/Skpow1234/Katame/pkg/katame"
 )
 
 func main() {
@@ -39,7 +39,7 @@ func main() {
 	obj.Set("inspect", js.FuncOf(jsInspect))
 	obj.Set("sign", js.FuncOf(jsSign))
 	obj.Set("verify", js.FuncOf(jsVerify))
-	js.Global().Set("Vaultpack", obj)
+	js.Global().Set("Katame", obj)
 	select {}
 }
 
@@ -82,15 +82,15 @@ func optInt(opts js.Value, key string) int {
 	return v.Int()
 }
 
-func manifestJS(m *vaultpack.Manifest) any {
-	data, err := vaultpack.MarshalManifest(m)
+func manifestJS(m *katame.Manifest) any {
+	data, err := katame.MarshalManifest(m)
 	if err != nil {
 		return nil
 	}
 	return js.Global().Get("JSON").Call("parse", string(data))
 }
 
-func jsVersion(this js.Value, args []js.Value) any { return vaultpack.Version }
+func jsVersion(this js.Value, args []js.Value) any { return katame.Version }
 
 func jsProtect(this js.Value, args []js.Value) any {
 	if len(args) < 1 {
@@ -112,7 +112,7 @@ func jsProtect(this js.Value, args []js.Value) any {
 	if err != nil {
 		return jsError("protect: " + err.Error())
 	}
-	opts := vaultpack.ProtectOptions{
+	opts := katame.ProtectOptions{
 		Plaintext:      plaintext,
 		Key:            key,
 		Password:       optString(o, "password"),
@@ -132,7 +132,7 @@ func jsProtect(this js.Value, args []js.Value) any {
 			r := recs.Index(i)
 			pem := optString(r, "publicKeyPEM")
 			path := optString(r, "publicKeyPath")
-			rec := vaultpack.Recipient{PublicKeyPath: path}
+			rec := katame.Recipient{PublicKeyPath: path}
 			if pem != "" {
 				rec.PublicKeyPEM = []byte(pem)
 			}
@@ -141,7 +141,7 @@ func jsProtect(this js.Value, args []js.Value) any {
 	}
 	var buf bytes.Buffer
 	opts.OutputWriter = &buf
-	res, err := vaultpack.Protect(opts)
+	res, err := katame.Protect(opts)
 	if err != nil {
 		return jsError(err.Error())
 	}
@@ -183,7 +183,7 @@ func jsDecrypt(this js.Value, args []js.Value) any {
 	if err != nil {
 		return jsError("decrypt: " + err.Error())
 	}
-	decOpts := vaultpack.DecryptOptions{
+	decOpts := katame.DecryptOptions{
 		InputBytes:     bundleBytes,
 		Key:            key,
 		Password:       optString(o, "password"),
@@ -194,7 +194,7 @@ func jsDecrypt(this js.Value, args []js.Value) any {
 	if pem := optString(o, "privateKeyPEM"); pem != "" {
 		decOpts.PrivateKey = []byte(pem)
 	}
-	res, err := vaultpack.Decrypt(decOpts)
+	res, err := katame.Decrypt(decOpts)
 	if err != nil {
 		return jsError(err.Error())
 	}
@@ -213,7 +213,7 @@ func jsInspect(this js.Value, args []js.Value) any {
 	if err != nil || b == nil {
 		return jsError("inspect: bundle (Uint8Array) is required")
 	}
-	m, err := vaultpack.InspectBytes(b)
+	m, err := katame.InspectBytes(b)
 	if err != nil {
 		return jsError(err.Error())
 	}
@@ -233,7 +233,7 @@ func jsSign(this js.Value, args []js.Value) any {
 	if pem == "" {
 		return jsError("sign: privateKeyPEM is required")
 	}
-	signed, res, err := vaultpack.SignBytes(bundleBytes, vaultpack.SignOptions{
+	signed, res, err := katame.SignBytes(bundleBytes, katame.SignOptions{
 		PrivateKey: []byte(pem),
 		Algo:       optString(o, "algo"),
 	})
@@ -262,7 +262,7 @@ func jsVerify(this js.Value, args []js.Value) any {
 	if pem == "" {
 		return jsError("verify: publicKeyPEM is required")
 	}
-	res, err := vaultpack.VerifyBytes(bundleBytes, vaultpack.VerifyOptions{
+	res, err := katame.VerifyBytes(bundleBytes, katame.VerifyOptions{
 		PublicKey: []byte(pem),
 	})
 	if err != nil {

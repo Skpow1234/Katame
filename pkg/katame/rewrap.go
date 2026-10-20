@@ -1,6 +1,6 @@
-package vaultpack
+package katame
 
-import "github.com/Skpow1234/Vaultpack/internal/vpackop"
+import "github.com/Skpow1234/Katame/internal/katameop"
 
 // RewrapOptions re-wraps a KMS-protected DEK without decrypting the payload.
 type RewrapOptions struct {
@@ -21,7 +21,7 @@ type RewrapResult struct {
 
 // Rewrap changes the KMS key wrapping the DEK while leaving ciphertext untouched.
 func Rewrap(opts RewrapOptions) (*RewrapResult, error) {
-	res, err := vpackop.Rewrap(vpackop.RewrapParams{
+	res, err := katameop.Rewrap(katameop.RewrapParams{
 		InputPath:   opts.InputPath,
 		InputBytes:  opts.InputBytes,
 		OutputPath:  opts.OutputPath,

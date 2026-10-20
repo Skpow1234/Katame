@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
 )
 
 // --- split-key / combine-key round-trip ---
@@ -107,7 +107,7 @@ func TestCombineKey_InsufficientShares(t *testing.T) {
 func TestProtect_WithSplitShares(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "secret.txt")
-	outFile := filepath.Join(dir, "secret.vpack")
+	outFile := filepath.Join(dir, "secret.katame")
 	keyOutFile := filepath.Join(dir, "secret.key")
 
 	os.WriteFile(inFile, []byte("split-shares-protect-test"), 0o600)
@@ -165,7 +165,7 @@ func TestProtect_WithSplitShares(t *testing.T) {
 func TestProtect_SplitShares_DecryptRoundTrip(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	outFile := filepath.Join(dir, "data.vpack")
+	outFile := filepath.Join(dir, "data.katame")
 	keyOutFile := filepath.Join(dir, "data.key")
 	decryptedFile := filepath.Join(dir, "data.out")
 	original := []byte("full round-trip with Shamir split and combine")
@@ -221,7 +221,7 @@ func TestProtect_SplitShares_DecryptRoundTrip(t *testing.T) {
 func TestProtect_SplitShares_JSONOutput(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "j.txt")
-	outFile := filepath.Join(dir, "j.vpack")
+	outFile := filepath.Join(dir, "j.katame")
 	keyOutFile := filepath.Join(dir, "j.key")
 
 	os.WriteFile(inFile, []byte("json output test"), 0o600)
@@ -305,7 +305,7 @@ func TestSplitKey_InvalidParams(t *testing.T) {
 func TestInspect_SplitKeyBundle(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	outFile := filepath.Join(dir, "data.vpack")
+	outFile := filepath.Join(dir, "data.katame")
 	keyOutFile := filepath.Join(dir, "data.key")
 
 	os.WriteFile(inFile, []byte("inspect split bundle"), 0o600)

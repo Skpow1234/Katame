@@ -6,17 +6,17 @@ import (
 	"os"
 	"sync"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/config"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/kms"
-	"github.com/Skpow1234/Vaultpack/internal/plugin"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/config"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/kms"
+	"github.com/Skpow1234/Katame/internal/plugin"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
-// newRotateKeyCmd builds the `vaultpack rotate-key` command.
+// newRotateKeyCmd builds the `katame rotate-key` command.
 //
 // rotate-key performs a full re-encryption of the payload under a fresh DEK,
 // rewraps the new DEK for the same wrapping mode (key file, password, KMS,
@@ -24,7 +24,7 @@ import (
 // compromise, or after removing a recipient, since rewrap/remove-recipient
 // alone do not change the underlying ciphertext.
 //
-// The new manifest invalidates any prior signature; re-sign with 'vaultpack sign'.
+// The new manifest invalidates any prior signature; re-sign with 'katame sign'.
 func newRotateKeyCmd() *cobra.Command {
 	var (
 		inFile  string
@@ -56,7 +56,7 @@ func newRotateKeyCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rotate-key",
 		Short: "Re-encrypt a bundle under a fresh DEK (full rotation)",
-		Long: `Re-encrypt a .vpack bundle under a freshly generated Data Encryption Key (DEK).
+		Long: `Re-encrypt a .katame bundle under a freshly generated Data Encryption Key (DEK).
 
 This is a full rotation: the payload bytes change, the nonce changes, and the
 manifest is rebuilt. Use rotate-key when:
@@ -66,7 +66,7 @@ manifest is rebuilt. Use rotate-key when:
     remove-recipient), or
   * you need to migrate the bundle to a different cipher / KDF / KMS key.
 
-The new manifest invalidates any prior signature; re-sign with 'vaultpack sign'.
+The new manifest invalidates any prior signature; re-sign with 'katame sign'.
 
 Provide the OLD credentials so the existing DEK can be unwrapped, plus the new
 credentials for the rewrap. The wrapping mode (key file, password, KMS, hybrid)
@@ -240,7 +240,7 @@ is preserved from the input unless overridden.`,
 			remoteOut := ""
 			if isRemoteURI(outFile) {
 				remoteOut = outFile
-				tmp, terr := os.CreateTemp("", "vaultpack-rotate-*.vpack")
+				tmp, terr := os.CreateTemp("", "katame-rotate-*.katame")
 				if terr != nil {
 					return fmt.Errorf("create temp output: %w", terr)
 				}
@@ -292,13 +292,13 @@ is preserved from the input unless overridden.`,
 				printer.Human("Old keyID:  %s", oldDigest)
 				printer.Human("New keyID:  %s", newKeyDigest)
 				printer.Human("Cipher:     %s", cipherName)
-				printer.Human("Signature:  cleared; run 'vaultpack sign' to re-sign.")
+				printer.Human("Signature:  cleared; run 'katame sign' to re-sign.")
 			}
 			return nil
 		},
 	}
 
-	cmd.Flags().StringVar(&inFile, "in", "", "input .vpack bundle (required)")
+	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle (required)")
 	cmd.Flags().StringVar(&outFile, "out", "", "output bundle path (defaults to --in)")
 
 	cmd.Flags().StringVar(&oldKeyFile, "old-key", "", "old key file (for key-file bundles)")

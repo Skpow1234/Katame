@@ -51,8 +51,8 @@ func TestBuildMerkleRoot(t *testing.T) {
 
 func TestSealDir_VerifySealDir_RoundTrip(t *testing.T) {
 	dir := t.TempDir()
-	// Create two fake .vpack files.
-	for _, name := range []string{"a.vpack", "b.vpack"} {
+	// Create two fake .katame files.
+	for _, name := range []string{"a.katame", "b.katame"} {
 		if err := os.WriteFile(filepath.Join(dir, name), []byte("content-"+name), 0o644); err != nil {
 			t.Fatal(err)
 		}
@@ -72,7 +72,7 @@ func TestSealDir_VerifySealDir_RoundTrip(t *testing.T) {
 		t.Fatal("verify-seal should pass after seal")
 	}
 	// Tamper: change one file.
-	if err := os.WriteFile(filepath.Join(dir, "a.vpack"), []byte("tampered"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "a.katame"), []byte("tampered"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	ok2, _, _ := VerifySealDir(dir, rootHex)
@@ -81,10 +81,10 @@ func TestSealDir_VerifySealDir_RoundTrip(t *testing.T) {
 	}
 }
 
-func TestSealDir_NoVpackFiles(t *testing.T) {
+func TestSealDir_NoKatameFiles(t *testing.T) {
 	dir := t.TempDir()
 	_, _, err := SealDir(dir)
 	if err == nil {
-		t.Fatal("expected error when no .vpack files")
+		t.Fatal("expected error when no .katame files")
 	}
 }

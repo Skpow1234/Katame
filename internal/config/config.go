@@ -12,11 +12,11 @@ import (
 
 const (
 	// EnvConfigPath is the environment variable for config file path.
-	EnvConfigPath = "VPACK_CONFIG"
+	EnvConfigPath = "KATAME_CONFIG"
 	// EnvProfile is the environment variable for profile name.
-	EnvProfile = "VPACK_PROFILE"
+	EnvProfile = "KATAME_PROFILE"
 	// EnvPluginDir is the environment variable for plugin discovery directory.
-	EnvPluginDir = "VPACK_PLUGIN_DIR"
+	EnvPluginDir = "KATAME_PLUGIN_DIR"
 )
 
 // EffectiveConfig holds the merged configuration (defaults + config file + profile).
@@ -75,8 +75,8 @@ var (
 )
 
 // Load reads config from the given path (or discovers it), applies the given profile, and stores the result.
-// Config path: if path is non-empty it is used; else VPACK_CONFIG; else ~/.vpack.yaml, ./.vpack.yaml (first found).
-// Profile: if profile is non-empty it is used; else VPACK_PROFILE; else no profile.
+// Config path: if path is non-empty it is used; else KATAME_CONFIG; else ~/.katame.yaml, ./.katame.yaml (first found).
+// Profile: if profile is non-empty it is used; else KATAME_PROFILE; else no profile.
 // Precedence for final values: caller will layer CLI/env on top; this returns file-based effective config.
 func Load(configPath, profile string) (*EffectiveConfig, error) {
 	base := DefaultEffective()
@@ -98,11 +98,11 @@ func Load(configPath, profile string) (*EffectiveConfig, error) {
 		home, _ := os.UserHomeDir()
 		candidates := []string{}
 		if home != "" {
-			candidates = append(candidates, filepath.Join(home, ".vpack.yaml"), filepath.Join(home, ".vpack.yml"))
+			candidates = append(candidates, filepath.Join(home, ".katame.yaml"), filepath.Join(home, ".katame.yml"))
 		}
 		wd, _ := os.Getwd()
 		if wd != "" {
-			candidates = append(candidates, filepath.Join(wd, ".vpack.yaml"), filepath.Join(wd, ".vpack.yml"))
+			candidates = append(candidates, filepath.Join(wd, ".katame.yaml"), filepath.Join(wd, ".katame.yml"))
 		}
 		for _, p := range candidates {
 			if _, err := os.Stat(p); err == nil {

@@ -5,15 +5,15 @@ import (
 	"os"
 	"os/user"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/policy"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/policy"
 	"github.com/spf13/cobra"
 )
 
-// newPolicyCmd builds the `vaultpack policy` command tree with three sub-verbs:
+// newPolicyCmd builds the `katame policy` command tree with three sub-verbs:
 //
 //	policy validate --file path/policy.yaml
-//	policy test     --file path/policy.yaml --bundle x.vpack --op decrypt [--user alice]
+//	policy test     --file path/policy.yaml --bundle x.katame --op decrypt [--user alice]
 //	policy show
 //
 // `validate` parses+lints a policy file. `test` dry-runs a decision against a
@@ -22,8 +22,8 @@ import (
 func newPolicyCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "policy",
-		Short: "Inspect, validate, and test VaultPack policies",
-		Long:  "Manage the RBAC policy that gates VaultPack operations (decrypt, sign, verify, rotation, etc).",
+		Short: "Inspect, validate, and test Katame policies",
+		Long:  "Manage the RBAC policy that gates Katame operations (decrypt, sign, verify, rotation, etc).",
 	}
 	cmd.AddCommand(newPolicyValidateCmd())
 	cmd.AddCommand(newPolicyTestCmd())
@@ -181,9 +181,9 @@ func newPolicyShowCmd() *cobra.Command {
 			path := flagPolicy
 			source := "--policy"
 			if path == "" {
-				path = os.Getenv("VAULTPACK_POLICY")
+				path = os.Getenv("KATAME_POLICY")
 				if path != "" {
-					source = "VAULTPACK_POLICY"
+					source = "KATAME_POLICY"
 				}
 			}
 			if path == "" {

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
+	"github.com/Skpow1234/Katame/internal/audit"
 )
 
 func TestBuildReport(t *testing.T) {

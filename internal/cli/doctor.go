@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/Skpow1234/Vaultpack/internal/keysource"
-	"github.com/Skpow1234/Vaultpack/internal/kms"
+	"github.com/Skpow1234/Katame/internal/keysource"
+	"github.com/Skpow1234/Katame/internal/kms"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,7 @@ func newDoctorCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "doctor",
 		Short: "Run local environment diagnostics",
-		Long:  "Check local VaultPack runtime assumptions: Go/runtime info, configured KMS providers, audit/config env vars, and key-source/HSM availability hints.",
+		Long:  "Check local Katame runtime assumptions: Go/runtime info, configured KMS providers, audit/config env vars, and key-source/HSM availability hints.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			checks := runDoctorChecks()
 			printer := NewPrinter(flagJSON, flagQuiet)
@@ -49,12 +49,12 @@ func runDoctorChecks() []doctorCheck {
 		{Name: "runtime", OK: true, Details: runtime.GOOS + "/" + runtime.GOARCH + " " + runtime.Version()},
 		{Name: "kms providers", OK: len(kms.Providers()) > 0, Details: fmt.Sprintf("%v", kms.Providers())},
 	}
-	if p := os.Getenv("VAULTPACK_AUDIT_LOG"); p != "" {
+	if p := os.Getenv("KATAME_AUDIT_LOG"); p != "" {
 		checks = append(checks, doctorCheck{Name: "audit log env", OK: true, Details: p})
 	} else {
 		checks = append(checks, doctorCheck{Name: "audit log env", OK: true, Details: "not set (audit disabled unless --audit-log is used)"})
 	}
-	if p := os.Getenv("VAULTPACK_POLICY"); p != "" {
+	if p := os.Getenv("KATAME_POLICY"); p != "" {
 		checks = append(checks, doctorCheck{Name: "policy env", OK: true, Details: p})
 	} else {
 		checks = append(checks, doctorCheck{Name: "policy env", OK: true, Details: "not set"})

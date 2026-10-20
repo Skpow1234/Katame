@@ -21,7 +21,7 @@ func TestGenerateSigningKeyPair(t *testing.T) {
 
 func TestSignAndVerify(t *testing.T) {
 	priv, pub, _ := GenerateSigningKeyPair()
-	message := []byte("hello vaultpack signing")
+	message := []byte("hello katame signing")
 
 	sig := Sign(priv, message)
 	if len(sig) != ed25519.SignatureSize {

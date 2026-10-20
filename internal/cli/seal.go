@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
+	"github.com/Skpow1234/Katame/internal/audit"
 	"github.com/spf13/cobra"
 )
 
@@ -16,8 +16,8 @@ func newSealCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "seal",
-		Short: "Create a Merkle root over all .vpack bundles in a directory",
-		Long:  "Hash every .vpack file in the directory and compute a deterministic Merkle root. Use verify-seal to later verify that no bundles were added, removed, or modified.",
+		Short: "Create a Merkle root over all .katame bundles in a directory",
+		Long:  "Hash every .katame file in the directory and compute a deterministic Merkle root. Use verify-seal to later verify that no bundles were added, removed, or modified.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printer := NewPrinter(flagJSON, flagQuiet)
 
@@ -62,7 +62,7 @@ func newSealCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&dir, "dir", "", "directory containing .vpack bundles (required)")
+	cmd.Flags().StringVar(&dir, "dir", "", "directory containing .katame bundles (required)")
 	cmd.Flags().StringVar(&rootOut, "out", "", "write Merkle root (hex) to this file")
 
 	return cmd

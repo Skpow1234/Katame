@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/policy"
+	"github.com/Skpow1234/Katame/internal/policy"
 )
 
 // writeYAMLPolicy writes the given source to a tempdir/<name>.yaml file and returns the path.
@@ -19,7 +19,7 @@ func writeYAMLPolicy(t *testing.T, name, src string) string {
 	return p
 }
 
-// TestPolicyValidateCmd_OK exercises `vaultpack policy validate --file ...` happy path.
+// TestPolicyValidateCmd_OK exercises `katame policy validate --file ...` happy path.
 func TestPolicyValidateCmd_OK(t *testing.T) {
 	p := writeYAMLPolicy(t, "p.yaml", `
 version: 1
@@ -78,7 +78,7 @@ rules:
 func TestEnforceFromFlag_DenyDecrypt(t *testing.T) {
 	dir := t.TempDir()
 	in := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	out := filepath.Join(dir, "secret.dec")
 	if err := os.WriteFile(in, []byte("policy-test"), 0o600); err != nil {
 		t.Fatal(err)
@@ -126,7 +126,7 @@ rules:
 func TestEnforceFromFlag_AllowDecrypt(t *testing.T) {
 	dir := t.TempDir()
 	in := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	out := filepath.Join(dir, "secret.dec")
 	if err := os.WriteFile(in, []byte("policy-allow"), 0o600); err != nil {
 		t.Fatal(err)

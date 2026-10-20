@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/transparency"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/transparency"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 const defaultRekorTimeout = 30 * time.Second

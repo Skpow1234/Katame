@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
 	"github.com/spf13/cobra"
 )
 
@@ -26,8 +26,8 @@ func newAttestCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "attest",
-		Short: "Generate SLSA-style provenance for a .vpack bundle",
-		Long:  "Read a .vpack bundle and emit a provenance statement (builder identity, build timestamp, source hash, environment). Use --out to write to a file; use --embed to store provenance.json inside the bundle (rewrites the bundle).",
+		Short: "Generate SLSA-style provenance for a .katame bundle",
+		Long:  "Read a .katame bundle and emit a provenance statement (builder identity, build timestamp, source hash, environment). Use --out to write to a file; use --embed to store provenance.json inside the bundle (rewrites the bundle).",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printer := NewPrinter(flagJSON, flagQuiet)
 
@@ -176,7 +176,7 @@ func newAttestCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&inFile, "in", "", "input .vpack bundle (required)")
+	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle (required)")
 	cmd.Flags().StringVar(&outFile, "out", "", "output provenance.json path (default: stdout)")
 	cmd.Flags().BoolVar(&embed, "embed", false, "store provenance.json inside the bundle (rewrites bundle)")
 	cmd.Flags().BoolVar(&useTransparency, "transparency", false, "sign the provenance and upload it to a Sigstore Rekor transparency log")

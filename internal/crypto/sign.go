@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 // GenerateSigningKeyPair creates a new Ed25519 private/public key pair.

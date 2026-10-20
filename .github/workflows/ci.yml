@@ -241,9 +241,9 @@ jobs:
         run: |
           EXT=""
           if [ "${{ matrix.goos }}" = "windows" ]; then EXT=".exe"; fi
-          BIN="vaultpack-${{ matrix.goos }}-${{ matrix.goarch }}${EXT}"
-          go build -trimpath -ldflags "-s -w -X github.com/Skpow1234/Vaultpack/internal/cli.Version=${GITHUB_SHA::7}" \
-            -o "$BIN" ./cmd/vaultpack
+          BIN="katame-${{ matrix.goos }}-${{ matrix.goarch }}${EXT}"
+          go build -trimpath -ldflags "-s -w -X github.com/Skpow1234/Katame/internal/cli.Version=${GITHUB_SHA::7}" \
+            -o "$BIN" ./cmd/katame
           echo "BIN=$BIN" >> "$GITHUB_ENV"
           ls -la "$BIN"
 
@@ -257,8 +257,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vaultpack-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: vaultpack-*
+          name: katame-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: katame-*
           retention-days: 14
           if-no-files-found: error
 
@@ -282,14 +282,14 @@ jobs:
           context: .
           push: false
           load: true
-          tags: vaultpack:ci
+          tags: katame:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Smoke container
         run: |
-          docker run --rm vaultpack:ci --version
-          docker run --rm vaultpack:ci --help >/dev/null
+          docker run --rm katame:ci --version
+          docker run --rm katame:ci --help >/dev/null
 
   # -------------------------------------------------------------------------
   # Required status gate (branch protection can require this single check)

@@ -7,9 +7,9 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	vpcrypto "github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/transparency"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	vpcrypto "github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/transparency"
 )
 
 // rekorUploadOpts groups the inputs needed to upload a Rekor entry and attach

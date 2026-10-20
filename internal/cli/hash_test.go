@@ -10,7 +10,7 @@ func TestHashCmd_JSON(t *testing.T) {
 	// Write a temp file with known content.
 	dir := t.TempDir()
 	inFile := dir + "/test.txt"
-	if err := writeFile(inFile, []byte("hello vaultpack")); err != nil {
+	if err := writeFile(inFile, []byte("hello katame")); err != nil {
 		t.Fatal(err)
 	}
 

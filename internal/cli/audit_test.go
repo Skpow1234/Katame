@@ -12,7 +12,7 @@ func TestAttestCmd_OutputProvenance(t *testing.T) {
 	// Create a minimal bundle (protect then attest).
 	tmpDir := t.TempDir()
 	in := filepath.Join(tmpDir, "in.txt")
-	out := filepath.Join(tmpDir, "out.vpack")
+	out := filepath.Join(tmpDir, "out.katame")
 	key := filepath.Join(tmpDir, "out.key")
 	prov := filepath.Join(tmpDir, "provenance.json")
 	if err := os.WriteFile(in, []byte("hello"), 0o600); err != nil {
@@ -51,17 +51,17 @@ func TestAttestCmd_OutputProvenance(t *testing.T) {
 	if p.Subject.BundlePath != out {
 		t.Errorf("bundle_path = %q", p.Subject.BundlePath)
 	}
-	if p.Builder.ID != "vaultpack" {
+	if p.Builder.ID != "katame" {
 		t.Errorf("builder.id = %q", p.Builder.ID)
 	}
 }
 
 func TestSealCmd_VerifySealCmd_RoundTrip(t *testing.T) {
 	tmpDir := t.TempDir()
-	// Create two .vpack files via protect.
+	// Create two .katame files via protect.
 	for i, name := range []string{"a", "b"} {
 		in := filepath.Join(tmpDir, name+".txt")
-		out := filepath.Join(tmpDir, name+".vpack")
+		out := filepath.Join(tmpDir, name+".katame")
 		if err := os.WriteFile(in, []byte("data"+string(rune('0'+i))), 0o600); err != nil {
 			t.Fatal(err)
 		}

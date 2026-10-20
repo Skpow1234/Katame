@@ -1,21 +1,21 @@
-"""VaultPack Python bindings.
+"""Katame Python bindings.
 
-This package provides a thin Python wrapper around `libvaultpack`, the
-VaultPack C-shared library. It uses :mod:`ctypes` (no compiler required at
+This package provides a thin Python wrapper around `libkatame`, the
+Katame C-shared library. It uses :mod:`ctypes` (no compiler required at
 install time) and works on Linux, macOS, and Windows.
 
 Quick start::
 
-    import vaultpack
+    import katame
 
-    res = vaultpack.protect(
+    res = katame.protect(
         input_path="secret.txt",
-        output_path="secret.vpack",
+        output_path="secret.katame",
     )
     key = res["generated_key_b64"]  # save this somewhere safe!
 
-    out = vaultpack.decrypt(
-        input_path="secret.vpack",
+    out = katame.decrypt(
+        input_path="secret.katame",
         key_b64=key,
     )
     print(out["plaintext_b64"])
@@ -25,7 +25,7 @@ See ``README.md`` for the full API.
 
 from .core import (
     VERSION,
-    VaultpackError,
+    KatameError,
     decrypt,
     inspect,
     protect,
@@ -36,7 +36,7 @@ from .core import (
 
 __all__ = [
     "VERSION",
-    "VaultpackError",
+    "KatameError",
     "decrypt",
     "inspect",
     "protect",

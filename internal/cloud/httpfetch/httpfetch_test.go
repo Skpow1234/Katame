@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/cloud"
+	"github.com/Skpow1234/Katame/internal/cloud"
 )
 
 func TestDownload(t *testing.T) {
@@ -21,7 +21,7 @@ func TestDownload(t *testing.T) {
 	defer srv.Close()
 
 	s := NewStore(Options{})
-	got, err := s.Download(context.Background(), srv.URL+"/bundle.vpack")
+	got, err := s.Download(context.Background(), srv.URL+"/bundle.katame")
 	if err != nil {
 		t.Fatalf("download: %v", err)
 	}
@@ -60,7 +60,7 @@ func TestDownload_404(t *testing.T) {
 }
 
 func TestBearerAuth(t *testing.T) {
-	t.Setenv("VAULTPACK_HTTP_BEARER", "secret-token-123")
+	t.Setenv("KATAME_HTTP_BEARER", "secret-token-123")
 	gotAuth := ""
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotAuth = r.Header.Get("Authorization")
@@ -79,9 +79,9 @@ func TestBearerAuth(t *testing.T) {
 }
 
 func TestBasicAuth(t *testing.T) {
-	t.Setenv("VAULTPACK_HTTP_BEARER", "")
-	t.Setenv("VAULTPACK_HTTP_USER", "alice")
-	t.Setenv("VAULTPACK_HTTP_PASS", "wonderland")
+	t.Setenv("KATAME_HTTP_BEARER", "")
+	t.Setenv("KATAME_HTTP_USER", "alice")
+	t.Setenv("KATAME_HTTP_PASS", "wonderland")
 	gotAuth := ""
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotAuth = r.Header.Get("Authorization")

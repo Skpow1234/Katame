@@ -16,7 +16,7 @@ import (
 )
 
 // FulcioClient is a minimal client for the Sigstore Fulcio CA. It implements
-// the single endpoint VaultPack needs: POST /api/v2/signingCert to exchange an
+// the single endpoint Katame needs: POST /api/v2/signingCert to exchange an
 // OIDC token + CSR / PEM proof for a short-lived signing certificate.
 type FulcioClient struct {
 	BaseURL    string

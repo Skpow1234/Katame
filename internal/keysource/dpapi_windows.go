@@ -8,7 +8,7 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/util"
 	"golang.org/x/sys/windows"
 )
 
@@ -17,7 +17,7 @@ const (
 	dpapiDetails   = "CryptProtectData/CryptUnprotectData (current-user scope)"
 )
 
-// dpapi://path/to/blob  — file contains DPAPI-protected ciphertext of a VaultPack key.
+// dpapi://path/to/blob  — file contains DPAPI-protected ciphertext of a Katame key.
 // dpapi://b64:<base64>  — inline DPAPI blob.
 func resolveDPAPISymmetric(value string) ([]byte, error) {
 	blob, err := loadDPAPIBlob(value)

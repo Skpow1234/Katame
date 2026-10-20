@@ -18,7 +18,7 @@ import (
 )
 
 // mockRekor is an in-process HTTP server that mimics enough of Rekor's API for
-// VaultPack's tests: POST /api/v1/log/entries returns a synthetic LogEntryAnon
+// Katame's tests: POST /api/v1/log/entries returns a synthetic LogEntryAnon
 // with a Signed Entry Timestamp produced by a freshly-generated ECDSA key.
 // GET /api/v1/log/publicKey returns that key's PEM.
 type mockRekor struct {

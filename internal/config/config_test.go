@@ -49,8 +49,8 @@ func TestLoad_ExplicitPath_NotFound(t *testing.T) {
 
 func TestLoad_ExplicitPath_ValidYAML(t *testing.T) {
 	dir := t.TempDir()
-	path := filepath.Join(dir, "vpack.yaml")
-	content := []byte(`audit_log: /var/log/vpack.jsonl
+	path := filepath.Join(dir, "katame.yaml")
+	content := []byte(`audit_log: /var/log/katame.jsonl
 cipher: chacha20-poly1305
 chunk_size: 131072
 output_dir: /tmp/out
@@ -64,7 +64,7 @@ output_dir: /tmp/out
 	if err != nil {
 		t.Fatalf("Load(): %v", err)
 	}
-	if cfg.AuditLog != "/var/log/vpack.jsonl" {
+	if cfg.AuditLog != "/var/log/katame.jsonl" {
 		t.Errorf("audit_log: got %q", cfg.AuditLog)
 	}
 	if cfg.Cipher != "chacha20-poly1305" {
@@ -80,12 +80,12 @@ output_dir: /tmp/out
 
 func TestLoad_ProfileOverride(t *testing.T) {
 	dir := t.TempDir()
-	path := filepath.Join(dir, "vpack.yaml")
+	path := filepath.Join(dir, "katame.yaml")
 	content := []byte(`audit_log: /var/log/default.jsonl
 cipher: aes-256-gcm
 profiles:
   prod:
-    audit_log: /var/log/vpack-prod.jsonl
+    audit_log: /var/log/katame-prod.jsonl
     cipher: xchacha20-poly1305
   dev:
     output_dir: ./dev-out
@@ -99,7 +99,7 @@ profiles:
 	if err != nil {
 		t.Fatalf("Load(prod): %v", err)
 	}
-	if cfg.AuditLog != "/var/log/vpack-prod.jsonl" {
+	if cfg.AuditLog != "/var/log/katame-prod.jsonl" {
 		t.Errorf("prod audit_log: got %q", cfg.AuditLog)
 	}
 	if cfg.Cipher != "xchacha20-poly1305" {

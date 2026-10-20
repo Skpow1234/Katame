@@ -1,12 +1,12 @@
-package vaultpack
+package katame
 
 import (
 	"bytes"
 	"errors"
 	"fmt"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
 )
 
 // VerifyOptions controls a single Verify call.
@@ -29,21 +29,21 @@ type VerifyResult struct {
 	Manifest  *Manifest
 }
 
-// Verify validates the detached signature of a .vpack bundle.
+// Verify validates the detached signature of a .katame bundle.
 func Verify(opts VerifyOptions) (*VerifyResult, error) {
 	if opts.BundlePath == "" {
-		return nil, errors.New("vaultpack.Verify: BundlePath is required")
+		return nil, errors.New("katame.Verify: BundlePath is required")
 	}
 	if opts.PublicKey == nil && opts.PublicKeyPath == "" {
-		return nil, errors.New("vaultpack.Verify: PublicKey or PublicKeyPath is required")
+		return nil, errors.New("katame.Verify: PublicKey or PublicKeyPath is required")
 	}
 	if opts.PublicKey != nil && opts.PublicKeyPath != "" {
-		return nil, errors.New("vaultpack.Verify: PublicKey and PublicKeyPath are mutually exclusive")
+		return nil, errors.New("katame.Verify: PublicKey and PublicKeyPath are mutually exclusive")
 	}
 
 	br, err := bundle.Read(opts.BundlePath)
 	if err != nil {
-		return nil, fmt.Errorf("vaultpack.Verify: read: %w", err)
+		return nil, fmt.Errorf("katame.Verify: read: %w", err)
 	}
 	return verifyParsed(br, opts.PublicKey, opts.PublicKeyPath)
 }
@@ -52,11 +52,11 @@ func Verify(opts VerifyOptions) (*VerifyResult, error) {
 // bundle bytes directly. Browser / WASM friendly.
 func VerifyBytes(bundleBytes []byte, opts VerifyOptions) (*VerifyResult, error) {
 	if opts.PublicKey == nil && opts.PublicKeyPath == "" {
-		return nil, errors.New("vaultpack.VerifyBytes: PublicKey or PublicKeyPath is required")
+		return nil, errors.New("katame.VerifyBytes: PublicKey or PublicKeyPath is required")
 	}
 	br, err := bundle.ReadBytes(bundleBytes)
 	if err != nil {
-		return nil, fmt.Errorf("vaultpack.VerifyBytes: read: %w", err)
+		return nil, fmt.Errorf("katame.VerifyBytes: read: %w", err)
 	}
 	return verifyParsed(br, opts.PublicKey, opts.PublicKeyPath)
 }
@@ -64,7 +64,7 @@ func VerifyBytes(bundleBytes []byte, opts VerifyOptions) (*VerifyResult, error) 
 func verifyParsed(br *bundle.ReadResult, pubBytes []byte, pubPath string) (*VerifyResult, error) {
 	var err error
 	if br.Signature == nil {
-		return nil, errors.New("vaultpack.Verify: bundle has no signature")
+		return nil, errors.New("katame.Verify: bundle has no signature")
 	}
 
 	var (
@@ -77,7 +77,7 @@ func verifyParsed(br *bundle.ReadResult, pubBytes []byte, pubPath string) (*Veri
 		pub, algo, err = crypto.ParseAnyPublicKey(pubBytes)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("vaultpack.Verify: load public key: %w", err)
+		return nil, fmt.Errorf("katame.Verify: load public key: %w", err)
 	}
 	if br.Manifest.SignatureAlgo != nil && *br.Manifest.SignatureAlgo != "" {
 		algo = *br.Manifest.SignatureAlgo
@@ -85,17 +85,17 @@ func verifyParsed(br *bundle.ReadResult, pubBytes []byte, pubPath string) (*Veri
 
 	canonical, err := bundle.CanonicalManifest(br.Manifest)
 	if err != nil {
-		return nil, fmt.Errorf("vaultpack.Verify: canonicalize: %w", err)
+		return nil, fmt.Errorf("katame.Verify: canonicalize: %w", err)
 	}
 	payloadHash, err := crypto.HashReader(bytes.NewReader(br.Ciphertext), "sha256")
 	if err != nil {
-		return nil, fmt.Errorf("vaultpack.Verify: hash payload: %w", err)
+		return nil, fmt.Errorf("katame.Verify: hash payload: %w", err)
 	}
 	sigMsg := crypto.BuildSigningMessage(canonical, payloadHash)
 
 	valid, err := crypto.VerifySignature(pub, algo, sigMsg, br.Signature)
 	if err != nil {
-		return nil, fmt.Errorf("vaultpack.Verify: verify: %w", err)
+		return nil, fmt.Errorf("katame.Verify: verify: %w", err)
 	}
 
 	signedAt := ""

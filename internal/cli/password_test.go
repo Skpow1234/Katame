@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 // TestPasswordProtectDecrypt_AllKDFs performs a full round-trip for each KDF.
@@ -16,7 +16,7 @@ func TestPasswordProtectDecrypt_AllKDFs(t *testing.T) {
 		t.Run(kdf, func(t *testing.T) {
 			dir := t.TempDir()
 			inFile := filepath.Join(dir, "data.txt")
-			bundlePath := filepath.Join(dir, "data.vpack")
+			bundlePath := filepath.Join(dir, "data.katame")
 			outFile := filepath.Join(dir, "recovered.txt")
 
 			original := []byte("password test data for " + kdf)
@@ -75,7 +75,7 @@ func TestPasswordProtectDecrypt_AllKDFs(t *testing.T) {
 func TestPasswordProtectDecrypt_WrongPassword(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	bundlePath := filepath.Join(dir, "data.vpack")
+	bundlePath := filepath.Join(dir, "data.katame")
 	outFile := filepath.Join(dir, "recovered.txt")
 
 	os.WriteFile(inFile, []byte("secret content"), 0o600)
@@ -129,7 +129,7 @@ func TestPasswordProtectDecrypt_WrongPassword(t *testing.T) {
 func TestPasswordProtect_NoKeyFileOutput(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	bundlePath := filepath.Join(dir, "data.vpack")
+	bundlePath := filepath.Join(dir, "data.katame")
 	possibleKeyFile := filepath.Join(dir, "data.txt.key")
 
 	os.WriteFile(inFile, []byte("no key file test"), 0o600)
@@ -155,7 +155,7 @@ func TestPasswordProtect_NoKeyFileOutput(t *testing.T) {
 func TestPasswordFile_RoundTrip(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	bundlePath := filepath.Join(dir, "data.vpack")
+	bundlePath := filepath.Join(dir, "data.katame")
 	outFile := filepath.Join(dir, "recovered.txt")
 	pwFile := filepath.Join(dir, "password.txt")
 
@@ -214,7 +214,7 @@ func TestPasswordAndKeyMutuallyExclusive(t *testing.T) {
 func TestDecryptPasswordBundleWithKeyFails(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	bundlePath := filepath.Join(dir, "data.vpack")
+	bundlePath := filepath.Join(dir, "data.katame")
 	fakeKeyFile := filepath.Join(dir, "fake.key")
 
 	os.WriteFile(inFile, []byte("password bundle"), 0o600)
@@ -246,7 +246,7 @@ func TestDecryptPasswordBundleWithKeyFails(t *testing.T) {
 func TestPasswordProtectWithSign_RoundTrip(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	bundlePath := filepath.Join(dir, "data.vpack")
+	bundlePath := filepath.Join(dir, "data.katame")
 	outFile := filepath.Join(dir, "recovered.txt")
 	privPath := filepath.Join(dir, "sign.key")
 	pubPath := filepath.Join(dir, "sign.pub")
@@ -302,7 +302,7 @@ func TestPasswordProtectWithSign_RoundTrip(t *testing.T) {
 func TestInspect_PasswordBundle(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	bundlePath := filepath.Join(dir, "data.vpack")
+	bundlePath := filepath.Join(dir, "data.katame")
 
 	os.WriteFile(inFile, []byte("inspect pw test"), 0o600)
 

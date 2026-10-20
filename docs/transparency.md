@@ -1,6 +1,6 @@
 # Transparency & Sigstore
 
-VaultPack can upload bundle signatures to [Sigstore Rekor](https://docs.sigstore.dev/logging/overview/) and embed inclusion metadata in the manifest.
+Katame can upload bundle signatures to [Sigstore Rekor](https://docs.sigstore.dev/logging/overview/) and embed inclusion metadata in the manifest.
 
 ## Flags
 
@@ -10,14 +10,14 @@ VaultPack can upload bundle signatures to [Sigstore Rekor](https://docs.sigstore
 | `--rekor-url` | Default `https://rekor.sigstore.dev` |
 | `--keyless` | Fulcio keyless signing (requires `--transparency`) |
 | `--fulcio-url` | Default `https://fulcio.sigstore.dev` |
-| `--oidc-token-file` | OIDC ID token (or `VAULTPACK_OIDC_TOKEN` / `SIGSTORE_ID_TOKEN`) |
+| `--oidc-token-file` | OIDC ID token (or `KATAME_OIDC_TOKEN` / `SIGSTORE_ID_TOKEN`) |
 | `--check-transparency` | Verify Rekor inclusion + SET on `verify` |
 | `--rekor-pubkey` | Offline Rekor public key (PEM) |
 
 ## Sign with personal key + Rekor
 
 ```bash
-vaultpack sign --in artifact.vpack --signing-priv id.key --transparency
+katame sign --in artifact.katame --signing-priv id.key --transparency
 ```
 
 ## Keyless via Fulcio
@@ -25,7 +25,7 @@ vaultpack sign --in artifact.vpack --signing-priv id.key --transparency
 ```bash
 export SIGSTORE_ID_TOKEN=$(cat my-oidc.jwt)
 
-vaultpack sign --in artifact.vpack \
+katame sign --in artifact.katame \
   --keyless \
   --transparency
 ```
@@ -35,8 +35,8 @@ Keyless generates an ephemeral ECDSA P-256 key, obtains a short-lived Fulcio cer
 ## Verify
 
 ```bash
-vaultpack verify --in artifact.vpack --pubkey id.pub --check-transparency
-vaultpack verify --in artifact.vpack --pubkey id.pub --check-transparency --rekor-pubkey rekor.pub
+katame verify --in artifact.katame --pubkey id.pub --check-transparency
+katame verify --in artifact.katame --pubkey id.pub --check-transparency --rekor-pubkey rekor.pub
 ```
 
 Checks:

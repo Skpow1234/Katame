@@ -7,13 +7,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
 func createTestBundle(t *testing.T, dir string) (bundlePath, keyPath string) {
 	t.Helper()
 	inFile := filepath.Join(dir, "input.txt")
-	bundlePath = filepath.Join(dir, "input.vpack")
+	bundlePath = filepath.Join(dir, "input.katame")
 	keyPath = filepath.Join(dir, "input.key")
 
 	os.WriteFile(inFile, []byte("inspect test data"), 0o600)

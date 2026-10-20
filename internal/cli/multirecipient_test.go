@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
 )
 
 func TestMultiRecipient_TwoRecipients(t *testing.T) {
@@ -27,7 +27,7 @@ func TestMultiRecipient_TwoRecipients(t *testing.T) {
 	}
 
 	inFile := filepath.Join(dir, "secret.txt")
-	outVpack := filepath.Join(dir, "secret.vpack")
+	outKatame := filepath.Join(dir, "secret.katame")
 	payload := []byte("multi-recipient secret data")
 	os.WriteFile(inFile, payload, 0o600)
 
@@ -36,7 +36,7 @@ func TestMultiRecipient_TwoRecipients(t *testing.T) {
 	root.SetArgs([]string{
 		"protect",
 		"--in", inFile,
-		"--out", outVpack,
+		"--out", outKatame,
 		"--recipient", filepath.Join(dir, "alice.pub"),
 		"--recipient", filepath.Join(dir, "bob.pub"),
 	})
@@ -45,7 +45,7 @@ func TestMultiRecipient_TwoRecipients(t *testing.T) {
 	}
 
 	// Verify manifest has multi-recipient entries.
-	br, err := bundle.Read(outVpack)
+	br, err := bundle.Read(outKatame)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,7 +64,7 @@ func TestMultiRecipient_TwoRecipients(t *testing.T) {
 	root2 := NewRootCmd()
 	root2.SetArgs([]string{
 		"decrypt",
-		"--in", outVpack,
+		"--in", outKatame,
 		"--out", aliceDec,
 		"--privkey", filepath.Join(dir, "alice.key"),
 	})
@@ -81,7 +81,7 @@ func TestMultiRecipient_TwoRecipients(t *testing.T) {
 	root3 := NewRootCmd()
 	root3.SetArgs([]string{
 		"decrypt",
-		"--in", outVpack,
+		"--in", outKatame,
 		"--out", bobDec,
 		"--privkey", filepath.Join(dir, "bob.key"),
 	})
@@ -106,14 +106,14 @@ func TestMultiRecipient_WrongKeyFails(t *testing.T) {
 	crypto.SaveKeyPEM(filepath.Join(dir, "eve.key"), evePriv, 0o600)
 
 	inFile := filepath.Join(dir, "secret.txt")
-	outVpack := filepath.Join(dir, "secret.vpack")
+	outKatame := filepath.Join(dir, "secret.katame")
 	os.WriteFile(inFile, []byte("for alice only"), 0o600)
 
 	root := NewRootCmd()
 	root.SetArgs([]string{
 		"protect",
 		"--in", inFile,
-		"--out", outVpack,
+		"--out", outKatame,
 		"--recipient", filepath.Join(dir, "alice.pub"),
 	})
 	root.Execute()
@@ -122,7 +122,7 @@ func TestMultiRecipient_WrongKeyFails(t *testing.T) {
 	root2 := NewRootCmd()
 	root2.SetArgs([]string{
 		"decrypt",
-		"--in", outVpack,
+		"--in", outKatame,
 		"--out", filepath.Join(dir, "eve.dec"),
 		"--privkey", filepath.Join(dir, "eve.key"),
 	})
@@ -144,7 +144,7 @@ func TestMultiRecipient_MixedSchemes(t *testing.T) {
 	crypto.SaveKeyPEM(filepath.Join(dir, "bob.pub"), bobPub, 0o644)
 
 	inFile := filepath.Join(dir, "data.txt")
-	outVpack := filepath.Join(dir, "data.vpack")
+	outKatame := filepath.Join(dir, "data.katame")
 	payload := []byte("mixed scheme multi-recipient")
 	os.WriteFile(inFile, payload, 0o600)
 
@@ -152,7 +152,7 @@ func TestMultiRecipient_MixedSchemes(t *testing.T) {
 	root.SetArgs([]string{
 		"protect",
 		"--in", inFile,
-		"--out", outVpack,
+		"--out", outKatame,
 		"--recipient", filepath.Join(dir, "alice.pub"),
 		"--recipient", filepath.Join(dir, "bob.pub"),
 	})
@@ -166,7 +166,7 @@ func TestMultiRecipient_MixedSchemes(t *testing.T) {
 		r := NewRootCmd()
 		r.SetArgs([]string{
 			"decrypt",
-			"--in", outVpack,
+			"--in", outKatame,
 			"--out", decFile,
 			"--privkey", filepath.Join(dir, who+".key"),
 		})
@@ -192,14 +192,14 @@ func TestMultiRecipient_Inspect(t *testing.T) {
 	crypto.SaveKeyPEM(filepath.Join(dir, "b.pub"), bobPub, 0o644)
 
 	inFile := filepath.Join(dir, "data.txt")
-	outVpack := filepath.Join(dir, "data.vpack")
+	outKatame := filepath.Join(dir, "data.katame")
 	os.WriteFile(inFile, []byte("inspect me"), 0o600)
 
 	root := NewRootCmd()
 	root.SetArgs([]string{
 		"protect",
 		"--in", inFile,
-		"--out", outVpack,
+		"--out", outKatame,
 		"--recipient", filepath.Join(dir, "a.pub"),
 		"--recipient", filepath.Join(dir, "b.pub"),
 	})
@@ -207,7 +207,7 @@ func TestMultiRecipient_Inspect(t *testing.T) {
 
 	// Inspect should not error.
 	root2 := NewRootCmd()
-	root2.SetArgs([]string{"inspect", "--in", outVpack})
+	root2.SetArgs([]string{"inspect", "--in", outKatame})
 	if err := root2.Execute(); err != nil {
 		t.Fatalf("inspect multi-recipient: %v", err)
 	}

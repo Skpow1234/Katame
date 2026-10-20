@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
 )
 
 // TestSignVerify_AllAlgos runs the full CLI sign→verify pipeline for every
@@ -16,7 +16,7 @@ func TestSignVerify_AllAlgos(t *testing.T) {
 		t.Run(algo, func(t *testing.T) {
 			dir := t.TempDir()
 			inFile := filepath.Join(dir, "data.txt")
-			bundlePath := filepath.Join(dir, "data.vpack")
+			bundlePath := filepath.Join(dir, "data.katame")
 			keyFile := filepath.Join(dir, "data.key")
 			privPath := filepath.Join(dir, "sign.key")
 			pubPath := filepath.Join(dir, "sign.pub")
@@ -76,7 +76,7 @@ func TestProtectSign_AllAlgos(t *testing.T) {
 		t.Run(algo, func(t *testing.T) {
 			dir := t.TempDir()
 			inFile := filepath.Join(dir, "data.txt")
-			bundlePath := filepath.Join(dir, "data.vpack")
+			bundlePath := filepath.Join(dir, "data.katame")
 			keyFile := filepath.Join(dir, "data.key")
 			privPath := filepath.Join(dir, "sign.key")
 			pubPath := filepath.Join(dir, "sign.pub")
@@ -142,7 +142,7 @@ func TestSignVerify_CrossAlgoRejection_CLI(t *testing.T) {
 
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	bundlePath := filepath.Join(dir, "data.vpack")
+	bundlePath := filepath.Join(dir, "data.katame")
 	keyFile := filepath.Join(dir, "data.key")
 
 	os.WriteFile(inFile, []byte("cross algo test"), 0o600)

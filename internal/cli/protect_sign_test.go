@@ -5,13 +5,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
 func TestProtectWithSign(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	keyFile := filepath.Join(dir, "secret.key")
 	privPath := filepath.Join(dir, "signing.key")
 	pubPath := filepath.Join(dir, "signing.pub")
@@ -59,7 +59,7 @@ func TestProtectWithSign(t *testing.T) {
 func TestProtectWithSignThenDecrypt(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.json")
-	bundleFile := filepath.Join(dir, "data.vpack")
+	bundleFile := filepath.Join(dir, "data.katame")
 	keyFile := filepath.Join(dir, "data.key")
 	outFile := filepath.Join(dir, "data_out.json")
 

@@ -1,13 +1,13 @@
 /**
- * TypeScript type definitions for the VaultPack WASM module.
+ * TypeScript type definitions for the Katame WASM module.
  */
 
-export interface VaultpackError {
+export interface KatameError {
   ok: false;
   error: string;
 }
 
-export interface VaultpackSuccess {
+export interface KatameSuccess {
   ok: true;
   manifest?: unknown;
   bundle?: Uint8Array;
@@ -21,7 +21,7 @@ export interface VaultpackSuccess {
   [k: string]: unknown;
 }
 
-export type VaultpackReply = VaultpackSuccess | VaultpackError;
+export type KatameReply = KatameSuccess | KatameError;
 
 export interface RecipientOptions {
   publicKeyPEM?: string;
@@ -66,18 +66,18 @@ export interface VerifyOptions {
   publicKeyPEM: string;
 }
 
-export interface Vaultpack {
+export interface Katame {
   version(): string;
-  protect(opts: ProtectOptions): VaultpackReply;
-  decrypt(opts: DecryptOptions): VaultpackReply;
-  inspect(bundle: Uint8Array): VaultpackReply;
-  sign(opts: SignOptions): VaultpackReply;
-  verify(opts: VerifyOptions): VaultpackReply;
+  protect(opts: ProtectOptions): KatameReply;
+  decrypt(opts: DecryptOptions): KatameReply;
+  inspect(bundle: Uint8Array): KatameReply;
+  sign(opts: SignOptions): KatameReply;
+  verify(opts: VerifyOptions): KatameReply;
 }
 
 declare global {
   // eslint-disable-next-line no-var
-  var Vaultpack: Vaultpack;
+  var Katame: Katame;
 }
 
 export {};

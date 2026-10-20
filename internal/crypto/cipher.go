@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/crypto/chacha20poly1305"
 
-	"github.com/Skpow1234/Vaultpack/internal/crypto/aesgcmsiv"
+	"github.com/Skpow1234/Katame/internal/crypto/aesgcmsiv"
 )
 
 // Supported AEAD cipher names.

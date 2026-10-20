@@ -1,7 +1,7 @@
 # Development
 
 ```bash
-make build        # bin/vaultpack
+make build        # bin/katame
 make test         # race-enabled tests
 make lint         # golangci-lint
 make fmt
@@ -17,14 +17,14 @@ Requires Go **1.26.x** (see `go.mod` `toolchain`). CI uses `setup-go` with `go-v
 ## Project structure
 
 ```text
-cmd/vaultpack/          # CLI entrypoint
-cmd/vaultpack-c/        # C-shared library (cshared tag)
-cmd/vaultpack-wasm/     # WASM build
-pkg/vaultpack/          # Public Go SDK
+cmd/katame/          # CLI entrypoint
+cmd/katame-c/        # C-shared library (cshared tag)
+cmd/katame-wasm/     # WASM build
+pkg/katame/          # Public Go SDK
 internal/cli/           # Cobra commands
 internal/crypto/        # AEAD, KDF, hybrid, PQ, SSS
 internal/bundle/        # ZIP I/O, manifest
-internal/vpackop/       # Shared protect/decrypt/rewrap ops
+internal/katameop/       # Shared protect/decrypt/rewrap ops
 internal/kms/           # AWS / GCP / Azure / mock
 internal/keysource/     # URI key loaders
 internal/policy/        # YAML/JSON/Rego

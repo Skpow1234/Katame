@@ -1,10 +1,10 @@
-"""Low-level ctypes wrapper around libvaultpack.
+"""Low-level ctypes wrapper around libkatame.
 
 The library is located via the following resolution order:
 
-1. ``$VAULTPACK_LIB`` environment variable (absolute path).
-2. A copy adjacent to this module (``vaultpack/libvaultpack.{so,dylib,dll}``).
-3. ``ctypes.util.find_library('vaultpack')`` (system loader).
+1. ``$KATAME_LIB`` environment variable (absolute path).
+2. A copy adjacent to this module (``katame/libkatame.{so,dylib,dll}``).
+3. ``ctypes.util.find_library('katame')`` (system loader).
 """
 
 from __future__ import annotations
@@ -18,32 +18,32 @@ import platform
 import sys
 from typing import Any, Optional, Sequence
 
-VERSION = "1.0.0"  # aligned with pkg/vaultpack.Version
+VERSION = "1.0.0"  # aligned with pkg/katame.Version
 
 
-class VaultpackError(RuntimeError):
+class KatameError(RuntimeError):
     """Raised when an SDK call returns ``{"ok": false}`` or fails to load."""
 
 
 def _libname() -> str:
     system = platform.system()
     if system == "Linux":
-        return "libvaultpack.so"
+        return "libkatame.so"
     if system == "Darwin":
-        return "libvaultpack.dylib"
+        return "libkatame.dylib"
     if system == "Windows":
-        return "libvaultpack.dll"
-    raise VaultpackError(f"unsupported platform: {system}")
+        return "libkatame.dll"
+    raise KatameError(f"unsupported platform: {system}")
 
 
 def _candidate_paths() -> list[str]:
     paths: list[str] = []
-    env = os.environ.get("VAULTPACK_LIB")
+    env = os.environ.get("KATAME_LIB")
     if env:
         paths.append(env)
     here = os.path.dirname(os.path.abspath(__file__))
     paths.append(os.path.join(here, _libname()))
-    found = ctypes.util.find_library("vaultpack")
+    found = ctypes.util.find_library("katame")
     if found:
         paths.append(found)
     return paths
@@ -58,9 +58,9 @@ def _load_library() -> ctypes.CDLL:
             return ctypes.CDLL(path)
         except OSError as exc:
             last_err = exc
-    raise VaultpackError(
-        "libvaultpack not found. Set VAULTPACK_LIB=/path/to/libvaultpack."
-        f"{_ext_for_msg()} or place the library next to vaultpack/core.py. "
+    raise KatameError(
+        "libkatame not found. Set KATAME_LIB=/path/to/libkatame."
+        f"{_ext_for_msg()} or place the library next to katame/core.py. "
         f"Last loader error: {last_err}"
     )
 
@@ -73,12 +73,12 @@ def _ext_for_msg() -> str:
 
 _LIB = _load_library()
 
-_LIB.vp_version.argtypes = []
-_LIB.vp_version.restype = ctypes.c_char_p
-_LIB.vp_free.argtypes = [ctypes.c_void_p]
-_LIB.vp_free.restype = None
+_LIB.kt_version.argtypes = []
+_LIB.kt_version.restype = ctypes.c_char_p
+_LIB.kt_free.argtypes = [ctypes.c_void_p]
+_LIB.kt_free.restype = None
 
-for sym in ("vp_protect", "vp_decrypt", "vp_inspect", "vp_sign", "vp_verify", "vp_rewrap"):
+for sym in ("kt_protect", "kt_decrypt", "kt_inspect", "kt_sign", "kt_verify", "kt_rewrap"):
     if hasattr(_LIB, sym):
         fn = getattr(_LIB, sym)
         fn.argtypes = [ctypes.c_char_p]
@@ -94,28 +94,28 @@ def _call_json(symbol: str, payload: Any) -> dict:
     fn = getattr(_LIB, symbol)
     ptr = fn(encoded)
     if not ptr:
-        raise VaultpackError(f"{symbol}: null reply from libvaultpack")
+        raise KatameError(f"{symbol}: null reply from libkatame")
 
     try:
         raw = ctypes.string_at(ptr).decode("utf-8")
     finally:
-        _LIB.vp_free(ptr)
+        _LIB.kt_free(ptr)
 
     try:
         reply = json.loads(raw)
     except json.JSONDecodeError as exc:
-        raise VaultpackError(f"{symbol}: invalid JSON reply: {exc}: {raw!r}")
+        raise KatameError(f"{symbol}: invalid JSON reply: {exc}: {raw!r}")
 
     if not isinstance(reply, dict) or not reply.get("ok", False):
         msg = reply.get("error", "unknown error") if isinstance(reply, dict) else raw
-        raise VaultpackError(f"{symbol}: {msg}")
+        raise KatameError(f"{symbol}: {msg}")
     return reply
 
 
 def version() -> str:
-    raw = _LIB.vp_version()
+    raw = _LIB.kt_version()
     if not raw:
-        raise VaultpackError("vp_version returned null")
+        raise KatameError("kt_version returned null")
     return raw.decode("utf-8")
 
 
@@ -138,15 +138,15 @@ def protect(
     split_threshold: Optional[int] = None,
     hash_algo: Optional[str] = None,
 ) -> dict:
-    """Encrypt a file or in-memory blob into a .vpack bundle.
+    """Encrypt a file or in-memory blob into a .katame bundle.
 
     Supports symmetric key, password, hybrid recipients, KMS wrap, compression,
     and Shamir key splitting (parity with the Go SDK / CLI).
     """
     if (input_path is None) == (plaintext is None):
-        raise VaultpackError("protect: exactly one of input_path or plaintext is required")
+        raise KatameError("protect: exactly one of input_path or plaintext is required")
     if not output_path and plaintext is None and input_path is None:
-        raise VaultpackError("protect: output_path is required")
+        raise KatameError("protect: output_path is required")
 
     payload: dict[str, Any] = {}
     if output_path is not None:
@@ -181,7 +181,7 @@ def protect(
         payload["split_threshold"] = split_threshold
     if hash_algo is not None:
         payload["hash_algo"] = hash_algo
-    return _call_json("vp_protect", payload)
+    return _call_json("kt_protect", payload)
 
 
 def decrypt(
@@ -197,9 +197,9 @@ def decrypt(
     private_key_pem: Optional[str] = None,
     private_key_path: Optional[str] = None,
 ) -> dict:
-    """Decrypt a .vpack bundle (symmetric, password, hybrid, or KMS)."""
+    """Decrypt a .katame bundle (symmetric, password, hybrid, or KMS)."""
     if (input_path is None) == (bundle is None):
-        raise VaultpackError("decrypt: exactly one of input_path or bundle is required")
+        raise KatameError("decrypt: exactly one of input_path or bundle is required")
 
     payload: dict[str, Any] = {}
     if input_path is not None:
@@ -222,7 +222,7 @@ def decrypt(
         payload["private_key_pem"] = private_key_pem
     if private_key_path is not None:
         payload["private_key_path"] = private_key_path
-    return _call_json("vp_decrypt", payload)
+    return _call_json("kt_decrypt", payload)
 
 
 def inspect(
@@ -231,16 +231,16 @@ def inspect(
     bundle: Optional[bytes] = None,
     input_path: Optional[str] = None,
 ) -> dict:
-    """Return the parsed manifest of a .vpack bundle without decrypting it."""
+    """Return the parsed manifest of a .katame bundle without decrypting it."""
     if path is not None and bundle is None and input_path is None:
         # Backward-compatible path-only call (raw string still accepted by C ABI).
-        return _call_json("vp_inspect", path)
+        return _call_json("kt_inspect", path)
     payload: dict[str, Any] = {}
     if input_path or path:
         payload["input_path"] = input_path or path
     if bundle is not None:
         payload["bundle_b64"] = base64.b64encode(bundle).decode("ascii")
-    return _call_json("vp_inspect", payload)
+    return _call_json("kt_inspect", payload)
 
 
 def sign(
@@ -251,7 +251,7 @@ def sign(
     algo: Optional[str] = None,
 ) -> dict:
     if (private_key_pem is None) == (private_key_path is None):
-        raise VaultpackError(
+        raise KatameError(
             "sign: exactly one of private_key_pem or private_key_path is required"
         )
     payload: dict[str, Any] = {"bundle_path": bundle_path}
@@ -261,7 +261,7 @@ def sign(
         payload["private_key_path"] = private_key_path
     if algo is not None:
         payload["algo"] = algo
-    return _call_json("vp_sign", payload)
+    return _call_json("kt_sign", payload)
 
 
 def verify(
@@ -271,7 +271,7 @@ def verify(
     public_key_path: Optional[str] = None,
 ) -> dict:
     if (public_key_pem is None) == (public_key_path is None):
-        raise VaultpackError(
+        raise KatameError(
             "verify: exactly one of public_key_pem or public_key_path is required"
         )
     payload: dict[str, Any] = {"bundle_path": bundle_path}
@@ -279,7 +279,7 @@ def verify(
         payload["public_key_pem"] = public_key_pem
     if public_key_path is not None:
         payload["public_key_path"] = public_key_path
-    return _call_json("vp_verify", payload)
+    return _call_json("kt_verify", payload)
 
 
 def rewrap(
@@ -292,7 +292,7 @@ def rewrap(
 ) -> dict:
     """Re-wrap a KMS-protected DEK without decrypting the payload."""
     return _call_json(
-        "vp_rewrap",
+        "kt_rewrap",
         {
             "input_path": input_path,
             "output_path": output_path,
@@ -304,5 +304,5 @@ def rewrap(
 
 
 if __name__ == "__main__":  # pragma: no cover
-    print("libvaultpack version:", version(), "(python wrapper", VERSION + ")")
+    print("libkatame version:", version(), "(python wrapper", VERSION + ")")
     sys.exit(0)

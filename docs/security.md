@@ -10,7 +10,7 @@
 
 ## Chunked streaming encryption
 
-Default 64 KiB plaintext chunks. VaultPack mitigates the three standard chunked-AEAD attacks:
+Default 64 KiB plaintext chunks. Katame mitigates the three standard chunked-AEAD attacks:
 
 **Nonce derivation.** Random base nonce per bundle; chunk nonce = `base_nonce XOR chunk_index` (big-endian 64-bit counter in the last 8 bytes).
 
@@ -33,6 +33,6 @@ Per chunk: plaintext + nonce + optional user AAD. Across the bundle: manifest re
 ## Operational notes
 
 - Prefer signed bundles + policy deny for unsigned decrypts in production
-- Do not expose `vaultpack serve --auth-disabled` on TCP
+- Do not expose `katame serve --auth-disabled` on TCP
 - Treat `/metrics` as sensitive (unauthenticated by default)
 - Plugin binaries are a trust boundary (DEK material via env/JSON)

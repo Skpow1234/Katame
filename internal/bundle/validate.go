@@ -3,8 +3,8 @@ package bundle
 import (
 	"fmt"
 
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 // ValidateManifest checks that a parsed Manifest has valid, supported values.

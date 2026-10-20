@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
 )
 
 // helper: SHA-256 hex of a file.
@@ -28,7 +28,7 @@ func sha256File(t *testing.T, path string) string {
 func TestRewrap_KMSRoundTrip(t *testing.T) {
 	dir := t.TempDir()
 	in := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	out := filepath.Join(dir, "secret.dec")
 	want := "kms rewrap test"
 	if err := os.WriteFile(in, []byte(want), 0o600); err != nil {
@@ -110,7 +110,7 @@ func TestRewrap_KMSRoundTrip(t *testing.T) {
 func TestRewrap_RejectsNonKMSBundle(t *testing.T) {
 	dir := t.TempDir()
 	in := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	keyFile := filepath.Join(dir, "secret.key")
 	os.WriteFile(in, []byte("data"), 0o600)
 
@@ -132,7 +132,7 @@ func TestRewrap_RejectsNonKMSBundle(t *testing.T) {
 func TestRotateKey_KeyFileMode(t *testing.T) {
 	dir := t.TempDir()
 	in := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	oldKey := filepath.Join(dir, "secret.key")
 	newKey := filepath.Join(dir, "secret.new.key")
 	dec := filepath.Join(dir, "secret.dec")
@@ -190,7 +190,7 @@ func TestRotateKey_KeyFileMode(t *testing.T) {
 func TestRotateKey_PasswordMode(t *testing.T) {
 	dir := t.TempDir()
 	in := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	dec := filepath.Join(dir, "secret.dec")
 	want := "rotate-key password"
 	os.WriteFile(in, []byte(want), 0o600)
@@ -234,7 +234,7 @@ func TestRotateKey_PasswordMode(t *testing.T) {
 func TestRotateKey_KMSMode(t *testing.T) {
 	dir := t.TempDir()
 	in := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	dec := filepath.Join(dir, "secret.dec")
 	want := "rotate-key kms"
 	os.WriteFile(in, []byte(want), 0o600)
@@ -301,7 +301,7 @@ func TestAddRecipient_SingleToMulti(t *testing.T) {
 	}
 
 	in := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	want := "add-recipient secret"
 	os.WriteFile(in, []byte(want), 0o600)
 
@@ -378,7 +378,7 @@ func TestAddRecipient_RejectsDuplicate(t *testing.T) {
 	_ = crypto.SaveKeyPEM(filepath.Join(dir, "alice.key"), priv, 0o600)
 	_ = crypto.SaveKeyPEM(filepath.Join(dir, "alice.pub"), pub, 0o644)
 	in := filepath.Join(dir, "s.txt")
-	out := filepath.Join(dir, "s.vpack")
+	out := filepath.Join(dir, "s.katame")
 	os.WriteFile(in, []byte("d"), 0o600)
 
 	cmd := NewRootCmd()
@@ -406,7 +406,7 @@ func TestRemoveRecipient_DropsEntryButPayloadStays(t *testing.T) {
 		_ = crypto.SaveKeyPEM(filepath.Join(dir, name+".pub"), pub, 0o644)
 	}
 	in := filepath.Join(dir, "s.txt")
-	bundleFile := filepath.Join(dir, "s.vpack")
+	bundleFile := filepath.Join(dir, "s.katame")
 	os.WriteFile(in, []byte("payload"), 0o600)
 
 	cmd := NewRootCmd()
@@ -457,7 +457,7 @@ func TestRemoveRecipient_RefusesEmpty(t *testing.T) {
 		_ = crypto.SaveKeyPEM(filepath.Join(dir, name+".pub"), pub, 0o644)
 	}
 	in := filepath.Join(dir, "s.txt")
-	bundleFile := filepath.Join(dir, "s.vpack")
+	bundleFile := filepath.Join(dir, "s.katame")
 	os.WriteFile(in, []byte("p"), 0o600)
 	cmd := NewRootCmd()
 	cmd.SetArgs([]string{"protect", "--in", in, "--out", bundleFile,
@@ -489,7 +489,7 @@ func TestRotationChain_AppendsAcrossOps(t *testing.T) {
 	_ = crypto.SaveKeyPEM(filepath.Join(dir, "b.pub"), pub2, 0o644)
 
 	in := filepath.Join(dir, "s.txt")
-	bundleFile := filepath.Join(dir, "s.vpack")
+	bundleFile := filepath.Join(dir, "s.katame")
 	os.WriteFile(in, []byte("chain test"), 0o600)
 
 	cmd := NewRootCmd()

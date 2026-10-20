@@ -21,7 +21,7 @@ func TestIsAzureHelper(t *testing.T) {
 func TestProtectCmd_AzureInputRequiresConfig(t *testing.T) {
 	// When --in is az:// but no Azure config, should get an Azure-related error.
 	tmpDir := t.TempDir()
-	outFile := filepath.Join(tmpDir, "out.vpack")
+	outFile := filepath.Join(tmpDir, "out.katame")
 
 	cmd := NewRootCmd()
 	cmd.SetArgs([]string{
@@ -48,7 +48,7 @@ func TestDecryptCmd_AzureInputRequiresConfig(t *testing.T) {
 	cmd := NewRootCmd()
 	cmd.SetArgs([]string{
 		"decrypt",
-		"--in", "az://testcontainer/testblob.vpack",
+		"--in", "az://testcontainer/testblob.katame",
 		"--out", outFile,
 		"--key", "dummy.key",
 	})
@@ -63,7 +63,7 @@ func TestInspectCmd_AzureInputRequiresConfig(t *testing.T) {
 	cmd := NewRootCmd()
 	cmd.SetArgs([]string{
 		"inspect",
-		"--in", "az://testcontainer/testblob.vpack",
+		"--in", "az://testcontainer/testblob.katame",
 	})
 
 	err := cmd.Execute()
@@ -108,11 +108,11 @@ func TestProtectDecrypt_LocalRoundTrip_Unaffected(t *testing.T) {
 	// Verify that local (non-Azure) protect/decrypt still works fine.
 	tmpDir := t.TempDir()
 	inputFile := filepath.Join(tmpDir, "test.txt")
-	bundleFile := filepath.Join(tmpDir, "test.vpack")
+	bundleFile := filepath.Join(tmpDir, "test.katame")
 	keyFile := filepath.Join(tmpDir, "test.key")
 	outputFile := filepath.Join(tmpDir, "test_decrypted.txt")
 
-	content := "Hello, VaultPack with Azure integration!"
+	content := "Hello, Katame with Azure integration!"
 	if err := os.WriteFile(inputFile, []byte(content), 0o600); err != nil {
 		t.Fatal(err)
 	}

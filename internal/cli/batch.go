@@ -95,9 +95,9 @@ func collectFiles(dir string, include, exclude []string) ([]string, error) {
 	return files, err
 }
 
-// collectVpackFiles walks a directory for .vpack files.
-func collectVpackFiles(dir string) ([]string, error) {
-	return collectFiles(dir, []string{"*.vpack"}, nil)
+// collectKatameFiles walks a directory for .katame files.
+func collectKatameFiles(dir string) ([]string, error) {
+	return collectFiles(dir, []string{"*.katame"}, nil)
 }
 
 // buildBatchEntries maps source files to output files, preserving directory structure.
@@ -115,12 +115,12 @@ func buildBatchEntries(files []string, srcDir, outDir, suffix string) []BatchFil
 	return entries
 }
 
-// buildBatchDecryptEntries maps .vpack files to output files, stripping the .vpack extension.
+// buildBatchDecryptEntries maps .katame files to output files, stripping the .katame extension.
 func buildBatchDecryptEntries(files []string, srcDir, outDir string) []BatchFileEntry {
 	entries := make([]BatchFileEntry, 0, len(files))
 	for _, f := range files {
 		relPath, _ := filepath.Rel(srcDir, f)
-		outName := strings.TrimSuffix(relPath, ".vpack")
+		outName := strings.TrimSuffix(relPath, ".katame")
 		outPath := filepath.Join(outDir, outName)
 		entries = append(entries, BatchFileEntry{
 			InputPath:  f,

@@ -1,4 +1,4 @@
-package vaultpack
+package katame
 
 import (
 	"bytes"
@@ -7,15 +7,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
 )
 
 type stdSigner = stdcrypto.Signer
 
 // SignOptions controls a single Sign call.
 //
-// SignBundle rewrites an existing .vpack file in place, adding (or replacing)
+// SignBundle rewrites an existing .katame file in place, adding (or replacing)
 // the detached signature.sig entry and populating manifest.signature_algo /
 // manifest.signed_at. Exactly one of {PrivateKey, PrivateKeyPath} must be set.
 type SignOptions struct {
@@ -30,11 +30,11 @@ type SignOptions struct {
 // metadata. Browser / WASM friendly.
 func SignBytes(bundleBytes []byte, opts SignOptions) ([]byte, *SignResult, error) {
 	if opts.PrivateKey == nil && opts.PrivateKeyPath == "" {
-		return nil, nil, errors.New("vaultpack.SignBytes: PrivateKey or PrivateKeyPath is required")
+		return nil, nil, errors.New("katame.SignBytes: PrivateKey or PrivateKeyPath is required")
 	}
 	br, err := bundle.ReadBytes(bundleBytes)
 	if err != nil {
-		return nil, nil, fmt.Errorf("vaultpack.SignBytes: read: %w", err)
+		return nil, nil, fmt.Errorf("katame.SignBytes: read: %w", err)
 	}
 	signer, detected, err := loadSigner(opts.PrivateKey, opts.PrivateKeyPath)
 	if err != nil {
@@ -43,7 +43,7 @@ func SignBytes(bundleBytes []byte, opts SignOptions) ([]byte, *SignResult, error
 	algo := detected
 	if opts.Algo != "" {
 		if opts.Algo != detected {
-			return nil, nil, fmt.Errorf("vaultpack.SignBytes: Algo %q does not match key type %q", opts.Algo, detected)
+			return nil, nil, fmt.Errorf("katame.SignBytes: Algo %q does not match key type %q", opts.Algo, detected)
 		}
 		algo = opts.Algo
 	}
@@ -53,19 +53,19 @@ func SignBytes(bundleBytes []byte, opts SignOptions) ([]byte, *SignResult, error
 
 	canonical, err := bundle.CanonicalManifest(br.Manifest)
 	if err != nil {
-		return nil, nil, fmt.Errorf("vaultpack.SignBytes: canonicalize: %w", err)
+		return nil, nil, fmt.Errorf("katame.SignBytes: canonicalize: %w", err)
 	}
 	payloadHash, err := crypto.HashReader(bytes.NewReader(br.Ciphertext), "sha256")
 	if err != nil {
-		return nil, nil, fmt.Errorf("vaultpack.SignBytes: hash: %w", err)
+		return nil, nil, fmt.Errorf("katame.SignBytes: hash: %w", err)
 	}
 	sig, err := crypto.SignMessage(signer, algo, crypto.BuildSigningMessage(canonical, payloadHash))
 	if err != nil {
-		return nil, nil, fmt.Errorf("vaultpack.SignBytes: sign: %w", err)
+		return nil, nil, fmt.Errorf("katame.SignBytes: sign: %w", err)
 	}
 	mb, err := bundle.MarshalManifest(br.Manifest)
 	if err != nil {
-		return nil, nil, fmt.Errorf("vaultpack.SignBytes: marshal manifest: %w", err)
+		return nil, nil, fmt.Errorf("katame.SignBytes: marshal manifest: %w", err)
 	}
 	var out bytes.Buffer
 	if err := bundle.Write(&bundle.WriteParams{
@@ -74,7 +74,7 @@ func SignBytes(bundleBytes []byte, opts SignOptions) ([]byte, *SignResult, error
 		ManifestBytes: mb,
 		Signature:     sig,
 	}); err != nil {
-		return nil, nil, fmt.Errorf("vaultpack.SignBytes: write: %w", err)
+		return nil, nil, fmt.Errorf("katame.SignBytes: write: %w", err)
 	}
 	return out.Bytes(), &SignResult{Algorithm: algo, SignedAt: ts, Signature: sig}, nil
 }
@@ -101,25 +101,25 @@ type SignResult struct {
 // payload, using the supplied signing key.
 func SignBundle(opts SignOptions) (*SignResult, error) {
 	if opts.BundlePath == "" {
-		return nil, errors.New("vaultpack.SignBundle: BundlePath is required")
+		return nil, errors.New("katame.SignBundle: BundlePath is required")
 	}
 	if opts.PrivateKey == nil && opts.PrivateKeyPath == "" {
-		return nil, errors.New("vaultpack.SignBundle: PrivateKey or PrivateKeyPath is required")
+		return nil, errors.New("katame.SignBundle: PrivateKey or PrivateKeyPath is required")
 	}
 
 	br, err := bundle.Read(opts.BundlePath)
 	if err != nil {
-		return nil, fmt.Errorf("vaultpack.SignBundle: read: %w", err)
+		return nil, fmt.Errorf("katame.SignBundle: read: %w", err)
 	}
 	signer, detected, err := loadSigner(opts.PrivateKey, opts.PrivateKeyPath)
 	if err != nil {
-		return nil, fmt.Errorf("vaultpack.SignBundle: load key: %w", err)
+		return nil, fmt.Errorf("katame.SignBundle: load key: %w", err)
 	}
 
 	algo := detected
 	if opts.Algo != "" {
 		if opts.Algo != detected {
-			return nil, fmt.Errorf("vaultpack.SignBundle: Algo %q does not match key type %q", opts.Algo, detected)
+			return nil, fmt.Errorf("katame.SignBundle: Algo %q does not match key type %q", opts.Algo, detected)
 		}
 		algo = opts.Algo
 	}
@@ -130,21 +130,21 @@ func SignBundle(opts SignOptions) (*SignResult, error) {
 
 	canonical, err := bundle.CanonicalManifest(br.Manifest)
 	if err != nil {
-		return nil, fmt.Errorf("vaultpack.SignBundle: canonicalize: %w", err)
+		return nil, fmt.Errorf("katame.SignBundle: canonicalize: %w", err)
 	}
 	payloadHash, err := crypto.HashReader(bytes.NewReader(br.Ciphertext), "sha256")
 	if err != nil {
-		return nil, fmt.Errorf("vaultpack.SignBundle: hash payload: %w", err)
+		return nil, fmt.Errorf("katame.SignBundle: hash payload: %w", err)
 	}
 	sigMsg := crypto.BuildSigningMessage(canonical, payloadHash)
 	sig, err := crypto.SignMessage(signer, algo, sigMsg)
 	if err != nil {
-		return nil, fmt.Errorf("vaultpack.SignBundle: sign: %w", err)
+		return nil, fmt.Errorf("katame.SignBundle: sign: %w", err)
 	}
 
 	manifestBytes, err := bundle.MarshalManifest(br.Manifest)
 	if err != nil {
-		return nil, fmt.Errorf("vaultpack.SignBundle: marshal manifest: %w", err)
+		return nil, fmt.Errorf("katame.SignBundle: marshal manifest: %w", err)
 	}
 	if err := bundle.Write(&bundle.WriteParams{
 		OutputPath:    opts.BundlePath,
@@ -152,7 +152,7 @@ func SignBundle(opts SignOptions) (*SignResult, error) {
 		ManifestBytes: manifestBytes,
 		Signature:     sig,
 	}); err != nil {
-		return nil, fmt.Errorf("vaultpack.SignBundle: write: %w", err)
+		return nil, fmt.Errorf("katame.SignBundle: write: %w", err)
 	}
 
 	return &SignResult{

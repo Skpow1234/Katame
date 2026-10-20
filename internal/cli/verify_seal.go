@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -17,8 +17,8 @@ func newVerifySealCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "verify-seal",
-		Short: "Verify Merkle root of .vpack bundles in a directory",
-		Long:  "Recompute the Merkle root over all .vpack files in the directory and compare with the expected root. Exits with code 0 if intact, 10 if verification fails.",
+		Short: "Verify Merkle root of .katame bundles in a directory",
+		Long:  "Recompute the Merkle root over all .katame files in the directory and compare with the expected root. Exits with code 0 if intact, 10 if verification fails.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printer := NewPrinter(flagJSON, flagQuiet)
 
@@ -59,7 +59,7 @@ func newVerifySealCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&dir, "dir", "", "directory containing .vpack bundles (required)")
+	cmd.Flags().StringVar(&dir, "dir", "", "directory containing .katame bundles (required)")
 	cmd.Flags().StringVar(&root, "root", "", "expected Merkle root (hex) from seal (required)")
 
 	return cmd

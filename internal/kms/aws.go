@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	// EncryptionContextKey is the key used in AWS KMS encryption context for vaultpack DEK wrap.
-	EncryptionContextKey = "vaultpack"
+	// EncryptionContextKey is the key used in AWS KMS encryption context for katame DEK wrap.
+	EncryptionContextKey = "katame"
 	// EncryptionContextValue is the value for the context key.
 	EncryptionContextValue = "dek-wrap"
 )

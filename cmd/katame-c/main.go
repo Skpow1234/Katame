@@ -1,16 +1,16 @@
 //go:build cgo && cshared
 
-// Package main builds a C-shared library (libvaultpack.so / .dylib / .dll)
-// exposing the VaultPack SDK to native callers (Python, Ruby, Java, etc).
+// Package main builds a C-shared library (libkatame.so / .dylib / .dll)
+// exposing the Katame SDK to native callers (Python, Ruby, Java, etc).
 //
 // Build:
 //
-//	go build -buildmode=c-shared -tags cshared -o libvaultpack.so ./cmd/vaultpack-c
+//	go build -buildmode=c-shared -tags cshared -o libkatame.so ./cmd/katame-c
 //
 // The exported C ABI is intentionally small and JSON-based: every entry
 // point takes a single null-terminated JSON string and returns a single
 // malloc-allocated JSON string. The caller is responsible for releasing the
-// returned string with vp_free.
+// returned string with kt_free.
 package main
 
 /*
@@ -22,9 +22,9 @@ import (
 	"encoding/json"
 	"unsafe"
 
-	_ "github.com/Skpow1234/Vaultpack/internal/kms" // register aws/gcp/azure/mock providers
-	"github.com/Skpow1234/Vaultpack/internal/util"
-	"github.com/Skpow1234/Vaultpack/pkg/vaultpack"
+	_ "github.com/Skpow1234/Katame/internal/kms" // register aws/gcp/azure/mock providers
+	"github.com/Skpow1234/Katame/internal/util"
+	"github.com/Skpow1234/Katame/pkg/katame"
 )
 
 func jsonReply(v any) *C.char {
@@ -39,13 +39,13 @@ func errReply(msg string) *C.char {
 	return jsonReply(map[string]any{"ok": false, "error": msg})
 }
 
-//export vp_version
-func vp_version() *C.char {
-	return C.CString(vaultpack.Version)
+//export kt_version
+func kt_version() *C.char {
+	return C.CString(katame.Version)
 }
 
-//export vp_free
-func vp_free(p *C.char) {
+//export kt_free
+func kt_free(p *C.char) {
 	if p != nil {
 		C.free(unsafe.Pointer(p))
 	}
@@ -56,8 +56,8 @@ type recipientIn struct {
 	PublicKeyPath string `json:"public_key_path,omitempty"`
 }
 
-//export vp_protect
-func vp_protect(cOpts *C.char) *C.char {
+//export kt_protect
+func kt_protect(cOpts *C.char) *C.char {
 	var in struct {
 		InputPath      string        `json:"input_path,omitempty"`
 		PlaintextB64   string        `json:"plaintext_b64,omitempty"`
@@ -80,7 +80,7 @@ func vp_protect(cOpts *C.char) *C.char {
 		return errReply("invalid JSON: " + err.Error())
 	}
 
-	opts := vaultpack.ProtectOptions{
+	opts := katame.ProtectOptions{
 		InputPath:      in.InputPath,
 		OutputPath:     in.OutputPath,
 		Password:       in.Password,
@@ -116,14 +116,14 @@ func vp_protect(cOpts *C.char) *C.char {
 		opts.AAD = a
 	}
 	for _, r := range in.Recipients {
-		rec := vaultpack.Recipient{PublicKeyPath: r.PublicKeyPath}
+		rec := katame.Recipient{PublicKeyPath: r.PublicKeyPath}
 		if r.PublicKeyPEM != "" {
 			rec.PublicKeyPEM = []byte(r.PublicKeyPEM)
 		}
 		opts.Recipients = append(opts.Recipients, rec)
 	}
 
-	res, err := vaultpack.Protect(opts)
+	res, err := katame.Protect(opts)
 	if err != nil {
 		return errReply(err.Error())
 	}
@@ -145,8 +145,8 @@ func vp_protect(cOpts *C.char) *C.char {
 	return jsonReply(out)
 }
 
-//export vp_decrypt
-func vp_decrypt(cOpts *C.char) *C.char {
+//export kt_decrypt
+func kt_decrypt(cOpts *C.char) *C.char {
 	var in struct {
 		InputPath      string `json:"input_path,omitempty"`
 		BundleB64      string `json:"bundle_b64,omitempty"`
@@ -162,7 +162,7 @@ func vp_decrypt(cOpts *C.char) *C.char {
 		return errReply("invalid JSON: " + err.Error())
 	}
 
-	opts := vaultpack.DecryptOptions{
+	opts := katame.DecryptOptions{
 		InputPath:      in.InputPath,
 		OutputPath:     in.OutputPath,
 		Password:       in.Password,
@@ -194,7 +194,7 @@ func vp_decrypt(cOpts *C.char) *C.char {
 		opts.AAD = a
 	}
 
-	res, err := vaultpack.Decrypt(opts)
+	res, err := katame.Decrypt(opts)
 	if err != nil {
 		return errReply(err.Error())
 	}
@@ -208,8 +208,8 @@ func vp_decrypt(cOpts *C.char) *C.char {
 	return jsonReply(out)
 }
 
-//export vp_inspect
-func vp_inspect(cOpts *C.char) *C.char {
+//export kt_inspect
+func kt_inspect(cOpts *C.char) *C.char {
 	raw := C.GoString(cOpts)
 	// Accept either a raw path string or a JSON object for consistency.
 	var in struct {
@@ -224,7 +224,7 @@ func vp_inspect(cOpts *C.char) *C.char {
 			if err != nil {
 				return errReply("decode bundle_b64: " + err.Error())
 			}
-			m, err := vaultpack.InspectBytes(b)
+			m, err := katame.InspectBytes(b)
 			if err != nil {
 				return errReply(err.Error())
 			}
@@ -235,15 +235,15 @@ func vp_inspect(cOpts *C.char) *C.char {
 			path = in.Path
 		}
 	}
-	m, err := vaultpack.Inspect(path)
+	m, err := katame.Inspect(path)
 	if err != nil {
 		return errReply(err.Error())
 	}
 	return jsonReply(map[string]any{"ok": true, "manifest": m})
 }
 
-//export vp_sign
-func vp_sign(cOpts *C.char) *C.char {
+//export kt_sign
+func kt_sign(cOpts *C.char) *C.char {
 	var in struct {
 		BundlePath     string `json:"bundle_path"`
 		PrivateKeyPEM  string `json:"private_key_pem,omitempty"`
@@ -253,7 +253,7 @@ func vp_sign(cOpts *C.char) *C.char {
 	if err := json.Unmarshal([]byte(C.GoString(cOpts)), &in); err != nil {
 		return errReply("invalid JSON: " + err.Error())
 	}
-	opts := vaultpack.SignOptions{
+	opts := katame.SignOptions{
 		BundlePath:     in.BundlePath,
 		PrivateKeyPath: in.PrivateKeyPath,
 		Algo:           in.Algo,
@@ -261,7 +261,7 @@ func vp_sign(cOpts *C.char) *C.char {
 	if in.PrivateKeyPEM != "" {
 		opts.PrivateKey = []byte(in.PrivateKeyPEM)
 	}
-	res, err := vaultpack.SignBundle(opts)
+	res, err := katame.SignBundle(opts)
 	if err != nil {
 		return errReply(err.Error())
 	}
@@ -273,8 +273,8 @@ func vp_sign(cOpts *C.char) *C.char {
 	})
 }
 
-//export vp_verify
-func vp_verify(cOpts *C.char) *C.char {
+//export kt_verify
+func kt_verify(cOpts *C.char) *C.char {
 	var in struct {
 		BundlePath    string `json:"bundle_path"`
 		PublicKeyPEM  string `json:"public_key_pem,omitempty"`
@@ -283,14 +283,14 @@ func vp_verify(cOpts *C.char) *C.char {
 	if err := json.Unmarshal([]byte(C.GoString(cOpts)), &in); err != nil {
 		return errReply("invalid JSON: " + err.Error())
 	}
-	opts := vaultpack.VerifyOptions{
+	opts := katame.VerifyOptions{
 		BundlePath:    in.BundlePath,
 		PublicKeyPath: in.PublicKeyPath,
 	}
 	if in.PublicKeyPEM != "" {
 		opts.PublicKey = []byte(in.PublicKeyPEM)
 	}
-	res, err := vaultpack.Verify(opts)
+	res, err := katame.Verify(opts)
 	if err != nil {
 		return errReply(err.Error())
 	}
@@ -303,8 +303,8 @@ func vp_verify(cOpts *C.char) *C.char {
 	})
 }
 
-//export vp_rewrap
-func vp_rewrap(cOpts *C.char) *C.char {
+//export kt_rewrap
+func kt_rewrap(cOpts *C.char) *C.char {
 	var in struct {
 		InputPath   string `json:"input_path,omitempty"`
 		OutputPath  string `json:"output_path,omitempty"`
@@ -315,7 +315,7 @@ func vp_rewrap(cOpts *C.char) *C.char {
 	if err := json.Unmarshal([]byte(C.GoString(cOpts)), &in); err != nil {
 		return errReply("invalid JSON: " + err.Error())
 	}
-	res, err := vaultpack.Rewrap(vaultpack.RewrapOptions{
+	res, err := katame.Rewrap(katame.RewrapOptions{
 		InputPath:   in.InputPath,
 		OutputPath:  in.OutputPath,
 		KMSProvider: in.KMSProvider,

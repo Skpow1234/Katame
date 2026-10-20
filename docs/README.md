@@ -1,4 +1,4 @@
-# VaultPack documentation
+# Katame documentation
 
 | Guide | Description |
 | ----- | ----------- |
@@ -9,14 +9,14 @@
 | [Audit & reports](audit.md) | Audit log, attest, seal, report |
 | [Policy & RBAC](policy.md) | YAML/JSON/Rego enforcement |
 | [Transparency](transparency.md) | Sigstore Rekor / Fulcio |
-| [Tamper-evident repo](repo.md) | `vaultpack repo` Merkle history |
+| [Tamper-evident repo](repo.md) | `katame repo` Merkle history |
 | [Key-source URIs](key-sources.md) | `file://`, `env://`, `b64://`, reserved HSM schemes |
-| [Service mode](serve.md) | `vaultpack serve` overview |
+| [Service mode](serve.md) | `katame serve` overview |
 | [HTTP endpoints](endpoints.md) | API routes, auth, metrics |
 | [OpenAPI](openapi.yaml) | OpenAPI 3.1 contract |
 | [SDK & bindings](sdk.md) | Go, C-shared, Python, TypeScript/WASM |
 | [Security](security.md) | Algorithms, chunked AEAD, threat properties |
-| [Bundle design](design.md) | `.vpack` layout and manifest schema |
+| [Bundle design](design.md) | `.katame` layout and manifest schema |
 | [Plugins](plugins.md) | Custom KEM / sign plugins |
 | [Recipes](recipes.md) | Common workflows |
 | [Deployment](deployment.md) | Binaries, Docker, sidecar, packages |

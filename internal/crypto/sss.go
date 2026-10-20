@@ -6,7 +6,7 @@
 //
 // Share format (per share file):
 //
-//	Header: "VAULTPACK-SHARE-V1\n"
+//	Header: "KATAME-SHARE-V1\n"
 //	Index:  1-byte share index (1..N, never 0)
 //	Threshold: 1-byte threshold K
 //	Total:  1-byte total shares N
@@ -25,8 +25,8 @@ import (
 )
 
 const (
-	// ShareFileHeader identifies a VaultPack share file.
-	ShareFileHeader = "VAULTPACK-SHARE-V1\n"
+	// ShareFileHeader identifies a Katame share file.
+	ShareFileHeader = "KATAME-SHARE-V1\n"
 	// shareHeaderSize = len(header) + 1(index) + 1(threshold) + 1(total) + 2(keyLen) + 4(checksum)
 	shareMetaSize = 1 + 1 + 1 + 2 + 4 // 9 bytes after the header
 )

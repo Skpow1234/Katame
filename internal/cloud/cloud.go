@@ -1,6 +1,6 @@
 // Package cloud provides a unified abstraction over remote object stores
 // (Azure Blob, AWS S3, Google Cloud Storage) and read-only HTTPS for
-// VaultPack's --in/--out support.
+// Katame's --in/--out support.
 //
 // Supported URI schemes:
 //
@@ -89,7 +89,7 @@ func ParseBucketKey(uri string) (bucket, key string, err error) {
 	return bucket, key, nil
 }
 
-// Store is the minimal blob-store interface used by VaultPack's CLI for
+// Store is the minimal blob-store interface used by Katame's CLI for
 // remote --in/--out support. Implementations are constructed per scheme.
 type Store interface {
 	// Scheme returns the URI scheme this store handles ("az", "s3", "gs", "https").

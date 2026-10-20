@@ -5,13 +5,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
 func TestProtectCmd_ProducesBundle(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "secret.txt")
-	outFile := filepath.Join(dir, "secret.vpack")
+	outFile := filepath.Join(dir, "secret.katame")
 	keyFile := filepath.Join(dir, "secret.key")
 
 	if err := os.WriteFile(inFile, []byte("my secret data"), 0o600); err != nil {
@@ -66,7 +66,7 @@ func TestProtectCmd_MissingIn(t *testing.T) {
 func TestProtectCmd_WithAAD(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.json")
-	outFile := filepath.Join(dir, "data.vpack")
+	outFile := filepath.Join(dir, "data.katame")
 	keyFile := filepath.Join(dir, "data.key")
 
 	os.WriteFile(inFile, []byte(`{"key":"value"}`), 0o600)

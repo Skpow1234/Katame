@@ -1,6 +1,6 @@
 // Package azureadp adapts the existing internal/azure package to the
 // cloud.Store interface so it can be plumbed through the generic
-// remote-I/O helpers used by VaultPack's CLI.
+// remote-I/O helpers used by Katame's CLI.
 package azureadp
 
 import (
@@ -8,10 +8,10 @@ import (
 	"context"
 	"io"
 
-	azuremod "github.com/Skpow1234/Vaultpack/internal/azure"
+	azuremod "github.com/Skpow1234/Katame/internal/azure"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 
-	"github.com/Skpow1234/Vaultpack/internal/cloud"
+	"github.com/Skpow1234/Katame/internal/cloud"
 )
 
 // Store implements cloud.Store on top of internal/azure.

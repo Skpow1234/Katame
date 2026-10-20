@@ -1,6 +1,6 @@
 # HTTP endpoints
 
-Base: `vaultpack serve`. All `/v1/*` replies use `{"ok": true|false, ...}`.
+Base: `katame serve`. All `/v1/*` replies use `{"ok": true|false, ...}`.
 
 | Method | Path | Auth | Purpose |
 | ------ | ---- | ---- | ------- |
@@ -25,7 +25,7 @@ Send `Authorization: Bearer <token>` when using bearer auth, or present a client
 ## curl round-trip
 
 ```bash
-TOKEN="$(cat /etc/vaultpack/token)"
+TOKEN="$(cat /etc/katame/token)"
 
 RESPONSE=$(curl -s -X POST https://vp.example.com/v1/protect \
   -H "Authorization: Bearer $TOKEN" \
@@ -69,11 +69,11 @@ KMS rewrap of an existing wrapped DEK (rotation without touching payload ciphert
 
 Prometheus 0.0.4 text at `GET /metrics`:
 
-- `vaultpack_build_info{version}`
-- `vaultpack_uptime_seconds`
-- `vaultpack_http_requests_total{path,status}`
-- `vaultpack_http_request_duration_seconds` (histogram)
-- `vaultpack_auth_denied_total`
-- `vaultpack_kms_cache_entries` / `_hits_total` / `_misses_total` / `_evicted_total`
+- `katame_build_info{version}`
+- `katame_uptime_seconds`
+- `katame_http_requests_total{path,status}`
+- `katame_http_request_duration_seconds` (histogram)
+- `katame_auth_denied_total`
+- `katame_kms_cache_entries` / `_hits_total` / `_misses_total` / `_evicted_total`
 
 Default body limit: 64 MiB (`--max-request-bytes`).

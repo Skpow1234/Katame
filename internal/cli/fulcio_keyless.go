@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/transparency"
+	"github.com/Skpow1234/Katame/internal/transparency"
 )
 
 // keylessSession is what `sign --keyless` produces: an ephemeral ECDSA

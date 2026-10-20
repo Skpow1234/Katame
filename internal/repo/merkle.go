@@ -1,5 +1,5 @@
 // Package repo implements a tamper-evident, append-only repository of
-// .vpack bundles. Each `repo add` appends a new leaf to an RFC 6962-style
+// .katame bundles. Each `repo add` appends a new leaf to an RFC 6962-style
 // Merkle history tree, signs the resulting root, and (optionally) anchors
 // it in a Sigstore Rekor log. `repo verify` walks the log forward and
 // recomputes every root, ensuring the chain is intact and every entry's
@@ -54,7 +54,7 @@ func NodeHash(left, right []byte) []byte {
 // canonical hash SHA-256("").
 //
 // The tree stores only leaf hashes; internal hashes are recomputed on
-// demand. For VaultPack repos the leaf count is small (one per `repo add`),
+// demand. For Katame repos the leaf count is small (one per `repo add`),
 // so memory cost is negligible.
 type MerkleTree struct {
 	leaves [][]byte

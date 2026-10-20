@@ -7,7 +7,7 @@ import (
 )
 
 func TestStreamEncryptDecryptRoundTrip(t *testing.T) {
-	plaintext := []byte("hello vaultpack streaming encryption!")
+	plaintext := []byte("hello katame streaming encryption!")
 	key, _ := GenerateKey(AES256KeySize)
 
 	var cipherBuf bytes.Buffer

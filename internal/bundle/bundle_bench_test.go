@@ -26,7 +26,7 @@ func BenchmarkWrite_1MB(b *testing.B) {
 	ciphertext := make([]byte, benchSize1MB)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		path := filepath.Join(dir, "out.vpack")
+		path := filepath.Join(dir, "out.katame")
 		err := Write(&WriteParams{
 			OutputPath:    path,
 			Ciphertext:    ciphertext,
@@ -48,7 +48,7 @@ func BenchmarkWrite_100MB(b *testing.B) {
 	ciphertext := make([]byte, benchSize100MB)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		path := filepath.Join(dir, "out.vpack")
+		path := filepath.Join(dir, "out.katame")
 		err := Write(&WriteParams{
 			OutputPath:    path,
 			Ciphertext:    ciphertext,
@@ -62,7 +62,7 @@ func BenchmarkWrite_100MB(b *testing.B) {
 
 func BenchmarkRead_1MB(b *testing.B) {
 	dir := b.TempDir()
-	path := filepath.Join(dir, "read.vpack")
+	path := filepath.Join(dir, "read.katame")
 	m := benchManifest(benchSize1MB)
 	manifestBytes, _ := MarshalManifest(m)
 	ciphertext := make([]byte, benchSize1MB)
@@ -82,7 +82,7 @@ func BenchmarkRead_1MB(b *testing.B) {
 
 func BenchmarkRead_100MB(b *testing.B) {
 	dir := b.TempDir()
-	path := filepath.Join(dir, "read.vpack")
+	path := filepath.Join(dir, "read.katame")
 	m := benchManifest(benchSize100MB)
 	manifestBytes, _ := MarshalManifest(m)
 	ciphertext := make([]byte, benchSize100MB)

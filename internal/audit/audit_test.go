@@ -16,7 +16,7 @@ func TestFileLogger_Log(t *testing.T) {
 	e := &Entry{
 		Operation:  OpProtect,
 		InputFile:  "test.txt",
-		OutputFile: "test.vpack",
+		OutputFile: "test.katame",
 		Success:    true,
 	}
 	if err := logger.Log(e); err != nil {

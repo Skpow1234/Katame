@@ -13,7 +13,7 @@ build/
 *.dll
 *.so
 *.dylib
-/vaultpack
+/katame
 
 # Test artifacts
 *.test
@@ -51,12 +51,12 @@ signing.pub
 nul
 NUL
 
-# VaultPack bundles (don't commit test outputs)
-*.vpack
+# Katame bundles (don't commit test outputs)
+*.katame
 
 # Bindings staged native artifacts (built locally via go build)
-bindings/python/vaultpack/libvaultpack.*
-bindings/typescript/vaultpack.wasm
+bindings/python/katame/libkatame.*
+bindings/typescript/katame.wasm
 bindings/typescript/wasm_exec.js
 
 # Python build/cache artifacts

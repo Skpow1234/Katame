@@ -1,4 +1,4 @@
-// Dummy KEM plugin for VaultPack (Milestone 19 example).
+// Dummy KEM plugin for Katame (Milestone 19 example).
 // NOT SECURE — for demonstration only. Registers scheme "dummy-kem".
 package main
 
@@ -18,7 +18,7 @@ const schemeName = "dummy-kem"
 const wrapByte = 0x42
 
 func main() {
-	if len(os.Args) >= 2 && os.Args[1] == "--vpack-list" {
+	if len(os.Args) >= 2 && os.Args[1] == "--katame-list" {
 		out := map[string][]string{"kem": {schemeName}, "sign": {}}
 		b, _ := json.Marshal(out)
 		fmt.Println(string(b))
@@ -59,7 +59,7 @@ func runKeygen(args []string) {
 	pubPath := strings.TrimSuffix(privPath, ".key") + ".pub"
 	// Dummy key material (fixed for demo).
 	privContent := "dummy-kem-private-key\n"
-	pubContent := "VPACK-KEM-SCHEME: " + schemeName + "\n" + "dummy-kem-public-key\n"
+	pubContent := "KATAME-KEM-SCHEME: " + schemeName + "\n" + "dummy-kem-public-key\n"
 	if err := os.WriteFile(privPath, []byte(privContent), 0o600); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -80,7 +80,7 @@ func runEncapsulate(args []string) {
 	}
 	// Generate or use provided DEK.
 	var dek []byte
-	if b64 := os.Getenv("VPACK_DEK_B64"); b64 != "" {
+	if b64 := os.Getenv("KATAME_DEK_B64"); b64 != "" {
 		var err error
 		dek, err = base64.StdEncoding.DecodeString(b64)
 		if err != nil || len(dek) == 0 {
@@ -114,7 +114,7 @@ func runDecapsulate(args []string) {
 	if *algo != schemeName || *privkey == "" {
 		os.Exit(1)
 	}
-	inputB64 := os.Getenv("VPACK_CIPHERTEXT_B64")
+	inputB64 := os.Getenv("KATAME_CIPHERTEXT_B64")
 	if inputB64 == "" {
 		os.Exit(1)
 	}

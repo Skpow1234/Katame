@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Skpow1234/Vaultpack/internal/config"
-	"github.com/Skpow1234/Vaultpack/internal/plugin"
-	"github.com/Skpow1234/Vaultpack/internal/policy"
+	"github.com/Skpow1234/Katame/internal/config"
+	"github.com/Skpow1234/Katame/internal/plugin"
+	"github.com/Skpow1234/Katame/internal/policy"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
@@ -30,19 +30,19 @@ var (
 // NewRootCmd creates the top-level cobra command with global flags.
 func NewRootCmd() *cobra.Command {
 	root := &cobra.Command{
-		Use:     "vaultpack",
+		Use:     "katame",
 		Short:   "Protect data artifacts with encryption, hashing, and signing",
-		Long:    "VaultPack encrypts, hashes, and signs data artifacts into portable .vpack bundles.",
+		Long:    "Katame encrypts, hashes, and signs data artifacts into portable .katame bundles.",
 		Version: Version,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			// Load config (optional): --config or VPACK_CONFIG, then ~/.vpack.yaml, ./.vpack.yaml.
-			// Profile: --profile or VPACK_PROFILE. Errors are ignored so commands run with defaults.
+			// Load config (optional): --config or KATAME_CONFIG, then ~/.katame.yaml, ./.katame.yaml.
+			// Profile: --profile or KATAME_PROFILE. Errors are ignored so commands run with defaults.
 			_, _ = config.Load(flagConfig, flagProfile)
 			// Precedence: CLI flags > env vars > config file > built-in defaults.
 			root := cmd.Root()
 			if root != nil && root.PersistentFlags().Changed("audit-log") {
 				effectiveAuditLogPath = flagAuditLog
-			} else if v := os.Getenv("VAULTPACK_AUDIT_LOG"); v != "" {
+			} else if v := os.Getenv("KATAME_AUDIT_LOG"); v != "" {
 				effectiveAuditLogPath = v
 			} else if c := config.Get(); c != nil && c.AuditLog != "" {
 				effectiveAuditLogPath = c.AuditLog
@@ -59,10 +59,10 @@ func NewRootCmd() *cobra.Command {
 				zerolog.SetGlobalLevel(zerolog.ErrorLevel)
 			}
 
-			// Policy resolution: --policy > VAULTPACK_POLICY env > config.policy_file.
+			// Policy resolution: --policy > KATAME_POLICY env > config.policy_file.
 			policyPath := flagPolicy
 			if policyPath == "" {
-				policyPath = os.Getenv("VAULTPACK_POLICY")
+				policyPath = os.Getenv("KATAME_POLICY")
 			}
 			if policyPath == "" {
 				if c := config.Get(); c != nil {
@@ -73,12 +73,12 @@ func NewRootCmd() *cobra.Command {
 				ev, err := policy.Load(policyPath)
 				if err != nil {
 					// Fail-closed: a configured policy that cannot be loaded must
-					// not silently disable enforcement (matches vaultpack serve).
+					// not silently disable enforcement (matches katame serve).
 					return fmt.Errorf("policy load failed (%s): %w", policyPath, err)
 				}
 				policy.SetGlobal(ev)
 			}
-			// Plugin discovery: VPACK_PLUGIN_DIR or config plugin_dir.
+			// Plugin discovery: KATAME_PLUGIN_DIR or config plugin_dir.
 			pluginDir := os.Getenv(config.EnvPluginDir)
 			if pluginDir == "" && config.Get() != nil {
 				pluginDir = config.Get().PluginDir
@@ -107,14 +107,14 @@ func NewRootCmd() *cobra.Command {
 	pf.BoolVar(&awsS3PathStyle, "s3-path-style", false, "Use path-style S3 addressing")
 
 	// Audit trail.
-	pf.StringVar(&flagAuditLog, "audit-log", "", "Append-only audit log file (or VAULTPACK_AUDIT_LOG env)")
+	pf.StringVar(&flagAuditLog, "audit-log", "", "Append-only audit log file (or KATAME_AUDIT_LOG env)")
 
 	// Configuration (Milestone 16).
-	pf.StringVar(&flagConfig, "config", "", "Config file path (or VPACK_CONFIG env); default: ~/.vpack.yaml, ./.vpack.yaml")
-	pf.StringVar(&flagProfile, "profile", "", "Config profile: dev, staging, prod (or VPACK_PROFILE env)")
+	pf.StringVar(&flagConfig, "config", "", "Config file path (or KATAME_CONFIG env); default: ~/.katame.yaml, ./.katame.yaml")
+	pf.StringVar(&flagProfile, "profile", "", "Config profile: dev, staging, prod (or KATAME_PROFILE env)")
 
 	// Policy (M23).
-	pf.StringVar(&flagPolicy, "policy", "", "Policy file (YAML/JSON/Rego) to enforce before operations (or VAULTPACK_POLICY env)")
+	pf.StringVar(&flagPolicy, "policy", "", "Policy file (YAML/JSON/Rego) to enforce before operations (or KATAME_POLICY env)")
 
 	// Register subcommands.
 	root.AddCommand(newHashCmd())

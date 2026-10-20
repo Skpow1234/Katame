@@ -1,4 +1,4 @@
-// Package azure provides Azure Blob Storage I/O for VaultPack.
+// Package azure provides Azure Blob Storage I/O for Katame.
 //
 // URI scheme:
 //

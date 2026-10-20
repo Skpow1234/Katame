@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/crypto"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +26,7 @@ At least K shares are required to reconstruct the original key; fewer than K
 shares reveal zero information about the secret.
 
 Example:
-  vaultpack split-key --in data.key --shares 5 --threshold 3
+  katame split-key --in data.key --shares 5 --threshold 3
   # produces data.key.share1 … data.key.share5`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printer := NewPrinter(flagJSON, flagQuiet)

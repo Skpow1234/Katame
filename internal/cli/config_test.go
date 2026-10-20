@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/config"
+	"github.com/Skpow1234/Katame/internal/config"
 )
 
 func TestConfigCmd_LoadOrder(t *testing.T) {
 	dir := t.TempDir()
-	cfgPath := filepath.Join(dir, ".vpack.yaml")
+	cfgPath := filepath.Join(dir, ".katame.yaml")
 	content := []byte("cipher: chacha20-poly1305\nchunk_size: 32768\n")
 	if err := os.WriteFile(cfgPath, content, 0o600); err != nil {
 		t.Fatalf("write config: %v", err)
@@ -36,7 +36,7 @@ func TestConfigCmd_LoadOrder(t *testing.T) {
 
 func TestConfigCmd_ProfileSelection(t *testing.T) {
 	dir := t.TempDir()
-	cfgPath := filepath.Join(dir, "vpack.yaml")
+	cfgPath := filepath.Join(dir, "katame.yaml")
 	content := []byte(`audit_log: /default.jsonl
 profiles:
   prod:

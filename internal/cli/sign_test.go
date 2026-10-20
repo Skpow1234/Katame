@@ -5,14 +5,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
 func setupSigningTest(t *testing.T) (dir, bundlePath, privPath, pubPath string) {
 	t.Helper()
 	dir = t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	bundlePath = filepath.Join(dir, "data.vpack")
+	bundlePath = filepath.Join(dir, "data.katame")
 	keyFile := filepath.Join(dir, "data.key")
 	privPath = filepath.Join(dir, "signing.key")
 	pubPath = filepath.Join(dir, "signing.pub")

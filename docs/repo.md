@@ -1,14 +1,14 @@
 # Tamper-evident repo
 
-`vaultpack repo` maintains an append-only Merkle history of `.vpack` bundles. Each `repo add` appends a leaf, records a signed root, and can optionally anchor that root in Rekor.
+`katame repo` maintains an append-only Merkle history of `.katame` bundles. Each `repo add` appends a leaf, records a signed root, and can optionally anchor that root in Rekor.
 
 ```bash
-vaultpack keygen --out repo-signing
-vaultpack repo init --dir ./vp-repo --signing-key repo-signing.key --store-bundles
-vaultpack repo add --dir ./vp-repo --bundle secret.vpack --signing-key repo-signing.key --copy
-vaultpack repo list --dir ./vp-repo
-vaultpack repo verify --dir ./vp-repo --verify-key repo-signing.pub
-vaultpack repo anchor --dir ./vp-repo --signing-key repo-signing.key --rekor-url https://rekor.sigstore.dev
+katame keygen --out repo-signing
+katame repo init --dir ./vp-repo --signing-key repo-signing.key --store-bundles
+katame repo add --dir ./vp-repo --bundle secret.katame --signing-key repo-signing.key --copy
+katame repo list --dir ./vp-repo
+katame repo verify --dir ./vp-repo --verify-key repo-signing.pub
+katame repo anchor --dir ./vp-repo --signing-key repo-signing.key --rekor-url https://rekor.sigstore.dev
 ```
 
 ## Layout

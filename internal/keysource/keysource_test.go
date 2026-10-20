@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	vpcrypto "github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	vpcrypto "github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 func testKey() []byte {
@@ -35,8 +35,8 @@ func TestResolveSymmetricKey_File(t *testing.T) {
 
 func TestResolveSymmetricKey_Env(t *testing.T) {
 	key := testKey()
-	t.Setenv("VP_TEST_KEY", vpcrypto.KeyFilePrefix+util.B64Encode(key))
-	got, err := ResolveSymmetricKey("env://VP_TEST_KEY")
+	t.Setenv("KT_TEST_KEY", vpcrypto.KeyFilePrefix+util.B64Encode(key))
+	got, err := ResolveSymmetricKey("env://KT_TEST_KEY")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,8 +70,8 @@ func TestResolvePrivateKey_FileEnvB64(t *testing.T) {
 	if string(got) != string(pemBytes) {
 		t.Fatal("file private key mismatch")
 	}
-	t.Setenv("VP_TEST_PRIV", string(pemBytes))
-	got, err = ResolvePrivateKey("env://VP_TEST_PRIV")
+	t.Setenv("KT_TEST_PRIV", string(pemBytes))
+	got, err = ResolvePrivateKey("env://KT_TEST_PRIV")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,7 +88,7 @@ func TestResolvePrivateKey_FileEnvB64(t *testing.T) {
 }
 
 func TestUnsupportedSchemes(t *testing.T) {
-	for _, uri := range []string{"pkcs11://slot/1", "keychain://vaultpack/sign", "dpapi://vaultpack/key", "piv://slot/9c"} {
+	for _, uri := range []string{"pkcs11://slot/1", "keychain://katame/sign", "dpapi://katame/key", "piv://slot/9c"} {
 		if _, err := ResolveSymmetricKey(uri); err == nil {
 			t.Fatalf("expected unsupported error for %s", uri)
 		}

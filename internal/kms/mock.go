@@ -48,7 +48,7 @@ func (m *MockProvider) WrapDEK(plainDEK []byte, keyID string) (wrapped []byte, e
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
 		return nil, err
 	}
-	ciphertext := gcm.Seal(nonce, nonce, plainDEK, []byte("vaultpack-mock-kms"))
+	ciphertext := gcm.Seal(nonce, nonce, plainDEK, []byte("katame-mock-kms"))
 	return ciphertext, nil
 }
 
@@ -72,7 +72,7 @@ func (m *MockProvider) UnwrapDEK(wrapped []byte, keyID string) ([]byte, error) {
 		return nil, fmt.Errorf("mock kms: ciphertext too short")
 	}
 	nonce, ciphertext := wrapped[:nonceSize], wrapped[nonceSize:]
-	return gcm.Open(nil, nonce, ciphertext, []byte("vaultpack-mock-kms"))
+	return gcm.Open(nil, nonce, ciphertext, []byte("katame-mock-kms"))
 }
 
 // MockKeyID is the key ID string used by MockProvider (for manifest storage).

@@ -94,21 +94,21 @@ func (m *Metrics) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Metrics) write(w io.Writer) {
-	fmt.Fprintf(w, "# HELP vaultpack_build_info Build info; the constant 1 with a version label.\n")
-	fmt.Fprintf(w, "# TYPE vaultpack_build_info gauge\n")
-	fmt.Fprintf(w, "vaultpack_build_info{version=%q} 1\n", "1.0.0")
+	fmt.Fprintf(w, "# HELP katame_build_info Build info; the constant 1 with a version label.\n")
+	fmt.Fprintf(w, "# TYPE katame_build_info gauge\n")
+	fmt.Fprintf(w, "katame_build_info{version=%q} 1\n", "1.0.0")
 
-	fmt.Fprintf(w, "# HELP vaultpack_uptime_seconds Server uptime in seconds.\n")
-	fmt.Fprintf(w, "# TYPE vaultpack_uptime_seconds counter\n")
-	fmt.Fprintf(w, "vaultpack_uptime_seconds %g\n", time.Since(m.startedAt).Seconds())
+	fmt.Fprintf(w, "# HELP katame_uptime_seconds Server uptime in seconds.\n")
+	fmt.Fprintf(w, "# TYPE katame_uptime_seconds counter\n")
+	fmt.Fprintf(w, "katame_uptime_seconds %g\n", time.Since(m.startedAt).Seconds())
 
-	fmt.Fprintf(w, "# HELP vaultpack_auth_denied_total Requests rejected by the auth gate.\n")
-	fmt.Fprintf(w, "# TYPE vaultpack_auth_denied_total counter\n")
-	fmt.Fprintf(w, "vaultpack_auth_denied_total %d\n", m.AuthDenied.Load())
+	fmt.Fprintf(w, "# HELP katame_auth_denied_total Requests rejected by the auth gate.\n")
+	fmt.Fprintf(w, "# TYPE katame_auth_denied_total counter\n")
+	fmt.Fprintf(w, "katame_auth_denied_total %d\n", m.AuthDenied.Load())
 
-	fmt.Fprintf(w, "# HELP vaultpack_rate_limited_total Requests rejected by the rate limiter.\n")
-	fmt.Fprintf(w, "# TYPE vaultpack_rate_limited_total counter\n")
-	fmt.Fprintf(w, "vaultpack_rate_limited_total %d\n", m.RateLimited.Load())
+	fmt.Fprintf(w, "# HELP katame_rate_limited_total Requests rejected by the rate limiter.\n")
+	fmt.Fprintf(w, "# TYPE katame_rate_limited_total counter\n")
+	fmt.Fprintf(w, "katame_rate_limited_total %d\n", m.RateLimited.Load())
 
 	m.writeRequestsTotal(w)
 	m.writeLatencyHistograms(w)
@@ -123,8 +123,8 @@ func (m *Metrics) writeRequestsTotal(w io.Writer) {
 	}
 	m.requestsMu.Unlock()
 
-	fmt.Fprintf(w, "# HELP vaultpack_http_requests_total Total HTTP requests served, labeled by path and status.\n")
-	fmt.Fprintf(w, "# TYPE vaultpack_http_requests_total counter\n")
+	fmt.Fprintf(w, "# HELP katame_http_requests_total Total HTTP requests served, labeled by path and status.\n")
+	fmt.Fprintf(w, "# TYPE katame_http_requests_total counter\n")
 
 	// Deterministic ordering for diffability + tests.
 	keys := make([]requestLabels, 0, len(snapshot))
@@ -138,7 +138,7 @@ func (m *Metrics) writeRequestsTotal(w io.Writer) {
 		return keys[i].Status < keys[j].Status
 	})
 	for _, k := range keys {
-		fmt.Fprintf(w, "vaultpack_http_requests_total{path=%q,status=\"%d\"} %d\n",
+		fmt.Fprintf(w, "katame_http_requests_total{path=%q,status=\"%d\"} %d\n",
 			k.Path, k.Status, snapshot[k])
 	}
 }
@@ -152,8 +152,8 @@ func (m *Metrics) writeLatencyHistograms(w io.Writer) {
 	sort.Strings(paths)
 	m.requestSecsMu.Unlock()
 
-	fmt.Fprintf(w, "# HELP vaultpack_http_request_duration_seconds Request latency in seconds, per path.\n")
-	fmt.Fprintf(w, "# TYPE vaultpack_http_request_duration_seconds histogram\n")
+	fmt.Fprintf(w, "# HELP katame_http_request_duration_seconds Request latency in seconds, per path.\n")
+	fmt.Fprintf(w, "# TYPE katame_http_request_duration_seconds histogram\n")
 	for _, p := range paths {
 		m.requestSecsMu.Lock()
 		h := m.requestSecHist[p]
@@ -162,13 +162,13 @@ func (m *Metrics) writeLatencyHistograms(w io.Writer) {
 		count := h.count
 		m.requestSecsMu.Unlock()
 		for i, b := range histogramBuckets {
-			fmt.Fprintf(w, "vaultpack_http_request_duration_seconds_bucket{path=%q,le=\"%s\"} %d\n",
+			fmt.Fprintf(w, "katame_http_request_duration_seconds_bucket{path=%q,le=\"%s\"} %d\n",
 				p, formatBucket(b), counts[i])
 		}
-		fmt.Fprintf(w, "vaultpack_http_request_duration_seconds_bucket{path=%q,le=\"+Inf\"} %d\n",
+		fmt.Fprintf(w, "katame_http_request_duration_seconds_bucket{path=%q,le=\"+Inf\"} %d\n",
 			p, counts[len(histogramBuckets)])
-		fmt.Fprintf(w, "vaultpack_http_request_duration_seconds_sum{path=%q} %g\n", p, sum)
-		fmt.Fprintf(w, "vaultpack_http_request_duration_seconds_count{path=%q} %d\n", p, count)
+		fmt.Fprintf(w, "katame_http_request_duration_seconds_sum{path=%q} %g\n", p, sum)
+		fmt.Fprintf(w, "katame_http_request_duration_seconds_count{path=%q} %d\n", p, count)
 	}
 }
 
@@ -186,16 +186,16 @@ func (m *Metrics) writeKMSCache(w io.Writer) {
 		return
 	}
 	stats := m.kmsRef.Stats()
-	fmt.Fprintf(w, "# HELP vaultpack_kms_cache_entries Current KMS unwrap cache size.\n")
-	fmt.Fprintf(w, "# TYPE vaultpack_kms_cache_entries gauge\n")
-	fmt.Fprintf(w, "vaultpack_kms_cache_entries %d\n", stats.Size)
-	fmt.Fprintf(w, "# HELP vaultpack_kms_cache_hits_total KMS unwrap cache hits.\n")
-	fmt.Fprintf(w, "# TYPE vaultpack_kms_cache_hits_total counter\n")
-	fmt.Fprintf(w, "vaultpack_kms_cache_hits_total %d\n", stats.Hits)
-	fmt.Fprintf(w, "# HELP vaultpack_kms_cache_misses_total KMS unwrap cache misses.\n")
-	fmt.Fprintf(w, "# TYPE vaultpack_kms_cache_misses_total counter\n")
-	fmt.Fprintf(w, "vaultpack_kms_cache_misses_total %d\n", stats.Misses)
-	fmt.Fprintf(w, "# HELP vaultpack_kms_cache_evicted_total KMS unwrap cache evictions.\n")
-	fmt.Fprintf(w, "# TYPE vaultpack_kms_cache_evicted_total counter\n")
-	fmt.Fprintf(w, "vaultpack_kms_cache_evicted_total %d\n", stats.Evicted)
+	fmt.Fprintf(w, "# HELP katame_kms_cache_entries Current KMS unwrap cache size.\n")
+	fmt.Fprintf(w, "# TYPE katame_kms_cache_entries gauge\n")
+	fmt.Fprintf(w, "katame_kms_cache_entries %d\n", stats.Size)
+	fmt.Fprintf(w, "# HELP katame_kms_cache_hits_total KMS unwrap cache hits.\n")
+	fmt.Fprintf(w, "# TYPE katame_kms_cache_hits_total counter\n")
+	fmt.Fprintf(w, "katame_kms_cache_hits_total %d\n", stats.Hits)
+	fmt.Fprintf(w, "# HELP katame_kms_cache_misses_total KMS unwrap cache misses.\n")
+	fmt.Fprintf(w, "# TYPE katame_kms_cache_misses_total counter\n")
+	fmt.Fprintf(w, "katame_kms_cache_misses_total %d\n", stats.Misses)
+	fmt.Fprintf(w, "# HELP katame_kms_cache_evicted_total KMS unwrap cache evictions.\n")
+	fmt.Fprintf(w, "# TYPE katame_kms_cache_evicted_total counter\n")
+	fmt.Fprintf(w, "katame_kms_cache_evicted_total %d\n", stats.Evicted)
 }

@@ -6,7 +6,7 @@ import (
 )
 
 func TestEncryptDecryptRoundTrip(t *testing.T) {
-	plaintext := []byte("hello vaultpack, this is a secret message!")
+	plaintext := []byte("hello katame, this is a secret message!")
 	key, err := GenerateKey(AES256KeySize)
 	if err != nil {
 		t.Fatalf("generate key: %v", err)

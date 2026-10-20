@@ -7,7 +7,7 @@ import (
 
 	"github.com/open-policy-agent/opa/rego"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
 // regoEvaluator wraps a compiled OPA query so we can satisfy Evaluator.
@@ -17,9 +17,9 @@ type regoEvaluator struct {
 }
 
 // loadRego compiles a .rego source file. The policy is expected to define a
-// boolean rule named `allow` in package `vaultpack` (or `vaultpack.policy`):
+// boolean rule named `allow` in package `katame` (or `katame.policy`):
 //
-//	package vaultpack
+//	package katame
 //
 //	default allow := false
 //
@@ -34,7 +34,7 @@ func loadRego(path string, data []byte) (Evaluator, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	q, err := rego.New(
-		rego.Query("data.vaultpack"),
+		rego.Query("data.katame"),
 		rego.Module(path, string(data)),
 	).PrepareForEval(ctx)
 	if err != nil {
@@ -86,7 +86,7 @@ func (r *regoEvaluator) Evaluate(ctx Context) (Decision, error) {
 		return Decision{Action: ActionDeny, Reason: "rego: no result"}, nil
 	}
 
-	// results[0].Expressions[0].Value is the entire `data.vaultpack` document.
+	// results[0].Expressions[0].Value is the entire `data.katame` document.
 	doc, ok := results[0].Expressions[0].Value.(map[string]any)
 	if !ok {
 		return Decision{Action: ActionDeny, Reason: "rego: result not an object"}, nil

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Skpow1234/Vaultpack/internal/config"
+	"github.com/Skpow1234/Katame/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -13,12 +13,12 @@ func newConfigCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Short: "Show effective configuration and precedence",
-		Long: "Show the effective configuration used by vaultpack (from config file and profile).\n\n" +
+		Long: "Show the effective configuration used by katame (from config file and profile).\n\n" +
 			"Precedence (highest wins):\n" +
 			"  1. CLI flags (e.g. --audit-log, --cipher)\n" +
-			"  2. Environment variables (e.g. VAULTPACK_AUDIT_LOG)\n" +
-			"  3. Config file (from --config, VPACK_CONFIG, or ~/.vpack.yaml / ./.vpack.yaml)\n" +
-			"  4. Profile overrides (from --profile or VPACK_PROFILE: dev, staging, prod)\n" +
+			"  2. Environment variables (e.g. KATAME_AUDIT_LOG)\n" +
+			"  3. Config file (from --config, KATAME_CONFIG, or ~/.katame.yaml / ./.katame.yaml)\n" +
+			"  4. Profile overrides (from --profile or KATAME_PROFILE: dev, staging, prod)\n" +
 			"  5. Built-in defaults\n\n" +
 			"Config file keys: audit_log, cipher, chunk_size, output_dir, default_key_path, default_pubkey_path, recipients.\n" +
 			"Profiles can override any of these under the 'profiles' key (e.g. profiles.prod.audit_log).",

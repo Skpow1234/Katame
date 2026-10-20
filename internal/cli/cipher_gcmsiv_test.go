@@ -9,7 +9,7 @@ import (
 func TestProtectDecrypt_AES256GCMSIV(t *testing.T) {
 	dir := t.TempDir()
 	in := filepath.Join(dir, "input.txt")
-	out := filepath.Join(dir, "input.vpack")
+	out := filepath.Join(dir, "input.katame")
 	key := filepath.Join(dir, "input.key")
 	decrypted := filepath.Join(dir, "input.dec")
 

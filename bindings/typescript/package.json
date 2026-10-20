@@ -1,14 +1,14 @@
 {
-  "name": "@vaultpack/wasm",
+  "name": "@katame/wasm",
   "version": "0.1.0",
-  "description": "WebAssembly bindings for VaultPack — encrypt/decrypt/sign/verify .vpack bundles in the browser or Node.js",
+  "description": "WebAssembly bindings for Katame — encrypt/decrypt/sign/verify .katame bundles in the browser or Node.js",
   "type": "module",
-  "main": "vaultpack-loader.js",
-  "types": "vaultpack.d.ts",
+  "main": "katame-loader.js",
+  "types": "katame.d.ts",
   "files": [
-    "vaultpack-loader.js",
-    "vaultpack.d.ts",
-    "vaultpack.wasm",
+    "katame-loader.js",
+    "katame.d.ts",
+    "katame.wasm",
     "wasm_exec.js",
     "README.md"
   ],
@@ -16,7 +16,7 @@
     "node": ">=20"
   },
   "keywords": [
-    "vaultpack",
+    "katame",
     "wasm",
     "encryption",
     "post-quantum",
@@ -25,7 +25,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Skpow1234/Vaultpack.git"
+    "url": "git+https://github.com/Skpow1234/Katame.git"
   },
-  "homepage": "https://github.com/Skpow1234/Vaultpack/tree/main/bindings/typescript"
+  "homepage": "https://github.com/Skpow1234/Katame/tree/main/bindings/typescript"
 }

@@ -1,10 +1,10 @@
-package vaultpack
+package katame
 
 import (
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
-// Manifest is the metadata stored inside a .vpack bundle.
+// Manifest is the metadata stored inside a .katame bundle.
 //
 // It is re-exported as a type alias of the canonical internal type so SDK
 // consumers can use the same JSON field names as the CLI's --json output
@@ -44,7 +44,7 @@ type RotationEntry = bundle.RotationEntry
 // TransparencyEntry records an M24 Sigstore Rekor inclusion proof.
 type TransparencyEntry = bundle.TransparencyEntry
 
-// Bundle is the in-memory representation of a parsed .vpack file. It is what
+// Bundle is the in-memory representation of a parsed .katame file. It is what
 // `Read` returns and `Write` accepts.
 type Bundle struct {
 	Manifest      *Manifest

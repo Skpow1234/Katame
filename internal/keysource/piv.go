@@ -8,21 +8,21 @@ import (
 
 const (
 	pivAvailable = true
-	pivDetails   = "file-backed PIV shim via VAULTPACK_PIV_DIR (slot → .pem); YubiKey piv-go in later builds"
+	pivDetails   = "file-backed PIV shim via KATAME_PIV_DIR (slot → .pem); YubiKey piv-go in later builds"
 )
 
 // piv://slot  — e.g. piv://9a or piv://9c
 //
-// Reads VAULTPACK_PIV_DIR/<slot>.pem for private key material. Native YubiKey
+// Reads KATAME_PIV_DIR/<slot>.pem for private key material. Native YubiKey
 // PIV (go-piv) is planned behind optional CGO builds.
 func resolvePIVPrivate(value string) ([]byte, error) {
 	slot := strings.TrimPrefix(strings.ToLower(value), "/")
 	if slot == "" {
 		return nil, fmt.Errorf("piv URI must be piv://SLOT (e.g. piv://9a)")
 	}
-	dir := os.Getenv("VAULTPACK_PIV_DIR")
+	dir := os.Getenv("KATAME_PIV_DIR")
 	if dir == "" {
-		return nil, fmt.Errorf("piv://: set VAULTPACK_PIV_DIR to a directory of <slot>.pem files (native PIV support planned)")
+		return nil, fmt.Errorf("piv://: set KATAME_PIV_DIR to a directory of <slot>.pem files (native PIV support planned)")
 	}
 	path := strings.TrimRight(dir, `/\`) + "/" + slot + ".pem"
 	data, err := os.ReadFile(path)

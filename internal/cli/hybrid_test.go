@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
 )
 
 // TestHybridProtectDecrypt_AllSchemes performs a full CLI round-trip for every hybrid scheme.
@@ -15,7 +15,7 @@ func TestHybridProtectDecrypt_AllSchemes(t *testing.T) {
 		t.Run(scheme, func(t *testing.T) {
 			dir := t.TempDir()
 			inFile := filepath.Join(dir, "data.txt")
-			bundlePath := filepath.Join(dir, "data.vpack")
+			bundlePath := filepath.Join(dir, "data.katame")
 			outFile := filepath.Join(dir, "recovered.txt")
 			privPath := filepath.Join(dir, "recipient.key")
 			pubPath := filepath.Join(dir, "recipient.pub")
@@ -78,7 +78,7 @@ func TestHybridProtectDecrypt_AllSchemes(t *testing.T) {
 func TestHybridProtectDecrypt_WithSign(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	bundlePath := filepath.Join(dir, "data.vpack")
+	bundlePath := filepath.Join(dir, "data.katame")
 	outFile := filepath.Join(dir, "recovered.txt")
 
 	original := []byte("hybrid + sign test")
@@ -137,7 +137,7 @@ func TestHybridProtectDecrypt_WithSign(t *testing.T) {
 func TestHybridInspect(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.txt")
-	bundlePath := filepath.Join(dir, "data.vpack")
+	bundlePath := filepath.Join(dir, "data.katame")
 
 	os.WriteFile(inFile, []byte("inspect hybrid test"), 0o600)
 

@@ -14,7 +14,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 // Signing algorithm names.

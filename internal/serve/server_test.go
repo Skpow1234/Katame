@@ -17,8 +17,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/serve"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/serve"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 // startServer spins up a Server bound to a random localhost TCP port and
@@ -347,12 +347,12 @@ func TestMetricsEndpoint(t *testing.T) {
 	body, _ := io.ReadAll(resp.Body)
 	text := string(body)
 	for _, want := range []string{
-		"vaultpack_build_info",
-		"vaultpack_uptime_seconds",
-		"vaultpack_http_requests_total",
-		"vaultpack_http_request_duration_seconds_bucket",
+		"katame_build_info",
+		"katame_uptime_seconds",
+		"katame_http_requests_total",
+		"katame_http_request_duration_seconds_bucket",
 		`path="/v1/protect"`,
-		"vaultpack_kms_cache_entries",
+		"katame_kms_cache_entries",
 	} {
 		if !strings.Contains(text, want) {
 			t.Errorf("metrics missing %q\nfull body:\n%s", want, text)

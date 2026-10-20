@@ -27,7 +27,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 
-	"github.com/Skpow1234/Vaultpack/internal/cloud"
+	"github.com/Skpow1234/Katame/internal/cloud"
 )
 
 // Store implements cloud.Store for AWS S3.

@@ -9,7 +9,7 @@ import (
 )
 
 // KeygenSign runs the plugin keygen for a sign algorithm: plugin keygen --type sign --algo <name> --out <prefix>.
-// The plugin must write <prefix>.key and <prefix>.pub (and may add VPACK-SIGN-ALGO to the key file).
+// The plugin must write <prefix>.key and <prefix>.pub (and may add KATAME-SIGN-ALGO to the key file).
 func (r *Registry) KeygenSign(algo, outPrefix string) error {
 	path := r.SignAlgo(algo)
 	if path == "" {

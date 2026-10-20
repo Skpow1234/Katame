@@ -1,4 +1,4 @@
-package vaultpack_test
+package katame_test
 
 import (
 	"bytes"
@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/pkg/vaultpack"
+	"github.com/Skpow1234/Katame/pkg/katame"
 )
 
 func TestProtectDecrypt_KeyFile_RoundTrip(t *testing.T) {
@@ -21,9 +21,9 @@ func TestProtectDecrypt_KeyFile_RoundTrip(t *testing.T) {
 	if err := os.WriteFile(inPath, plaintext, 0o600); err != nil {
 		t.Fatal(err)
 	}
-	outPath := filepath.Join(dir, "secret.vpack")
+	outPath := filepath.Join(dir, "secret.katame")
 
-	res, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	res, err := katame.Protect(katame.ProtectOptions{
 		InputPath:  inPath,
 		OutputPath: outPath,
 	})
@@ -47,7 +47,7 @@ func TestProtectDecrypt_KeyFile_RoundTrip(t *testing.T) {
 	}
 
 	plainOut := filepath.Join(dir, "secret.out")
-	dec, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
+	dec, err := katame.Decrypt(katame.DecryptOptions{
 		InputPath:  outPath,
 		OutputPath: plainOut,
 		Key:        res.GeneratedKey,
@@ -72,8 +72,8 @@ func TestProtectDecrypt_InMemory_RoundTrip(t *testing.T) {
 	dir := t.TempDir()
 	plaintext := []byte("hello, sdk")
 
-	bundlePath := filepath.Join(dir, "mem.vpack")
-	res, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	bundlePath := filepath.Join(dir, "mem.katame")
+	res, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:  plaintext,
 		OutputPath: bundlePath,
 		InputName:  "mem.txt",
@@ -85,7 +85,7 @@ func TestProtectDecrypt_InMemory_RoundTrip(t *testing.T) {
 		t.Errorf("input.name = %q, want mem.txt", res.Manifest.Input.Name)
 	}
 
-	dec, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
+	dec, err := katame.Decrypt(katame.DecryptOptions{
 		InputPath: bundlePath,
 		Key:       res.GeneratedKey,
 	})
@@ -99,11 +99,11 @@ func TestProtectDecrypt_InMemory_RoundTrip(t *testing.T) {
 
 func TestProtectDecrypt_Password_RoundTrip(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "p.vpack")
+	bundlePath := filepath.Join(dir, "p.katame")
 	plaintext := []byte("super secret")
 	password := "correct horse battery staple"
 
-	_, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	_, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:  plaintext,
 		OutputPath: bundlePath,
 		Password:   password,
@@ -112,7 +112,7 @@ func TestProtectDecrypt_Password_RoundTrip(t *testing.T) {
 		t.Fatalf("Protect: %v", err)
 	}
 
-	dec, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
+	dec, err := katame.Decrypt(katame.DecryptOptions{
 		InputPath: bundlePath,
 		Password:  password,
 	})
@@ -123,7 +123,7 @@ func TestProtectDecrypt_Password_RoundTrip(t *testing.T) {
 		t.Fatalf("plaintext mismatch")
 	}
 
-	if _, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
+	if _, err := katame.Decrypt(katame.DecryptOptions{
 		InputPath: bundlePath,
 		Password:  "wrong password",
 	}); err == nil {
@@ -133,8 +133,8 @@ func TestProtectDecrypt_Password_RoundTrip(t *testing.T) {
 
 func TestDecrypt_WrongKey_Fails(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "wk.vpack")
-	res, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	bundlePath := filepath.Join(dir, "wk.katame")
+	res, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:  []byte("x"),
 		OutputPath: bundlePath,
 	})
@@ -145,7 +145,7 @@ func TestDecrypt_WrongKey_Fails(t *testing.T) {
 	for i := range wrong {
 		wrong[i] = res.GeneratedKey[i] ^ 0xFF
 	}
-	if _, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
+	if _, err := katame.Decrypt(katame.DecryptOptions{
 		InputPath: bundlePath,
 		Key:       wrong,
 	}); err == nil {
@@ -155,10 +155,10 @@ func TestDecrypt_WrongKey_Fails(t *testing.T) {
 
 func TestProtectDecrypt_InputBytes_RoundTrip(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "ib.vpack")
+	bundlePath := filepath.Join(dir, "ib.katame")
 	plaintext := []byte("from disk, into memory")
 
-	res, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	res, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:  plaintext,
 		OutputPath: bundlePath,
 	})
@@ -170,7 +170,7 @@ func TestProtectDecrypt_InputBytes_RoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	dec, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
+	dec, err := katame.Decrypt(katame.DecryptOptions{
 		InputBytes: bundleBytes,
 		Key:        res.GeneratedKey,
 	})
@@ -184,9 +184,9 @@ func TestProtectDecrypt_InputBytes_RoundTrip(t *testing.T) {
 
 func TestInspect(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "i.vpack")
+	bundlePath := filepath.Join(dir, "i.katame")
 	plaintext := []byte("inspectable")
-	res, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	res, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:  plaintext,
 		OutputPath: bundlePath,
 		Cipher:     "chacha20-poly1305",
@@ -196,7 +196,7 @@ func TestInspect(t *testing.T) {
 	}
 	_ = res
 
-	m, err := vaultpack.Inspect(bundlePath)
+	m, err := katame.Inspect(bundlePath)
 	if err != nil {
 		t.Fatalf("Inspect: %v", err)
 	}
@@ -210,8 +210,8 @@ func TestInspect(t *testing.T) {
 
 func TestSignVerify_RoundTrip(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "sig.vpack")
-	_, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	bundlePath := filepath.Join(dir, "sig.katame")
+	_, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:  []byte("sign me"),
 		OutputPath: bundlePath,
 	})
@@ -234,7 +234,7 @@ func TestSignVerify_RoundTrip(t *testing.T) {
 	}
 	pubPEM := pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: pubDER})
 
-	sres, err := vaultpack.SignBundle(vaultpack.SignOptions{
+	sres, err := katame.SignBundle(katame.SignOptions{
 		BundlePath: bundlePath,
 		PrivateKey: privPEM,
 	})
@@ -248,7 +248,7 @@ func TestSignVerify_RoundTrip(t *testing.T) {
 		t.Error("empty signature")
 	}
 
-	vres, err := vaultpack.Verify(vaultpack.VerifyOptions{
+	vres, err := katame.Verify(katame.VerifyOptions{
 		BundlePath: bundlePath,
 		PublicKey:  pubPEM,
 	})
@@ -263,7 +263,7 @@ func TestSignVerify_RoundTrip(t *testing.T) {
 	otherPub, _, _ := ed25519.GenerateKey(rand.Reader)
 	otherDER, _ := x509.MarshalPKIXPublicKey(otherPub)
 	otherPEM := pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: otherDER})
-	vres2, err := vaultpack.Verify(vaultpack.VerifyOptions{
+	vres2, err := katame.Verify(katame.VerifyOptions{
 		BundlePath: bundlePath,
 		PublicKey:  otherPEM,
 	})
@@ -277,7 +277,7 @@ func TestSignVerify_RoundTrip(t *testing.T) {
 
 func TestProtect_SignInline(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "inline.vpack")
+	bundlePath := filepath.Join(dir, "inline.katame")
 
 	_, priv, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
@@ -286,10 +286,10 @@ func TestProtect_SignInline(t *testing.T) {
 	privDER, _ := x509.MarshalPKCS8PrivateKey(priv)
 	privPEM := pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: privDER})
 
-	res, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	res, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:  []byte("sign at protect time"),
 		OutputPath: bundlePath,
-		Sign:       &vaultpack.SignParams{PrivateKey: privPEM},
+		Sign:       &katame.SignParams{PrivateKey: privPEM},
 	})
 	if err != nil {
 		t.Fatalf("Protect with Sign: %v", err)
@@ -305,24 +305,24 @@ func TestProtect_SignInline(t *testing.T) {
 func TestProtect_ErrorPaths(t *testing.T) {
 	tests := []struct {
 		name string
-		opts vaultpack.ProtectOptions
+		opts katame.ProtectOptions
 		msg  string
 	}{
 		{
 			name: "no input",
-			opts: vaultpack.ProtectOptions{OutputPath: "/tmp/x.vpack"},
+			opts: katame.ProtectOptions{OutputPath: "/tmp/x.katame"},
 			msg:  "one of",
 		},
 		{
 			name: "no output",
-			opts: vaultpack.ProtectOptions{Plaintext: []byte("x")},
+			opts: katame.ProtectOptions{Plaintext: []byte("x")},
 			msg:  "OutputPath or OutputWriter",
 		},
 		{
 			name: "key+password",
-			opts: vaultpack.ProtectOptions{
+			opts: katame.ProtectOptions{
 				Plaintext:  []byte("x"),
-				OutputPath: filepath.Join(t.TempDir(), "x.vpack"),
+				OutputPath: filepath.Join(t.TempDir(), "x.katame"),
 				Key:        make([]byte, 32),
 				Password:   "p",
 			},
@@ -330,9 +330,9 @@ func TestProtect_ErrorPaths(t *testing.T) {
 		},
 		{
 			name: "wrong key length",
-			opts: vaultpack.ProtectOptions{
+			opts: katame.ProtectOptions{
 				Plaintext:  []byte("x"),
-				OutputPath: filepath.Join(t.TempDir(), "x.vpack"),
+				OutputPath: filepath.Join(t.TempDir(), "x.katame"),
 				Key:        []byte("short"),
 			},
 			msg: "Key must be 32 bytes",
@@ -340,7 +340,7 @@ func TestProtect_ErrorPaths(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := vaultpack.Protect(tc.opts)
+			_, err := katame.Protect(tc.opts)
 			if err == nil {
 				t.Fatal("expected error")
 			}
@@ -352,13 +352,13 @@ func TestProtect_ErrorPaths(t *testing.T) {
 }
 
 func TestDecrypt_ErrorPaths(t *testing.T) {
-	_, err := vaultpack.Decrypt(vaultpack.DecryptOptions{InputPath: "no.vpack", Key: make([]byte, 32)})
+	_, err := katame.Decrypt(katame.DecryptOptions{InputPath: "no.katame", Key: make([]byte, 32)})
 	if err == nil {
 		t.Fatal("expected error for missing file")
 	}
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "k.vpack")
-	res, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	bundlePath := filepath.Join(dir, "k.katame")
+	res, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:  []byte("x"),
 		OutputPath: bundlePath,
 	})
@@ -366,28 +366,28 @@ func TestDecrypt_ErrorPaths(t *testing.T) {
 		t.Fatal(err)
 	}
 	_ = res
-	_, err = vaultpack.Decrypt(vaultpack.DecryptOptions{InputPath: bundlePath})
+	_, err = katame.Decrypt(katame.DecryptOptions{InputPath: bundlePath})
 	if err == nil || !strings.Contains(err.Error(), "Key") {
 		t.Fatalf("expected no-key error, got %v", err)
 	}
 }
 
 func TestVersion(t *testing.T) {
-	if vaultpack.Version == "" {
+	if katame.Version == "" {
 		t.Fatal("Version must not be empty")
 	}
-	parts := strings.Split(vaultpack.Version, ".")
+	parts := strings.Split(katame.Version, ".")
 	if len(parts) != 3 {
-		t.Fatalf("Version must be semver, got %q", vaultpack.Version)
+		t.Fatalf("Version must be semver, got %q", katame.Version)
 	}
 }
 
 func TestProtectDecrypt_Compression_RoundTrip(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "gzip.vpack")
+	bundlePath := filepath.Join(dir, "gzip.katame")
 	plaintext := bytes.Repeat([]byte("compressible payload "), 100)
 
-	res, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	res, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:  plaintext,
 		OutputPath: bundlePath,
 		Compress:   "gzip",
@@ -396,7 +396,7 @@ func TestProtectDecrypt_Compression_RoundTrip(t *testing.T) {
 		t.Fatalf("Protect: %v", err)
 	}
 
-	dec, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
+	dec, err := katame.Decrypt(katame.DecryptOptions{
 		InputPath: bundlePath,
 		Key:       res.GeneratedKey,
 	})
@@ -410,10 +410,10 @@ func TestProtectDecrypt_Compression_RoundTrip(t *testing.T) {
 
 func TestProtectDecrypt_KMS_RoundTrip(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "kms.vpack")
+	bundlePath := filepath.Join(dir, "kms.katame")
 	plaintext := []byte("kms-wrapped dek")
 
-	_, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	_, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:   plaintext,
 		OutputPath:  bundlePath,
 		KMSProvider: "mock",
@@ -423,7 +423,7 @@ func TestProtectDecrypt_KMS_RoundTrip(t *testing.T) {
 		t.Fatalf("Protect: %v", err)
 	}
 
-	dec, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
+	dec, err := katame.Decrypt(katame.DecryptOptions{
 		InputPath:   bundlePath,
 		KMSProvider: "mock",
 	})
@@ -437,10 +437,10 @@ func TestProtectDecrypt_KMS_RoundTrip(t *testing.T) {
 
 func TestProtectDecrypt_SplitShares_RoundTrip(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "split.vpack")
+	bundlePath := filepath.Join(dir, "split.katame")
 	plaintext := []byte("shamir split key material")
 
-	res, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	res, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:      plaintext,
 		OutputPath:     bundlePath,
 		SplitShares:    5,
@@ -454,12 +454,12 @@ func TestProtectDecrypt_SplitShares_RoundTrip(t *testing.T) {
 	}
 
 	rawShares := [][]byte{res.Shares[0].Data, res.Shares[2].Data, res.Shares[4].Data}
-	key, err := vaultpack.CombineShares(rawShares)
+	key, err := katame.CombineShares(rawShares)
 	if err != nil {
 		t.Fatalf("CombineShares: %v", err)
 	}
 
-	dec, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
+	dec, err := katame.Decrypt(katame.DecryptOptions{
 		InputPath: bundlePath,
 		Key:       key,
 	})
@@ -473,10 +473,10 @@ func TestProtectDecrypt_SplitShares_RoundTrip(t *testing.T) {
 
 func TestRewrap_KMS(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "rewrap.vpack")
-	outPath := filepath.Join(dir, "rewrap-out.vpack")
+	bundlePath := filepath.Join(dir, "rewrap.katame")
+	outPath := filepath.Join(dir, "rewrap-out.katame")
 
-	_, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	_, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:   []byte("rewrap me"),
 		OutputPath:  bundlePath,
 		KMSProvider: "mock",
@@ -486,7 +486,7 @@ func TestRewrap_KMS(t *testing.T) {
 		t.Fatalf("Protect: %v", err)
 	}
 
-	_, err = vaultpack.Rewrap(vaultpack.RewrapOptions{
+	_, err = katame.Rewrap(katame.RewrapOptions{
 		InputPath:   bundlePath,
 		OutputPath:  outPath,
 		KMSProvider: "mock",
@@ -497,7 +497,7 @@ func TestRewrap_KMS(t *testing.T) {
 		t.Fatalf("Rewrap: %v", err)
 	}
 
-	dec, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
+	dec, err := katame.Decrypt(katame.DecryptOptions{
 		InputPath:   outPath,
 		KMSProvider: "mock",
 	})

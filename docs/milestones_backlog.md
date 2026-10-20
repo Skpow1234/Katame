@@ -85,7 +85,7 @@ see [milestones.md](milestones.md).
 | **M107** | Generate man pages from cobra |
 | **M108** | Windows ACL key-file permission tests |
 | **M109** | Redact PEM/password from verbose logs everywhere |
-| **M110** | vaultpack convert legacy Ed25519 to PKCS#8 |
+| **M110** | katame convert legacy Ed25519 to PKCS#8 |
 | **M111** | Batch commands honor same policy ops |
 | **M112** | --force vs refuse-overwrite consistency |
 | **M113** | doctor probes plugin dir executables |
@@ -133,13 +133,13 @@ see [milestones.md](milestones.md).
 | **M155** | Syslog audit sink |
 | **M156** | Merkle checkpoint signing for audit chain |
 | **M157** | Concurrent FileLogger stress tests |
-| **M158** | Export audit verify in pkg/vaultpack |
+| **M158** | Export audit verify in pkg/katame |
 | **M159** | Redact secrets from audit Error fields |
 | **M160** | Encrypt-at-rest option for audit logs |
 | **M161** | Report correlates audit with Rekor UUIDs |
 | **M162** | Integration tests for repo rewrite.go |
 | **M163** | Concurrent repo Add stress test |
-| **M164** | Directory watch auto-add for .vpack |
+| **M164** | Directory watch auto-add for .katame |
 | **M165** | Repo prune/tombstone preserving history |
 | **M166** | HTTP serve of repo inclusion proofs |
 | **M167** | Persist partial Merkle tree on disk |
@@ -163,9 +163,9 @@ see [milestones.md](milestones.md).
 | **M185** | doctor IRSA / workload-identity checks |
 | **M186** | Multipart S3 upload for large outputs |
 | **M187** | Unify URI parsing helper for Windows drives |
-| **M188** | Cloud IT tests behind VAULTPACK_IT_CLOUD |
+| **M188** | Cloud IT tests behind KATAME_IT_CLOUD |
 | **M189** | Cache Store clients per scheme in batch |
-| **M190** | Fix User-Agent vaultpack/m21 string |
+| **M190** | Fix User-Agent katame/m21 string |
 | **M191** | Context on KMS Provider interface |
 | **M192** | Customizable AWS Encryption Context |
 | **M193** | Customizable GCP KMS AAD |
@@ -200,19 +200,19 @@ see [milestones.md](milestones.md).
 | **M222** | Standalone SplitShares export |
 | **M223** | ProtectContext / DecryptContext variants |
 | **M224** | Table tests for every cipher x KDF x compress |
-| **M225** | Unit tests for internal/vpackop |
+| **M225** | Unit tests for internal/katameop |
 | **M226** | Stable SDK sentinel errors |
 | **M227** | Write API symmetric to Read for Bundle |
 | **M228** | Experimental PQ opt-in gate |
 | **M229** | examples/sdk-* programs |
-| **M230** | Ship libvaultpack in GitHub Releases |
+| **M230** | Ship libkatame in GitHub Releases |
 | **M231** | Python wheels vendoring shared lib |
 | **M232** | Python .pyi type stubs |
-| **M233** | Publish @vaultpack/wasm to npm |
+| **M233** | Publish @katame/wasm to npm |
 | **M234** | WASM size budget / trimmed build |
 | **M235** | Playwright browser smoke for WASM |
 | **M236** | Node ESM/CJS dual package tests |
-| **M237** | pkg-config .pc for libvaultpack |
+| **M237** | pkg-config .pc for libkatame |
 | **M238** | Ruby FFI example |
 | **M239** | Java JNA example |
 | **M240** | C# P/Invoke example |
@@ -262,7 +262,7 @@ see [milestones.md](milestones.md).
 | **M284** | Add linux/arm64 to CI build matrix — **done** |
 | **M285** | Add windows/arm64 to CI build matrix — **done** |
 | **M286** | Publish fuzz crashers as CI artifacts — **done** (upload on fuzz job failure) |
-| **M287** | Coverage threshold for crypto/vpackop |
+| **M287** | Coverage threshold for crypto/katameop |
 | **M288** | Bindings smoke in CI |
 | **M289** | Dependabot for Go modules and Actions — **done** (`.github/dependabot.yml`) |
 | **M290** | Snap packaging |
@@ -277,20 +277,20 @@ see [milestones.md](milestones.md).
 | **M299** | Colored human diff for inspect |
 | **M300** | Generate docs/usage.md from cobra in CI |
 | **M301** | Troubleshooting runbook for KMS permissions |
-| **M302** | Architecture diagram vpackop/CLI/serve/bindings |
+| **M302** | Architecture diagram katameop/CLI/serve/bindings |
 | **M303** | ADR folder for cipher defaults and policy |
 | **M304** | docs/compat.md feature matrix |
 | **M305** | Named pipe serve on Windows |
 | **M306** | Long-path support for Windows batch trees |
 | **M307** | macOS hardened runtime entitlements notes |
 | **M308** | Warn on unknown config profile name |
-| **M309** | vaultpack config validate |
+| **M309** | katame config validate |
 | **M310** | TOML/JSON config file support |
-| **M311** | Unify VPACK_* vs VAULTPACK_* env prefixes |
+| **M311** | Unify KATAME_* vs KATAME_* env prefixes |
 | **M312** | Secure temp file helper in util |
 | **M313** | Replace panics in repo merkle subtree helpers |
 | **M314** | Shared deterministic JSON encode helper |
-| **M315** | Shared JSON envelope types pkg/vaultpack/apienc |
+| **M315** | Shared JSON envelope types pkg/katame/apienc |
 | **M316** | Add /v1/diff endpoint |
 | **M317** | Add /v1/batch-protect endpoint |
 | **M318** | Add /v1/batch-decrypt endpoint |
@@ -320,7 +320,7 @@ see [milestones.md](milestones.md).
 | **M342** | ARM crypto extension notes in docs |
 | **M343** | WASM SIMD acceleration investigation |
 | **M344** | TinyGo WASM experimental target |
-| **M345** | Deno loader for vaultpack.wasm |
+| **M345** | Deno loader for katame.wasm |
 | **M346** | Bun loader smoke test |
 | **M347** | React Native / mobile binding feasibility |
 | **M348** | Electron packaging example |
@@ -414,9 +414,9 @@ see [milestones.md](milestones.md).
 | **M436** | Kubernetes CSI secrets driver example |
 | **M437** | Vault Agent injector example |
 | **M438** | External Secrets Operator recipe |
-| **M439** | SOPS <-> .vpack interop bridge |
-| **M440** | age <-> .vpack conversion tool |
-| **M441** | gpg <-> .vpack conversion tool |
+| **M439** | SOPS <-> .katame interop bridge |
+| **M440** | age <-> .katame conversion tool |
+| **M441** | gpg <-> .katame conversion tool |
 | **M442** | zipcrypto migration detector |
 | **M443** | Malware scan hook after decrypt (optional) |
 | **M444** | DLP label propagation into manifest |
@@ -453,11 +453,11 @@ see [milestones.md](milestones.md).
 | **M475** | Postgres backend for enterprise repo |
 | **M476** | S3 as repo object store |
 | **M477** | Git-backed repo storage experiment |
-| **M478** | FUSE filesystem mounting .vpack dirs |
+| **M478** | FUSE filesystem mounting .katame dirs |
 | **M479** | 9p serve of decrypted views (dangerous; gated) |
 | **M480** | Windows ProjFS provider experiment |
 | **M481** | macOS File Provider extension experiment |
-| **M482** | rclone backend for .vpack |
+| **M482** | rclone backend for .katame |
 | **M483** | restic-compatible repository bridge |
 | **M484** | borgbackup interop notes |
 | **M485** | Tarsnap-like key hierarchy design |
@@ -473,7 +473,7 @@ see [milestones.md](milestones.md).
 | **M495** | ACL preservation cross-platform |
 | **M496** | Owner/group mapping tables |
 | **M497** | SELinux context notes |
-| **M498** | AppArmor profile for vaultpack serve |
+| **M498** | AppArmor profile for katame serve |
 | **M499** | seccomp.json for Docker serve |
 | **M500** | Kubernetes NetworkPolicy examples |
 | **M501** | Istio AuthorizationPolicy examples |
@@ -482,7 +482,7 @@ see [milestones.md](milestones.md).
 | **M504** | Supply chain levels for SLSA 3+ |
 | **M505** | in-toto layout for release pipeline |
 | **M506** | Witness run for build attestation |
-| **M507** | GUAC ingestion of vaultpack SBOMs |
+| **M507** | GUAC ingestion of katame SBOMs |
 | **M508** | Dependency-Track upload job |
 | **M509** | OSV scanner in CI |
 | **M510** | Nancy / govulncheck fail-on-high |
@@ -540,13 +540,13 @@ see [milestones.md](milestones.md).
 | **M562** | Nushell completions |
 | **M563** | Elvish completions |
 | **M564** | Fig/Amazon Q autocomplete spec |
-| **M565** | VS Code extension for .vpack inspect |
-| **M566** | JetBrains plugin for .vpack |
+| **M565** | VS Code extension for .katame inspect |
+| **M566** | JetBrains plugin for .katame |
 | **M567** | Vim/Neovim plugin |
 | **M568** | Emacs package |
 | **M569** | Language server for policy YAML |
 | **M570** | Schema store entry for policy.yaml |
-| **M571** | JSON Schema for .vpack.yaml config |
+| **M571** | JSON Schema for .katame.yaml config |
 | **M572** | cue / rego dual policy authoring |
 | **M573** | Cedar policy backend experiment |
 | **M574** | Polar (Oso) backend experiment |
@@ -566,12 +566,12 @@ see [milestones.md](milestones.md).
 | **M588** | Chronicle / SecOps parser |
 | **M589** | STIX/TAXII export of incidents |
 | **M590** | MISP event from seal failure |
-| **M591** | Sigma rules for vaultpack audit |
-| **M592** | YARA rules for .vpack magic |
+| **M591** | Sigma rules for katame audit |
+| **M592** | YARA rules for .katame magic |
 | **M593** | File magic / MIME database entry |
 | **M594** | Windows Defender ASR notes |
 | **M595** | CrowdStrike custom IOA examples |
-| **M596** | osquery table for .vpack files |
+| **M596** | osquery table for .katame files |
 | **M597** | Fleet policy for encrypted exports |
 | **M598** | Jamf profile for macOS keychain items |
 | **M599** | Intune Win32 app packaging |
@@ -583,7 +583,7 @@ see [milestones.md](milestones.md).
 | **M605** | Terraform provider for serve |
 | **M606** | Pulumi component |
 | **M607** | Crossplane XRD |
-| **M608** | Operator SDK CRD for VaultPackServe |
+| **M608** | Operator SDK CRD for KatameServe |
 | **M609** | Helm chart with values schema |
 | **M610** | Kustomize base overlays |
 | **M611** | Skaffold profile |
@@ -629,7 +629,7 @@ see [milestones.md](milestones.md).
 | **M651** | NIST 800-53 control mapping |
 | **M652** | CIS benchmarks mapping |
 | **M653** | PCI DSS key management notes |
-| **M654** | HIPAA guidance for PHI in .vpack |
+| **M654** | HIPAA guidance for PHI in .katame |
 | **M655** | GDPR encryption of personal data notes |
 | **M656** | FedRAMP boundary discussion |
 | **M657** | ITAR/export compliance for PQ crypto |
@@ -665,7 +665,7 @@ see [milestones.md](milestones.md).
 | **M687** | dbt post-hook encryption example |
 | **M688** | Spark UDF feasibility study |
 | **M689** | Flink operator notes |
-| **M690** | Kafka Connect SMT for .vpack |
+| **M690** | Kafka Connect SMT for .katame |
 | **M691** | Pulsar function example |
 | **M692** | NATS JetStream consumer example |
 | **M693** | SQS worker pattern |
@@ -685,7 +685,7 @@ see [milestones.md](milestones.md).
 | **M707** | COSE_Sign1 alternative signature format |
 | **M708** | CMS/PKCS7 detached signature option |
 | **M709** | XMLDSig for enterprise interop |
-| **M710** | PDF signing recipe using .vpack sidecar |
+| **M710** | PDF signing recipe using .katame sidecar |
 | **M711** | Office document protect recipe |
 | **M712** | DICOM medical image protect recipe |
 | **M713** | GeoTIFF protect recipe |
@@ -695,14 +695,14 @@ see [milestones.md](milestones.md).
 | **M717** | ML model weight protect recipe |
 | **M718** | ONNX bundle protect |
 | **M719** | Docker layer protect experiment |
-| **M720** | OCI artifact attach of .vpack |
+| **M720** | OCI artifact attach of .katame |
 | **M721** | Sigstore cosign attach cookbook |
 | **M722** | Notation (notaryv2) interop |
 | **M723** | in-toto link for protect step |
 | **M724** | Witness keyless for CLI in CI |
-| **M725** | Git commit signing with vaultpack keys |
+| **M725** | Git commit signing with katame keys |
 | **M726** | GPG agent forwarding notes |
-| **M727** | SSH certificate CA using vaultpack keys |
+| **M727** | SSH certificate CA using katame keys |
 | **M728** | SPIRE upstream authority experiment |
 | **M729** | Cert-manager CSR signer plugin |
 | **M730** | Smallstep CA integration |
@@ -764,7 +764,7 @@ see [milestones.md](milestones.md).
 | **M786** | StackBlitz WASM demo |
 | **M787** | Benchmark published on website |
 | **M788** | Public corpus of encrypted samples |
-| **M789** | CTF challenges using .vpack |
+| **M789** | CTF challenges using .katame |
 | **M790** | University course lab materials |
 | **M791** | Workshop slide deck |
 | **M792** | Conference talk outline |
@@ -781,7 +781,7 @@ see [milestones.md](milestones.md).
 | **M803** | Security advisory PGP key |
 | **M804** | Keyserver upload automation |
 | **M805** | WKD for release identity |
-| **M806** | DNS CAA for vaultpack.example |
+| **M806** | DNS CAA for katame.example |
 | **M807** | Brand assets / logo SVG |
 | **M808** | Sticker sheet for conferences |
 | **M809** | Swag store (optional) |

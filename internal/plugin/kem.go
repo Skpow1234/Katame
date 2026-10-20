@@ -19,7 +19,7 @@ type EncapsulateResult struct {
 }
 
 // Keygen runs the plugin keygen for a KEM scheme: plugin keygen --type kem --algo <name> --out <prefix>.
-// The plugin must write <prefix>.key and <prefix>.pub and may add VPACK-KEM-SCHEME to the .pub file.
+// The plugin must write <prefix>.key and <prefix>.pub and may add KATAME-KEM-SCHEME to the .pub file.
 func (r *Registry) KeygenKEM(scheme, outPrefix string) error {
 	path := r.KEMScheme(scheme)
 	if path == "" {
@@ -43,7 +43,7 @@ func (r *Registry) Encapsulate(scheme, pubKeyPath string, dekForWrap []byte) (*E
 	}
 	cmd := exec.Command(path, "encapsulate", "--algo", scheme, "--pubkey", pubKeyPath)
 	if len(dekForWrap) > 0 {
-		cmd.Env = append(os.Environ(), "VPACK_DEK_B64="+base64.StdEncoding.EncodeToString(dekForWrap))
+		cmd.Env = append(os.Environ(), "KATAME_DEK_B64="+base64.StdEncoding.EncodeToString(dekForWrap))
 	}
 	out, err := cmd.Output()
 	if err != nil {
@@ -60,7 +60,7 @@ func (r *Registry) Encapsulate(scheme, pubKeyPath string, dekForWrap []byte) (*E
 }
 
 // Decapsulate runs the plugin decapsulate: plugin decapsulate --algo <name> --privkey <path>.
-// Ciphertext (ephemeral + wrapped DEK) is passed via env VPACK_CIPHERTEXT_B64 (JSON object base64) or stdin.
+// Ciphertext (ephemeral + wrapped DEK) is passed via env KATAME_CIPHERTEXT_B64 (JSON object base64) or stdin.
 // Returns DEK from stdout (hex or base64 line).
 func (r *Registry) Decapsulate(scheme, privKeyPath string, ephemeralB64, wrappedDEKB64 string) ([]byte, error) {
 	path := r.KEMScheme(scheme)
@@ -81,7 +81,7 @@ func (r *Registry) Decapsulate(scheme, privKeyPath string, ephemeralB64, wrapped
 		inputB64 = base64.StdEncoding.EncodeToString(b)
 	}
 	cmd := exec.Command(path, "decapsulate", "--algo", scheme, "--privkey", privKeyPath)
-	cmd.Env = append(os.Environ(), "VPACK_CIPHERTEXT_B64="+inputB64)
+	cmd.Env = append(os.Environ(), "KATAME_CIPHERTEXT_B64="+inputB64)
 	out, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("plugin decapsulate: %w", err)

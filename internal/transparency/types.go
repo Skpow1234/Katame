@@ -1,4 +1,4 @@
-// Package transparency implements VaultPack's Sigstore integration:
+// Package transparency implements Katame's Sigstore integration:
 //
 //   - Rekor client for uploading hashedrekord entries and fetching SETs.
 //   - Canonical body reconstruction + SET (Signed Entry Timestamp) verification.

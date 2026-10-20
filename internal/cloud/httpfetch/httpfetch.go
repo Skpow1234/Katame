@@ -7,8 +7,8 @@
 //	http://host/path
 //
 // Authentication is supported via:
-//   - VAULTPACK_HTTP_BEARER environment variable (sent as Authorization: Bearer ...).
-//   - VAULTPACK_HTTP_USER + VAULTPACK_HTTP_PASS for HTTP Basic auth.
+//   - KATAME_HTTP_BEARER environment variable (sent as Authorization: Bearer ...).
+//   - KATAME_HTTP_USER + KATAME_HTTP_PASS for HTTP Basic auth.
 //
 // Uploads are not supported; Upload returns cloud.ErrReadOnly.
 // List is not supported; List returns cloud.ErrNotSupported.
@@ -23,7 +23,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/cloud"
+	"github.com/Skpow1234/Katame/internal/cloud"
 )
 
 // Store implements cloud.Store by fetching objects over HTTP(S).
@@ -54,13 +54,13 @@ func (s *Store) newRequest(ctx context.Context, uri string) (*http.Request, erro
 	if err != nil {
 		return nil, fmt.Errorf("http request: %w", err)
 	}
-	if tok := os.Getenv("VAULTPACK_HTTP_BEARER"); tok != "" {
+	if tok := os.Getenv("KATAME_HTTP_BEARER"); tok != "" {
 		req.Header.Set("Authorization", "Bearer "+tok)
-	} else if u, p := os.Getenv("VAULTPACK_HTTP_USER"), os.Getenv("VAULTPACK_HTTP_PASS"); u != "" {
+	} else if u, p := os.Getenv("KATAME_HTTP_USER"), os.Getenv("KATAME_HTTP_PASS"); u != "" {
 		auth := base64.StdEncoding.EncodeToString([]byte(u + ":" + p))
 		req.Header.Set("Authorization", "Basic "+auth)
 	}
-	req.Header.Set("User-Agent", "vaultpack/m21")
+	req.Header.Set("User-Agent", "katame/m21")
 	return req, nil
 }
 
