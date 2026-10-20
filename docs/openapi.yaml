@@ -1,0 +1,228 @@
+openapi: 3.1.0
+info:
+  title: VaultPack HTTP API
+  version: v1
+  description: |
+    JSON-in / JSON-out API exposed by `vaultpack serve`.
+    Envelope: `{"ok": true|false, ...}`. Auth required on `/v1/*` unless `--auth-disabled`.
+servers:
+  - url: https://vp.example.com
+paths:
+  /healthz:
+    get:
+      summary: Liveness probe
+      security: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  status: { type: string }
+  /metrics:
+    get:
+      summary: Prometheus metrics
+      security: []
+      responses:
+        "200":
+          description: Prometheus text exposition
+          content:
+            text/plain:
+              schema: { type: string }
+  /v1/version:
+    get:
+      summary: SDK and API version
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Version info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  sdk_version: { type: string }
+                  api_version: { type: string }
+  /v1/protect:
+    post:
+      summary: Encrypt plaintext into a .vpack bundle
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProtectRequest"
+      responses:
+        "200":
+          description: Protect result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProtectResponse"
+  /v1/decrypt:
+    post:
+      summary: Decrypt a .vpack bundle
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DecryptRequest"
+      responses:
+        "200":
+          description: Decrypt result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DecryptResponse"
+  /v1/inspect:
+    post:
+      summary: Decode bundle manifest
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InspectRequest"
+      responses:
+        "200":
+          description: Manifest
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  manifest: { type: object }
+  /v1/sign:
+    post:
+      summary: Sign a bundle
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignRequest"
+      responses:
+        "200":
+          description: Sign result
+  /v1/verify:
+    post:
+      summary: Verify a bundle signature
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyRequest"
+      responses:
+        "200":
+          description: Verify result
+  /v1/rewrap:
+    post:
+      summary: Re-wrap a KMS-wrapped DEK
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "200":
+          description: Rewrap result
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    ProtectRequest:
+      type: object
+      properties:
+        plaintext_b64: { type: string }
+        input_path: { type: string }
+        output_path: { type: string }
+        key_b64: { type: string }
+        password: { type: string }
+        kdf_algo: { type: string }
+        kms_provider: { type: string }
+        kms_key_id: { type: string }
+        recipients:
+          type: array
+          items:
+            type: object
+            properties:
+              public_key_pem: { type: string }
+              public_key_path: { type: string }
+        compress: { type: string }
+        split_shares: { type: integer }
+        split_threshold: { type: integer }
+        cipher: { type: string }
+        hash_algo: { type: string }
+        aad_b64: { type: string }
+        return_bundle: { type: boolean }
+    ProtectResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        bundle_path: { type: string }
+        bundle_b64: { type: string }
+        generated_key_b64: { type: string }
+        manifest: { type: object }
+    DecryptRequest:
+      type: object
+      properties:
+        input_path: { type: string }
+        bundle_b64: { type: string }
+        output_path: { type: string }
+        key_b64: { type: string }
+        password: { type: string }
+        kms_provider: { type: string }
+        private_key_pem: { type: string }
+        private_key_path: { type: string }
+        aad_b64: { type: string }
+        return_plaintext: { type: boolean }
+    DecryptResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        plaintext_b64: { type: string }
+        manifest: { type: object }
+    InspectRequest:
+      type: object
+      properties:
+        input_path: { type: string }
+        bundle_b64: { type: string }
+    SignRequest:
+      type: object
+      properties:
+        bundle_path: { type: string }
+        bundle_b64: { type: string }
+        private_key_pem: { type: string }
+        private_key_path: { type: string }
+        algo: { type: string }
+    VerifyRequest:
+      type: object
+      properties:
+        bundle_path: { type: string }
+        bundle_b64: { type: string }
+        public_key_pem: { type: string }
+        public_key_path: { type: string }
