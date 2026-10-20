@@ -11,15 +11,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/cloud"
-	"github.com/Skpow1234/Vaultpack/internal/config"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/keysource"
-	"github.com/Skpow1234/Vaultpack/internal/kms"
-	"github.com/Skpow1234/Vaultpack/internal/plugin"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/cloud"
+	"github.com/Skpow1234/Katame/internal/config"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/keysource"
+	"github.com/Skpow1234/Katame/internal/kms"
+	"github.com/Skpow1234/Katame/internal/plugin"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -55,8 +55,8 @@ func newProtectCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "protect",
-		Short: "Encrypt a file into a .vpack bundle",
-		Long:  "Hash the plaintext, optionally compress, encrypt with an AEAD cipher, and write a portable .vpack bundle.\n\nSupported ciphers: aes-256-gcm (default), chacha20-poly1305, xchacha20-poly1305, aes-256-gcm-siv.\nCompression: --compress gzip|zstd (default: none).\nMultiple recipients: --recipient alice.pem --recipient bob.pem.\nKey splitting: --split-shares 5 --split-threshold 3 (Shamir SSS).\n\nAzure: use az://container/blob paths for --in and/or --out.\n\nUse --stdin to read from standard input and --stdout to write the bundle to standard output.",
+		Short: "Encrypt a file into a .katame bundle",
+		Long:  "Hash the plaintext, optionally compress, encrypt with an AEAD cipher, and write a portable .katame bundle.\n\nSupported ciphers: aes-256-gcm (default), chacha20-poly1305, xchacha20-poly1305, aes-256-gcm-siv.\nCompression: --compress gzip|zstd (default: none).\nMultiple recipients: --recipient alice.pem --recipient bob.pem.\nKey splitting: --split-shares 5 --split-threshold 3 (Shamir SSS).\n\nAzure: use az://container/blob paths for --in and/or --out.\n\nUse --stdin to read from standard input and --stdout to write the bundle to standard output.",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			printer := NewPrinter(flagJSON, flagQuiet)
 			var auditOutDesc, auditKeyFP string
@@ -225,18 +225,18 @@ func newProtectCmd() *cobra.Command {
 				if useStdin {
 					return fmt.Errorf("--out is required when using --stdin")
 				}
-				baseName := filepath.Base(inFile) + ".vpack"
+				baseName := filepath.Base(inFile) + ".katame"
 				if c := config.Get(); c != nil && c.OutputDir != "" && c.OutputDir != "." {
 					outFile = filepath.Join(c.OutputDir, baseName)
 				} else {
-					outFile = inFile + ".vpack"
+					outFile = inFile + ".katame"
 				}
 			}
 
 			// If output is remote, use a temp file as the local write target.
 			var remoteOutCleanup func()
 			if remoteOutURI != "" {
-				tmpOut, err := os.CreateTemp("", "vaultpack-remote-out-*.vpack")
+				tmpOut, err := os.CreateTemp("", "katame-remote-out-*.katame")
 				if err != nil {
 					return fmt.Errorf("create temp output: %w", err)
 				}
@@ -559,7 +559,7 @@ func newProtectCmd() *cobra.Command {
 			// Encrypt using chunked streaming (optionally parallel).
 			var ciphertextBuf bytes.Buffer
 			var streamResult *crypto.StreamEncryptResult
-			if parallelWorkers > 1 || parallelWorkers == 0 && os.Getenv("VPACK_PARALLEL_WORKERS") == "auto" {
+			if parallelWorkers > 1 || parallelWorkers == 0 && os.Getenv("KATAME_PARALLEL_WORKERS") == "auto" {
 				streamResult, err = crypto.EncryptStreamParallel(
 					&plaintextBuf, &ciphertextBuf, key, aad, chunkSize, cipherName, parallelWorkers,
 				)
@@ -843,7 +843,7 @@ func newProtectCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&inFile, "in", "", "input file to protect")
-	cmd.Flags().StringVar(&outFile, "out", "", "output .vpack path (default: <input>.vpack)")
+	cmd.Flags().StringVar(&outFile, "out", "", "output .katame path (default: <input>.katame)")
 	cmd.Flags().StringVar(&keyOutFile, "key-out", "", "path to write the generated key (default: <input>.key)")
 	cmd.Flags().StringVar(&keyFile, "key", "", "path to an existing key (skips key generation)")
 	cmd.Flags().StringVar(&keySource, "key-source", "", "key source URI (file://, env://, b64://; reserved: pkcs11://, keychain://, dpapi://, piv://)")

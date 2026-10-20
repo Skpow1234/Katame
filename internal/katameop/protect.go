@@ -1,4 +1,4 @@
-package vpackop
+package katameop
 
 import (
 	"bytes"
@@ -11,16 +11,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/kms"
-	"github.com/Skpow1234/Vaultpack/internal/plugin"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/kms"
+	"github.com/Skpow1234/Katame/internal/plugin"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 type stdSigner = stdcrypto.Signer
 
-// Protect encrypts plaintext and writes a .vpack bundle.
+// Protect encrypts plaintext and writes a .katame bundle.
 func Protect(p ProtectParams) (*ProtectResult, error) {
 	plaintextReader, inputName, inputSize, cleanup, err := resolveProtectInput(p)
 	if err != nil {
@@ -30,7 +30,7 @@ func Protect(p ProtectParams) (*ProtectResult, error) {
 		defer cleanup()
 	}
 	if p.OutputPath == "" && p.OutputWriter == nil {
-		return nil, errors.New("vpackop.Protect: OutputPath or OutputWriter is required")
+		return nil, errors.New("katameop.Protect: OutputPath or OutputWriter is required")
 	}
 
 	if err := validateProtectModes(p); err != nil {
@@ -42,7 +42,7 @@ func Protect(p ProtectParams) (*ProtectResult, error) {
 		cipherName = crypto.CipherAES256GCM
 	}
 	if !crypto.SupportedCipher(cipherName) {
-		return nil, fmt.Errorf("vpackop.Protect: unsupported cipher %q", cipherName)
+		return nil, fmt.Errorf("katameop.Protect: unsupported cipher %q", cipherName)
 	}
 	chunkSize := p.ChunkSize
 	if chunkSize <= 0 {
@@ -53,17 +53,17 @@ func Protect(p ProtectParams) (*ProtectResult, error) {
 		hashAlgo = "sha256"
 	}
 	if !crypto.SupportedHashAlgo(hashAlgo) {
-		return nil, fmt.Errorf("vpackop.Protect: unsupported hash algo %q", hashAlgo)
+		return nil, fmt.Errorf("katameop.Protect: unsupported hash algo %q", hashAlgo)
 	}
 	if p.Compress != "" && p.Compress != crypto.CompressNone && !crypto.SupportedCompression(p.Compress) {
-		return nil, fmt.Errorf("vpackop.Protect: unsupported compression %q", p.Compress)
+		return nil, fmt.Errorf("katameop.Protect: unsupported compression %q", p.Compress)
 	}
 
 	var plaintextBuf bytes.Buffer
 	hashReader := io.TeeReader(plaintextReader, &plaintextBuf)
 	digest, err := crypto.HashReader(hashReader, hashAlgo)
 	if err != nil {
-		return nil, fmt.Errorf("vpackop.Protect: hash plaintext: %w", err)
+		return nil, fmt.Errorf("katameop.Protect: hash plaintext: %w", err)
 	}
 	if inputSize < 0 {
 		inputSize = int64(plaintextBuf.Len())
@@ -79,7 +79,7 @@ func Protect(p ProtectParams) (*ProtectResult, error) {
 		originalSize := int64(plaintextBuf.Len())
 		compressed, err := crypto.Compress(plaintextBuf.Bytes(), p.Compress)
 		if err != nil {
-			return nil, fmt.Errorf("vpackop.Protect: compress: %w", err)
+			return nil, fmt.Errorf("katameop.Protect: compress: %w", err)
 		}
 		compMeta = &bundle.CompressionMeta{Algo: p.Compress, OriginalSize: originalSize}
 		plaintextBuf.Reset()
@@ -98,7 +98,7 @@ func Protect(p ProtectParams) (*ProtectResult, error) {
 		)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("vpackop.Protect: encrypt: %w", err)
+		return nil, fmt.Errorf("katameop.Protect: encrypt: %w", err)
 	}
 
 	keyAlgo, keyDigest := crypto.KeyFingerprint(key)
@@ -150,7 +150,7 @@ func Protect(p ProtectParams) (*ProtectResult, error) {
 
 	manifestBytes, err := bundle.MarshalManifest(m)
 	if err != nil {
-		return nil, fmt.Errorf("vpackop.Protect: marshal manifest: %w", err)
+		return nil, fmt.Errorf("katameop.Protect: marshal manifest: %w", err)
 	}
 
 	var sig []byte
@@ -173,7 +173,7 @@ func Protect(p ProtectParams) (*ProtectResult, error) {
 		wp.OutputPath = p.OutputPath
 	}
 	if err := bundle.Write(wp); err != nil {
-		return nil, fmt.Errorf("vpackop.Protect: write bundle: %w", err)
+		return nil, fmt.Errorf("katameop.Protect: write bundle: %w", err)
 	}
 
 	res := &ProtectResult{
@@ -197,7 +197,7 @@ func validateProtectModes(p ProtectParams) error {
 	useSplit := p.SplitShares > 0 || p.SplitThreshold > 0
 
 	if useKMS && (p.KMSProvider == "" || p.KMSKeyID == "") {
-		return errors.New("vpackop.Protect: KMSProvider and KMSKeyID are both required for KMS mode")
+		return errors.New("katameop.Protect: KMSProvider and KMSKeyID are both required for KMS mode")
 	}
 
 	modes := 0
@@ -214,17 +214,17 @@ func validateProtectModes(p ProtectParams) error {
 		modes++
 	}
 	if modes > 1 {
-		return errors.New("vpackop.Protect: Password, Key, Recipients, and KMS are mutually exclusive")
+		return errors.New("katameop.Protect: Password, Key, Recipients, and KMS are mutually exclusive")
 	}
 	if useSplit {
 		if p.SplitShares < 2 || p.SplitShares > 255 {
-			return errors.New("vpackop.Protect: SplitShares must be in [2..255]")
+			return errors.New("katameop.Protect: SplitShares must be in [2..255]")
 		}
 		if p.SplitThreshold < 2 || p.SplitThreshold > p.SplitShares {
-			return errors.New("vpackop.Protect: SplitThreshold must be in [2..SplitShares]")
+			return errors.New("katameop.Protect: SplitThreshold must be in [2..SplitShares]")
 		}
 		if usePassword || useRecipient || useKMS {
-			return errors.New("vpackop.Protect: key splitting is only supported with Key or auto-generated key")
+			return errors.New("katameop.Protect: key splitting is only supported with Key or auto-generated key")
 		}
 	}
 	return nil
@@ -247,7 +247,7 @@ func resolveProtectInput(p ProtectParams) (io.Reader, string, int64, func(), err
 	case p.InputPath != "":
 		f, err := os.Open(p.InputPath)
 		if err != nil {
-			return nil, "", 0, nil, fmt.Errorf("vpackop.Protect: open input: %w", err)
+			return nil, "", 0, nil, fmt.Errorf("katameop.Protect: open input: %w", err)
 		}
 		info, err := f.Stat()
 		if err != nil {
@@ -260,7 +260,7 @@ func resolveProtectInput(p ProtectParams) (io.Reader, string, int64, func(), err
 		}
 		return f, name, info.Size(), func() { f.Close() }, nil
 	default:
-		return nil, "", 0, nil, errors.New("vpackop.Protect: one of Plaintext / PlaintextReader / InputPath is required")
+		return nil, "", 0, nil, errors.New("katameop.Protect: one of Plaintext / PlaintextReader / InputPath is required")
 	}
 }
 
@@ -513,7 +513,7 @@ func encapsulateRecipients(recipients []Recipient) ([]byte, *bundle.HybridMeta, 
 
 func signManifest(sp *SignParams, m *bundle.Manifest, ciphertextBuf *bytes.Buffer) ([]byte, string, []byte, error) {
 	if sp.PrivateKey == nil && sp.PrivateKeyPath == "" {
-		return nil, "", nil, errors.New("vpackop.Protect: Sign requires PrivateKey or PrivateKeyPath")
+		return nil, "", nil, errors.New("katameop.Protect: Sign requires PrivateKey or PrivateKeyPath")
 	}
 	var signer stdSigner
 	var detected string
@@ -524,12 +524,12 @@ func signManifest(sp *SignParams, m *bundle.Manifest, ciphertextBuf *bytes.Buffe
 		signer, detected, err = crypto.ParsePrivateKey(sp.PrivateKey)
 	}
 	if err != nil {
-		return nil, "", nil, fmt.Errorf("vpackop.Protect: load signing key: %w", err)
+		return nil, "", nil, fmt.Errorf("katameop.Protect: load signing key: %w", err)
 	}
 	algo := detected
 	if sp.Algo != "" {
 		if sp.Algo != detected {
-			return nil, "", nil, fmt.Errorf("vpackop.Protect: Algo %q does not match key type %q", sp.Algo, detected)
+			return nil, "", nil, fmt.Errorf("katameop.Protect: Algo %q does not match key type %q", sp.Algo, detected)
 		}
 		algo = sp.Algo
 	}

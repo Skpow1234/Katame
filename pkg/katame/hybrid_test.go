@@ -1,11 +1,11 @@
-package vaultpack
+package katame
 
 import (
 	"bytes"
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/crypto"
 )
 
 func TestProtectDecrypt_Hybrid_RoundTrip(t *testing.T) {
@@ -14,7 +14,7 @@ func TestProtectDecrypt_Hybrid_RoundTrip(t *testing.T) {
 		t.Fatalf("GenerateHybridKeys: %v", err)
 	}
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "hybrid.vpack")
+	bundlePath := filepath.Join(dir, "hybrid.katame")
 	plaintext := []byte("hybrid sdk round-trip")
 
 	_, err = Protect(ProtectOptions{

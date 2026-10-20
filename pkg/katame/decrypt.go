@@ -1,9 +1,9 @@
-package vaultpack
+package katame
 
 import (
 	"io"
 
-	"github.com/Skpow1234/Vaultpack/internal/vpackop"
+	"github.com/Skpow1234/Katame/internal/katameop"
 )
 
 // DecryptOptions controls a single Decrypt call.
@@ -36,9 +36,9 @@ type DecryptResult struct {
 	Plaintext []byte
 }
 
-// Decrypt reads a .vpack bundle and recovers the plaintext.
+// Decrypt reads a .katame bundle and recovers the plaintext.
 func Decrypt(opts DecryptOptions) (*DecryptResult, error) {
-	res, err := vpackop.Decrypt(toVpackopDecrypt(opts))
+	res, err := katameop.Decrypt(toKatameopDecrypt(opts))
 	if err != nil {
 		return nil, err
 	}

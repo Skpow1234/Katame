@@ -1,4 +1,4 @@
-// Package audit provides tamper-evident, append-only logging of VaultPack operations.
+// Package audit provides tamper-evident, append-only logging of Katame operations.
 package audit
 
 import (
@@ -183,7 +183,7 @@ func VerifyFile(path string) (*VerifyResult, error) {
 	return res, nil
 }
 
-// OCSFClass maps VaultPack operations to a compact OCSF-style category label.
+// OCSFClass maps Katame operations to a compact OCSF-style category label.
 func OCSFClass(op string) string {
 	switch op {
 	case OpProtect, OpDecrypt, OpRewrap, OpRotateKey, OpAddRecipient, OpRemoveRecipient:

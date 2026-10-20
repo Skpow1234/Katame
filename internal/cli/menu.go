@@ -13,7 +13,7 @@ func newMenuCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "menu",
 		Short: "Interactive mode — guided workflow",
-		Long:  "Launch an interactive menu to walk through VaultPack operations step by step.",
+		Long:  "Launch an interactive menu to walk through Katame operations step by step.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var action string
 
@@ -21,12 +21,12 @@ func newMenuCmd() *cobra.Command {
 				Title("What would you like to do?").
 				Options(
 					huh.NewOption("Protect a file (encrypt + bundle)", "protect"),
-					huh.NewOption("Decrypt a .vpack bundle", "decrypt"),
-					huh.NewOption("Inspect a .vpack bundle", "inspect"),
+					huh.NewOption("Decrypt a .katame bundle", "decrypt"),
+					huh.NewOption("Inspect a .katame bundle", "inspect"),
 					huh.NewOption("Hash a file", "hash"),
 					huh.NewOption("Generate signing key pair", "keygen"),
-					huh.NewOption("Sign a .vpack bundle", "sign"),
-					huh.NewOption("Verify a .vpack bundle", "verify"),
+					huh.NewOption("Sign a .katame bundle", "sign"),
+					huh.NewOption("Verify a .katame bundle", "verify"),
 					huh.NewOption("Verify integrity (decrypt + hash check)", "verify-integrity"),
 					huh.NewOption("Split a key into Shamir shares", "split-key"),
 					huh.NewOption("Combine Shamir shares into a key", "combine-key"),
@@ -116,7 +116,7 @@ func runProtectMenu(cmd *cobra.Command) error {
 				Value(&inFile),
 			huh.NewInput().
 				Title("Output bundle path (leave blank for default)").
-				Placeholder("<input>.vpack or az://container/blob.vpack").
+				Placeholder("<input>.katame or az://container/blob.katame").
 				Value(&outFile),
 			huh.NewSelect[string]().
 				Title("Key mode").
@@ -274,8 +274,8 @@ func runDecryptMenu(cmd *cobra.Command) error {
 	err := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
-				Title("Input .vpack bundle").
-				Placeholder("/path/to/bundle.vpack or az://container/blob.vpack").
+				Title("Input .katame bundle").
+				Placeholder("/path/to/bundle.katame or az://container/blob.katame").
 				Description("Use az:// for Azure Blob Storage").
 				Value(&inFile),
 			huh.NewInput().
@@ -344,8 +344,8 @@ func runInspectMenu() error {
 	err := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
-				Title("Input .vpack bundle").
-				Placeholder("/path/to/bundle.vpack or az://container/blob.vpack").
+				Title("Input .katame bundle").
+				Placeholder("/path/to/bundle.katame or az://container/blob.katame").
 				Description("Use az:// for Azure Blob Storage").
 				Value(&inFile),
 			huh.NewConfirm().
@@ -449,8 +449,8 @@ func runSignMenu() error {
 	err := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
-				Title("Input .vpack bundle to sign").
-				Placeholder("/path/to/bundle.vpack").
+				Title("Input .katame bundle to sign").
+				Placeholder("/path/to/bundle.katame").
 				Value(&inFile),
 			huh.NewInput().
 				Title("Path to private signing key").
@@ -477,8 +477,8 @@ func runVerifyMenu() error {
 	err := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
-				Title("Input .vpack bundle to verify").
-				Placeholder("/path/to/bundle.vpack").
+				Title("Input .katame bundle to verify").
+				Placeholder("/path/to/bundle.katame").
 				Value(&inFile),
 			huh.NewInput().
 				Title("Path to public key").
@@ -508,8 +508,8 @@ func runVerifyIntegrityMenu() error {
 	err := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
-				Title("Input .vpack bundle").
-				Placeholder("/path/to/bundle.vpack").
+				Title("Input .katame bundle").
+				Placeholder("/path/to/bundle.katame").
 				Value(&inFile),
 			huh.NewSelect[string]().
 				Title("Decryption method").
@@ -669,7 +669,7 @@ func runBatchProtectMenu() error {
 				Description("Use az:// for Azure Blob Storage").
 				Value(&srcDir),
 			huh.NewInput().
-				Title("Output directory for .vpack bundles").
+				Title("Output directory for .katame bundles").
 				Placeholder("./encrypted/ or az://container/prefix/").
 				Value(&outDir),
 			huh.NewSelect[string]().
@@ -725,7 +725,7 @@ func runBatchDecryptMenu() error {
 	err := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
-				Title("Directory with .vpack bundles").
+				Title("Directory with .katame bundles").
 				Placeholder("./encrypted/ or az://container/prefix/").
 				Description("Use az:// for Azure Blob Storage").
 				Value(&srcDir),
@@ -779,7 +779,7 @@ func runBatchDecryptMenu() error {
 func runBatchInspectMenu() error {
 	var srcDir string
 	err := huh.NewInput().
-		Title("Directory with .vpack bundles").
+		Title("Directory with .katame bundles").
 		Placeholder("./encrypted/").
 		Value(&srcDir).
 		Run()
@@ -797,8 +797,8 @@ func runAttestMenu() error {
 	err := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
-				Title("Input .vpack bundle").
-				Placeholder("bundle.vpack").
+				Title("Input .katame bundle").
+				Placeholder("bundle.katame").
 				Value(&inFile),
 			huh.NewInput().
 				Title("Output provenance file (leave blank for stdout)").
@@ -823,7 +823,7 @@ func runSealMenu() error {
 	err := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
-				Title("Directory with .vpack bundles").
+				Title("Directory with .katame bundles").
 				Placeholder("./bundles/").
 				Value(&dir),
 			huh.NewInput().
@@ -849,7 +849,7 @@ func runVerifySealMenu() error {
 	err := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
-				Title("Directory with .vpack bundles").
+				Title("Directory with .katame bundles").
 				Placeholder("./bundles/").
 				Value(&dir),
 			huh.NewInput().
@@ -872,7 +872,7 @@ func runAuditExportMenu() error {
 		huh.NewGroup(
 			huh.NewInput().
 				Title("Audit log file").
-				Placeholder("or set VAULTPACK_AUDIT_LOG").
+				Placeholder("or set KATAME_AUDIT_LOG").
 				Value(&logPath),
 			huh.NewSelect[string]().
 				Title("Format").

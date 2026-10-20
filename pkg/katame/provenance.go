@@ -1,4 +1,4 @@
-package vaultpack
+package katame
 
 import (
 	"context"
@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	vpcrypto "github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/transparency"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	vpcrypto "github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/transparency"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 // Provenance is a SLSA-style provenance statement for a bundle.

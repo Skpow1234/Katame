@@ -15,7 +15,7 @@ import (
 
 	"golang.org/x/crypto/hkdf"
 
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 // Hybrid encryption scheme names.
@@ -181,7 +181,7 @@ func encapsulateX25519(recipientPub any) (*HybridResult, error) {
 	}
 
 	// HKDF-SHA256 to derive DEK.
-	dek, err := hkdfDerive(shared, nil, []byte("vaultpack-x25519-dek"), AES256KeySize)
+	dek, err := hkdfDerive(shared, nil, []byte("katame-x25519-dek"), AES256KeySize)
 	if err != nil {
 		return nil, fmt.Errorf("x25519: HKDF: %w", err)
 	}
@@ -213,7 +213,7 @@ func decapsulateX25519(privKey any, ephemeralPubKeyBytes []byte) ([]byte, error)
 		return nil, fmt.Errorf("x25519: ECDH: %w", err)
 	}
 
-	dek, err := hkdfDerive(shared, nil, []byte("vaultpack-x25519-dek"), AES256KeySize)
+	dek, err := hkdfDerive(shared, nil, []byte("katame-x25519-dek"), AES256KeySize)
 	if err != nil {
 		return nil, fmt.Errorf("x25519: HKDF: %w", err)
 	}
@@ -250,7 +250,7 @@ func encapsulateECIESP256(recipientPub any) (*HybridResult, error) {
 		return nil, fmt.Errorf("ecies-p256: ECDH: %w", err)
 	}
 
-	dek, err := hkdfDerive(shared, nil, []byte("vaultpack-ecies-p256-dek"), AES256KeySize)
+	dek, err := hkdfDerive(shared, nil, []byte("katame-ecies-p256-dek"), AES256KeySize)
 	if err != nil {
 		return nil, fmt.Errorf("ecies-p256: HKDF: %w", err)
 	}
@@ -286,7 +286,7 @@ func decapsulateECIESP256(privKey any, ephemeralPubKeyBytes []byte) ([]byte, err
 		return nil, fmt.Errorf("ecies-p256: ECDH: %w", err)
 	}
 
-	dek, err := hkdfDerive(shared, nil, []byte("vaultpack-ecies-p256-dek"), AES256KeySize)
+	dek, err := hkdfDerive(shared, nil, []byte("katame-ecies-p256-dek"), AES256KeySize)
 	if err != nil {
 		return nil, fmt.Errorf("ecies-p256: HKDF: %w", err)
 	}
@@ -309,7 +309,7 @@ func encapsulateRSAOAEP(recipientPub any, scheme string) (*HybridResult, error) 
 	}
 
 	// Wrap DEK with RSA-OAEP.
-	wrappedDEK, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, rsaPub, dek, []byte("vaultpack-dek"))
+	wrappedDEK, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, rsaPub, dek, []byte("katame-dek"))
 	if err != nil {
 		return nil, fmt.Errorf("rsa-oaep: encrypt DEK: %w", err)
 	}
@@ -327,7 +327,7 @@ func decapsulateRSAOAEP(privKey any, wrappedDEK []byte) ([]byte, error) {
 		return nil, fmt.Errorf("rsa-oaep: expected RSA private key, got %T", privKey)
 	}
 
-	dek, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, rsaPriv, wrappedDEK, []byte("vaultpack-dek"))
+	dek, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, rsaPriv, wrappedDEK, []byte("katame-dek"))
 	if err != nil {
 		return nil, fmt.Errorf("rsa-oaep: decrypt DEK: %w", err)
 	}
@@ -375,11 +375,11 @@ func GenerateHybridKeys(scheme string) (privPEM, pubPEM []byte, err error) {
 }
 
 // PluginSchemePrefix is the first-line prefix in plugin-generated public key files.
-// Example: "VPACK-KEM-SCHEME: my-dummy-kem"
-const PluginSchemePrefix = "VPACK-KEM-SCHEME:"
+// Example: "KATAME-KEM-SCHEME: my-dummy-kem"
+const PluginSchemePrefix = "KATAME-KEM-SCHEME:"
 
 // DetectHybridScheme detects the hybrid scheme from a recipient public key file.
-// Plugin keys may start with a line "VPACK-KEM-SCHEME: <name>"; that name is returned without parsing PEM.
+// Plugin keys may start with a line "KATAME-KEM-SCHEME: <name>"; that name is returned without parsing PEM.
 func DetectHybridScheme(pubKeyPath string) (string, error) {
 	data, err := os.ReadFile(pubKeyPath)
 	if err != nil {
@@ -500,7 +500,7 @@ func wrapDEKX25519(recipientPub any, dek []byte) (*HybridResult, error) {
 		return nil, fmt.Errorf("x25519-wrap: ECDH: %w", err)
 	}
 
-	wrapKey, err := hkdfDerive(shared, nil, []byte("vaultpack-x25519-wrap"), AES256KeySize)
+	wrapKey, err := hkdfDerive(shared, nil, []byte("katame-x25519-wrap"), AES256KeySize)
 	if err != nil {
 		return nil, fmt.Errorf("x25519-wrap: HKDF: %w", err)
 	}
@@ -540,7 +540,7 @@ func wrapDEKECIESP256(recipientPub any, dek []byte) (*HybridResult, error) {
 		return nil, fmt.Errorf("ecies-p256-wrap: ECDH: %w", err)
 	}
 
-	wrapKey, err := hkdfDerive(shared, nil, []byte("vaultpack-ecies-p256-wrap"), AES256KeySize)
+	wrapKey, err := hkdfDerive(shared, nil, []byte("katame-ecies-p256-wrap"), AES256KeySize)
 	if err != nil {
 		return nil, fmt.Errorf("ecies-p256-wrap: HKDF: %w", err)
 	}
@@ -565,7 +565,7 @@ func wrapDEKRSAOAEP(recipientPub any, scheme string, dek []byte) (*HybridResult,
 		return nil, fmt.Errorf("rsa-oaep-wrap: expected RSA public key, got %T", recipientPub)
 	}
 
-	wrappedDEK, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, rsaPub, dek, []byte("vaultpack-dek"))
+	wrappedDEK, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, rsaPub, dek, []byte("katame-dek"))
 	if err != nil {
 		return nil, fmt.Errorf("rsa-oaep-wrap: encrypt DEK: %w", err)
 	}
@@ -657,7 +657,7 @@ func unwrapDEKX25519(privKey any, ephemeralPubKeyBytes, wrappedDEK []byte) ([]by
 		return nil, fmt.Errorf("x25519-unwrap: ECDH: %w", err)
 	}
 
-	wrapKey, err := hkdfDerive(shared, nil, []byte("vaultpack-x25519-wrap"), AES256KeySize)
+	wrapKey, err := hkdfDerive(shared, nil, []byte("katame-x25519-wrap"), AES256KeySize)
 	if err != nil {
 		return nil, fmt.Errorf("x25519-unwrap: HKDF: %w", err)
 	}
@@ -686,7 +686,7 @@ func unwrapDEKECIESP256(privKey any, ephemeralPubKeyBytes, wrappedDEK []byte) ([
 		return nil, fmt.Errorf("ecies-p256-unwrap: ECDH: %w", err)
 	}
 
-	wrapKey, err := hkdfDerive(shared, nil, []byte("vaultpack-ecies-p256-wrap"), AES256KeySize)
+	wrapKey, err := hkdfDerive(shared, nil, []byte("katame-ecies-p256-wrap"), AES256KeySize)
 	if err != nil {
 		return nil, fmt.Errorf("ecies-p256-unwrap: HKDF: %w", err)
 	}

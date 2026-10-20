@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
 // --- helpers ---
@@ -341,7 +341,7 @@ func TestLoad_UnknownExtension(t *testing.T) {
 func TestLoad_Rego_AllowDeny(t *testing.T) {
 	dir := t.TempDir()
 	// v0-style Rego (no `if` keyword) works under both v0 and v1 OPA parsers.
-	src := `package vaultpack
+	src := `package katame
 
 default allow = false
 

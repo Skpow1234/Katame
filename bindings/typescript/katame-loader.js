@@ -1,25 +1,25 @@
 /**
- * Browser/Node loader for the VaultPack WASM module.
+ * Browser/Node loader for the Katame WASM module.
  *
  * The Go runtime needs its companion `wasm_exec.js` (shipped with the Go
  * SDK at $(go env GOROOT)/lib/wasm/wasm_exec.js as of Go 1.22). Drop a
  * copy alongside this file, then:
  *
- *   import { loadVaultpack } from "./vaultpack-loader.js";
- *   await loadVaultpack("./vaultpack.wasm");   // returns globalThis.Vaultpack
+ *   import { loadKatame } from "./katame-loader.js";
+ *   await loadKatame("./katame.wasm");   // returns globalThis.Katame
  *
- * After the promise resolves the global `Vaultpack` object (typed by
- * vaultpack.d.ts) is ready to use.
+ * After the promise resolves the global `Katame` object (typed by
+ * katame.d.ts) is ready to use.
  */
 
 /**
- * @param {string|URL} wasmURL Path or URL to vaultpack.wasm.
+ * @param {string|URL} wasmURL Path or URL to katame.wasm.
  * @param {object}     [opts]
  * @param {string|URL} [opts.wasmExecURL=./wasm_exec.js]
  *   Location of Go's wasm_exec.js. Defaults to a sibling of wasmURL.
- * @returns {Promise<import("./vaultpack").Vaultpack>}
+ * @returns {Promise<import("./katame").Katame>}
  */
-export async function loadVaultpack(wasmURL, opts = {}) {
+export async function loadKatame(wasmURL, opts = {}) {
   if (typeof globalThis.Go !== "function") {
     const execURL = opts.wasmExecURL ?? new URL("./wasm_exec.js", wasmURL);
     // Browser path.
@@ -60,8 +60,8 @@ export async function loadVaultpack(wasmURL, opts = {}) {
   // run() returns when main() exits — Go's main() uses `select {}` to keep
   // the runtime alive, so we deliberately do not await this promise.
   go.run(result.instance);
-  if (typeof globalThis.Vaultpack === "undefined") {
-    throw new Error("vaultpack.wasm did not install globalThis.Vaultpack");
+  if (typeof globalThis.Katame === "undefined") {
+    throw new Error("katame.wasm did not install globalThis.Katame");
   }
-  return globalThis.Vaultpack;
+  return globalThis.Katame;
 }

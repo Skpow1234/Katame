@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/kms"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/kms"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
-// newRewrapCmd builds the `vaultpack rewrap` command.
+// newRewrapCmd builds the `katame rewrap` command.
 //
 // Rewrap re-wraps the bundle's Data Encryption Key (DEK) under a new wrapping
 // without touching the ciphertext payload. This is the cheap path for rotating
@@ -22,7 +22,7 @@ import (
 //
 // Currently supported: KMS → KMS (same provider, new key ID). Other modes
 // (password, key file, hybrid) do not have a separable "wrapping" layer to
-// rewrap independently of the payload; use `vaultpack rotate-key` for those.
+// rewrap independently of the payload; use `katame rotate-key` for those.
 func newRewrapCmd() *cobra.Command {
 	var (
 		inFile      string
@@ -35,12 +35,12 @@ func newRewrapCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "rewrap",
 		Short: "Re-wrap the DEK under a new KMS key without decrypting the payload",
-		Long: `Re-wrap the Data Encryption Key (DEK) of a .vpack bundle under a new KMS key.
+		Long: `Re-wrap the Data Encryption Key (DEK) of a .katame bundle under a new KMS key.
 
 The ciphertext payload is not touched, so this is suitable for KMS key rotation
 without requiring access to the plaintext.
 
-The new manifest invalidates any prior signature; re-sign with 'vaultpack sign'.`,
+The new manifest invalidates any prior signature; re-sign with 'katame sign'.`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			printer := NewPrinter(flagJSON, flagQuiet)
 			defer func() {
@@ -80,7 +80,7 @@ The new manifest invalidates any prior signature; re-sign with 'vaultpack sign'.
 				return err
 			}
 			if br.Manifest.Encryption.KmsKeyID == "" || br.Manifest.Encryption.KmsWrappedDEKB64 == "" {
-				return fmt.Errorf("bundle is not KMS-wrapped; use 'vaultpack rotate-key' to change key/mode")
+				return fmt.Errorf("bundle is not KMS-wrapped; use 'katame rotate-key' to change key/mode")
 			}
 
 			if fromKeyID != "" && fromKeyID != br.Manifest.Encryption.KmsKeyID {
@@ -125,7 +125,7 @@ The new manifest invalidates any prior signature; re-sign with 'vaultpack sign'.
 			remoteOut := ""
 			if isRemoteURI(outFile) {
 				remoteOut = outFile
-				tmp, terr := os.CreateTemp("", "vaultpack-rewrap-*.vpack")
+				tmp, terr := os.CreateTemp("", "katame-rewrap-*.katame")
 				if terr != nil {
 					return fmt.Errorf("create temp output: %w", terr)
 				}
@@ -160,13 +160,13 @@ The new manifest invalidates any prior signature; re-sign with 'vaultpack sign'.
 				printer.Human("Rewrap:    %s", outFile)
 				printer.Human("Old KMS:   %s", oldKeyID)
 				printer.Human("New KMS:   %s", toKeyID)
-				printer.Human("Signature: cleared; run 'vaultpack sign' to re-sign.")
+				printer.Human("Signature: cleared; run 'katame sign' to re-sign.")
 			}
 			return nil
 		},
 	}
 
-	cmd.Flags().StringVar(&inFile, "in", "", "input .vpack bundle (required)")
+	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle (required)")
 	cmd.Flags().StringVar(&outFile, "out", "", "output bundle path (defaults to --in, i.e. in-place)")
 	cmd.Flags().StringVar(&kmsProvider, "kms-provider", "", "KMS provider for both unwrap and rewrap (aws|gcp|azure|mock)")
 	cmd.Flags().StringVar(&fromKeyID, "from-kms-key-id", "", "expected KMS key ID currently wrapping the DEK (optional sanity check)")

@@ -21,8 +21,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/transparency"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/transparency"
 )
 
 // mockRekorServer is a test-only Rekor that signs SETs with a freshly-generated
@@ -155,7 +155,7 @@ func makeEd25519KeyFiles(t *testing.T, dir string) (priv, pub string) {
 func TestSignTransparency_RoundTrip(t *testing.T) {
 	dir := t.TempDir()
 	in := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	dataKey := filepath.Join(dir, "secret.key")
 	if err := os.WriteFile(in, []byte("transparency-roundtrip"), 0o600); err != nil {
 		t.Fatal(err)
@@ -218,7 +218,7 @@ func TestSignTransparency_RoundTrip(t *testing.T) {
 func TestVerify_TransparencyMismatchFails(t *testing.T) {
 	dir := t.TempDir()
 	in := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	dataKey := filepath.Join(dir, "secret.key")
 	os.WriteFile(in, []byte("transparency-tamper"), 0o600)
 
@@ -325,7 +325,7 @@ func newMockFulcioServer(t *testing.T) *mockFulcioServer {
 		}
 		leafTmpl := &x509.Certificate{
 			SerialNumber: big.NewInt(2),
-			Subject:      pkix.Name{CommonName: "vaultpack-test"},
+			Subject:      pkix.Name{CommonName: "katame-test"},
 			NotBefore:    time.Now().Add(-time.Minute),
 			NotAfter:     time.Now().Add(time.Hour),
 			KeyUsage:     x509.KeyUsageDigitalSignature,
@@ -368,7 +368,7 @@ func craftOIDCToken(t *testing.T, email, issuer string) string {
 func TestSign_Keyless_RoundTrip(t *testing.T) {
 	dir := t.TempDir()
 	in := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	dataKey := filepath.Join(dir, "secret.key")
 	os.WriteFile(in, []byte("keyless-roundtrip"), 0o600)
 
@@ -426,7 +426,7 @@ func TestSign_Keyless_RoundTrip(t *testing.T) {
 func TestSign_TransparencyRejectsPQAlgo(t *testing.T) {
 	dir := t.TempDir()
 	in := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	dataKey := filepath.Join(dir, "secret.key")
 	os.WriteFile(in, []byte("pq-rekor-reject"), 0o600)
 

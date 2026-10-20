@@ -1,7 +1,7 @@
-// Package serve implements `vaultpack serve` — a long-running HTTP API
-// that exposes the VaultPack SDK to remote clients. The wire contract is
+// Package serve implements `katame serve` — a long-running HTTP API
+// that exposes the Katame SDK to remote clients. The wire contract is
 // the same JSON envelope used by the C-shared library
-// (`cmd/vaultpack-c`) and the WASM bindings: every endpoint takes a JSON
+// (`cmd/katame-c`) and the WASM bindings: every endpoint takes a JSON
 // body and returns a JSON object whose top-level shape is either
 // `{"ok": true, ...}` or `{"ok": false, "error": "..."}`.
 package serve
@@ -18,8 +18,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/policy"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/policy"
 )
 
 // Options configures a server. A zero value is invalid; use NewServer.

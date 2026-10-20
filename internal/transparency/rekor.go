@@ -15,7 +15,7 @@ import (
 )
 
 // RekorClient is a minimal client for the Rekor REST API. It only implements
-// the surface VaultPack needs: hashedrekord upload, entry fetch by UUID, and
+// the surface Katame needs: hashedrekord upload, entry fetch by UUID, and
 // public-key retrieval (used to verify SETs).
 type RekorClient struct {
 	BaseURL    string

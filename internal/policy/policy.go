@@ -1,4 +1,4 @@
-// Package policy implements VaultPack's RBAC / rules engine.
+// Package policy implements Katame's RBAC / rules engine.
 //
 // A Policy is a YAML or JSON document containing a list of Rules. Each Rule
 // has an Action ("allow" or "deny"), an optional human-readable Reason, and
@@ -20,7 +20,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
 // SchemaVersion is the current policy schema version.

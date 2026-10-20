@@ -3,7 +3,7 @@ package crypto
 import (
 	"fmt"
 
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 const (

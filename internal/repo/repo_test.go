@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/repo"
-	"github.com/Skpow1234/Vaultpack/pkg/vaultpack"
+	"github.com/Skpow1234/Katame/internal/repo"
+	"github.com/Skpow1234/Katame/pkg/katame"
 )
 
 func ed25519PEMs(t *testing.T) (priv, pub []byte) {
@@ -35,7 +35,7 @@ func ed25519PEMs(t *testing.T) (priv, pub []byte) {
 func makeBundle(t *testing.T, dir, name, payload string) []byte {
 	t.Helper()
 	out := filepath.Join(dir, name)
-	_, err := vaultpack.Protect(vaultpack.ProtectOptions{
+	_, err := katame.Protect(katame.ProtectOptions{
 		Plaintext:  []byte(payload),
 		OutputPath: out,
 	})
@@ -94,8 +94,8 @@ func TestRepoAdd_AndVerify_Signed(t *testing.T) {
 
 	bundleDir := t.TempDir()
 	for i := 0; i < 5; i++ {
-		bundleBytes := makeBundle(t, bundleDir, "b.vpack", "payload "+string(rune('a'+i)))
-		res, err := r.Add(repo.AddOptions{BundleBytes: bundleBytes, BundleName: "b.vpack"})
+		bundleBytes := makeBundle(t, bundleDir, "b.katame", "payload "+string(rune('a'+i)))
+		res, err := r.Add(repo.AddOptions{BundleBytes: bundleBytes, BundleName: "b.katame"})
 		if err != nil {
 			t.Fatalf("Add %d: %v", i, err)
 		}
@@ -143,7 +143,7 @@ func TestRepoVerify_TamperedEntry(t *testing.T) {
 
 	bundleDir := t.TempDir()
 	for i := 0; i < 3; i++ {
-		b := makeBundle(t, bundleDir, "b.vpack", "x")
+		b := makeBundle(t, bundleDir, "b.katame", "x")
 		if _, err := r.Add(repo.AddOptions{BundleBytes: b}); err != nil {
 			t.Fatal(err)
 		}
@@ -205,7 +205,7 @@ func TestRepoList_Limit(t *testing.T) {
 	}
 	bdir := t.TempDir()
 	for i := 0; i < 6; i++ {
-		b := makeBundle(t, bdir, "b.vpack", "p")
+		b := makeBundle(t, bdir, "b.katame", "p")
 		_, _ = r.Add(repo.AddOptions{BundleBytes: b})
 	}
 	entries, roots, err := r.List(3)
@@ -227,7 +227,7 @@ func TestRepoAdd_StoreBundles(t *testing.T) {
 	}
 	r, _ := repo.Open(dir, nil)
 
-	bundleBytes := makeBundle(t, t.TempDir(), "b.vpack", "store me")
+	bundleBytes := makeBundle(t, t.TempDir(), "b.katame", "store me")
 	res, err := r.Add(repo.AddOptions{
 		BundleBytes: bundleBytes,
 		CopyBundle:  true,
@@ -235,7 +235,7 @@ func TestRepoAdd_StoreBundles(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	stored := filepath.Join(dir, "bundles", res.Entry.BundleSHA256+".vpack")
+	stored := filepath.Join(dir, "bundles", res.Entry.BundleSHA256+".katame")
 	if _, err := os.Stat(stored); err != nil {
 		t.Fatalf("stored bundle missing: %v", err)
 	}
@@ -249,7 +249,7 @@ func TestRepoVerify_UnsignedRepo(t *testing.T) {
 	r, _ := repo.Open(dir, nil)
 	bd := t.TempDir()
 	for i := 0; i < 4; i++ {
-		b := makeBundle(t, bd, "b.vpack", "x")
+		b := makeBundle(t, bd, "b.katame", "x")
 		_, _ = r.Add(repo.AddOptions{BundleBytes: b})
 	}
 	vr, err := r.Verify(nil)

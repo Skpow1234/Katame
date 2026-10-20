@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 	"github.com/spf13/cobra"
 )
 
@@ -18,16 +18,16 @@ func newBatchInspectCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "batch-inspect",
-		Short: "Show summary of all .vpack bundles in a directory",
-		Long: `Recursively find all .vpack bundles in a directory and display a summary
+		Short: "Show summary of all .katame bundles in a directory",
+		Long: `Recursively find all .katame bundles in a directory and display a summary
 of each bundle's manifest. Also reads batch-manifest.json if present.
 
 Use --redact to omit sensitive fields (plaintext digest, fingerprints, nonces, etc.)
 in JSON output, making the result safe to share for audit or support purposes.
 
 Example:
-  vaultpack batch-inspect --dir ./encrypted/
-  vaultpack batch-inspect --dir ./encrypted/ --redact --json`,
+  katame batch-inspect --dir ./encrypted/
+  katame batch-inspect --dir ./encrypted/ --redact --json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printer := NewPrinter(flagJSON, flagQuiet)
 
@@ -45,14 +45,14 @@ Example:
 				}
 			}
 
-			// Collect .vpack files.
-			files, err := collectVpackFiles(srcDir)
+			// Collect .katame files.
+			files, err := collectKatameFiles(srcDir)
 			if err != nil {
 				return fmt.Errorf("scan directory: %w", err)
 			}
 
 			if len(files) == 0 {
-				printer.Human("No .vpack files found in %s", srcDir)
+				printer.Human("No .katame files found in %s", srcDir)
 				return nil
 			}
 
@@ -129,7 +129,7 @@ Example:
 		},
 	}
 
-	cmd.Flags().StringVar(&srcDir, "dir", "", "directory with .vpack bundles (required)")
+	cmd.Flags().StringVar(&srcDir, "dir", "", "directory with .katame bundles (required)")
 	cmd.Flags().BoolVar(&redact, "redact", false, "omit sensitive fields (fingerprints, nonces, salts) from JSON output")
 
 	return cmd

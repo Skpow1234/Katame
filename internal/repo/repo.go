@@ -14,9 +14,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 // Repo is a handle to an on-disk tamper-evident repo.
@@ -159,14 +159,14 @@ func (r *Repo) Add(opts AddOptions) (*AddResult, error) {
 
 	// Validate the bundle by parsing its manifest. We don't decrypt or
 	// verify signatures here — repo just records what was added; the
-	// caller can run `vaultpack verify` separately if needed.
+	// caller can run `katame verify` separately if needed.
 	br, err := bundle.ReadBytes(opts.BundleBytes)
 	if err != nil {
 		return nil, fmt.Errorf("repo add: parse bundle: %w", err)
 	}
 
 	// Compute the leaf data deterministically. We use the SHA-256 of the
-	// .vpack bytes plus the next sequence number to make leaves unique
+	// .katame bytes plus the next sequence number to make leaves unique
 	// even if the exact same bundle is added twice.
 	bundleHash := sha256.Sum256(opts.BundleBytes)
 	bundleSHA256Hex := hex.EncodeToString(bundleHash[:])
@@ -233,7 +233,7 @@ func (r *Repo) Add(opts AddOptions) (*AddResult, error) {
 
 	// Optionally copy the bundle into bundles/.
 	if opts.CopyBundle && r.cfg.StoreBundles {
-		dst := filepath.Join(r.dir, bundlesSubdir, bundleSHA256Hex+".vpack")
+		dst := filepath.Join(r.dir, bundlesSubdir, bundleSHA256Hex+".katame")
 		if err := os.WriteFile(dst, opts.BundleBytes, 0o600); err != nil {
 			return nil, fmt.Errorf("repo add: copy bundle: %w", err)
 		}
@@ -487,8 +487,8 @@ func writeJSON(path string, v any) error {
 // canonicalLeafData is the deterministic byte string that gets hashed
 // into a tree leaf. Any change here is a tree-format breaking change.
 func canonicalLeafData(seq int64, ts string, bundleSHA []byte) []byte {
-	// "vpack-leaf-v1\x00<seq>\x00<ts>\x00<bundle_sha256>"
-	out := []byte("vpack-leaf-v1\x00")
+	// "katame-leaf-v1\x00<seq>\x00<ts>\x00<bundle_sha256>"
+	out := []byte("katame-leaf-v1\x00")
 	out = append(out, []byte(fmt.Sprintf("%d", seq))...)
 	out = append(out, 0)
 	out = append(out, []byte(ts)...)
@@ -500,7 +500,7 @@ func canonicalLeafData(seq int64, ts string, bundleSHA []byte) []byte {
 // canonicalRootMessage is the byte string signed by the repo's signing
 // key for each new root.
 func canonicalRootMessage(r *Root) []byte {
-	out := []byte("vpack-root-v1\x00")
+	out := []byte("katame-root-v1\x00")
 	out = append(out, []byte(fmt.Sprintf("%d", r.Seq))...)
 	out = append(out, 0)
 	out = append(out, []byte(r.Timestamp)...)

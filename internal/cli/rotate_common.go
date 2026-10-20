@@ -7,10 +7,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
-// hashBundleFile returns the lowercase-hex SHA-256 of the .vpack file at path.
+// hashBundleFile returns the lowercase-hex SHA-256 of the .katame file at path.
 // Used to record the previous bundle's identity in rotation history.
 func hashBundleFile(path string) (string, error) {
 	data, err := os.ReadFile(path)

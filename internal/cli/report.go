@@ -9,7 +9,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
+	"github.com/Skpow1234/Katame/internal/audit"
 	"github.com/spf13/cobra"
 )
 
@@ -37,13 +37,13 @@ func newReportCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "report",
 		Short: "Generate compliance reports from the audit log",
-		Long:  "Generate CSV or JSON compliance summaries from a VaultPack audit JSONL log, including operation counts, OCSF-style classes, success/failure totals, and audit hash-chain status.",
+		Long:  "Generate CSV or JSON compliance summaries from a Katame audit JSONL log, including operation counts, OCSF-style classes, success/failure totals, and audit hash-chain status.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if auditLogPath == "" {
 				auditLogPath = flagAuditLog
 			}
 			if auditLogPath == "" {
-				return fmt.Errorf("--audit-log is required (or set global --audit-log / VPACK_AUDIT_LOG)")
+				return fmt.Errorf("--audit-log is required (or set global --audit-log / KATAME_AUDIT_LOG)")
 			}
 			summary, rows, err := buildReport(auditLogPath)
 			if err != nil {

@@ -10,10 +10,10 @@ func TestDetectScheme(t *testing.T) {
 		{"az://container/blob", SchemeAzure},
 		{"s3://bucket/key", SchemeS3},
 		{"gs://bucket/key", SchemeGCS},
-		{"https://example.com/bundle.vpack", SchemeHTTPS},
-		{"http://example.com/bundle.vpack", SchemeHTTP},
+		{"https://example.com/bundle.katame", SchemeHTTPS},
+		{"http://example.com/bundle.katame", SchemeHTTP},
 		{"./relative/path", SchemeLocal},
-		{"C:\\Users\\foo\\file.vpack", SchemeLocal},
+		{"C:\\Users\\foo\\file.katame", SchemeLocal},
 		{"/absolute/path", SchemeLocal},
 		{"", SchemeLocal},
 	}
@@ -72,7 +72,7 @@ func TestParseBucketKey(t *testing.T) {
 		wantErr    bool
 	}{
 		{"s3://bucket/key/path", "bucket", "key/path", false},
-		{"gs://my-bucket/a/b/c.vpack", "my-bucket", "a/b/c.vpack", false},
+		{"gs://my-bucket/a/b/c.katame", "my-bucket", "a/b/c.katame", false},
 		{"s3://bucket", "bucket", "", false},
 		{"s3://bucket/", "bucket", "", false},
 		{"s3://", "", "", true},

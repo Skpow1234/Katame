@@ -1,4 +1,4 @@
-package vaultpack
+package katame
 
 // Version is the SDK's semver. Bumped on every release.
 //

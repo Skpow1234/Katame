@@ -6,10 +6,10 @@ import (
 	"os"
 	"os/user"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/kms"
-	"github.com/Skpow1234/Vaultpack/internal/policy"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/kms"
+	"github.com/Skpow1234/Katame/internal/policy"
 )
 
 func (s *Server) enforcePolicy(op, bundlePath string, m *bundle.Manifest) error {

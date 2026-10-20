@@ -50,11 +50,11 @@ func TestBatchProtectDecrypt_SharedKey(t *testing.T) {
 		t.Fatalf("batch-protect: %v", err)
 	}
 
-	// Verify .vpack files exist.
+	// Verify .katame files exist.
 	for name := range files {
-		vpackPath := filepath.Join(encDir, name+".vpack")
-		if _, err := os.Stat(vpackPath); err != nil {
-			t.Errorf("missing bundle: %s", vpackPath)
+		katamePath := filepath.Join(encDir, name+".katame")
+		if _, err := os.Stat(katamePath); err != nil {
+			t.Errorf("missing bundle: %s", katamePath)
 		}
 	}
 
@@ -136,7 +136,7 @@ func TestBatchProtectDecrypt_PerFileKey(t *testing.T) {
 
 	// Verify per-file .key files exist.
 	for name := range files {
-		keyPath := filepath.Join(encDir, name+".vpack.key")
+		keyPath := filepath.Join(encDir, name+".katame.key")
 		if _, err := os.Stat(keyPath); err != nil {
 			t.Errorf("missing per-file key: %s", keyPath)
 		}
@@ -222,14 +222,14 @@ func TestBatchProtect_IncludeExclude(t *testing.T) {
 	}
 
 	// CSV and TXT should be protected; LOG should not.
-	if _, err := os.Stat(filepath.Join(encDir, "data.csv.vpack")); err != nil {
-		t.Error("data.csv.vpack should exist")
+	if _, err := os.Stat(filepath.Join(encDir, "data.csv.katame")); err != nil {
+		t.Error("data.csv.katame should exist")
 	}
-	if _, err := os.Stat(filepath.Join(encDir, "note.txt.vpack")); err != nil {
-		t.Error("note.txt.vpack should exist")
+	if _, err := os.Stat(filepath.Join(encDir, "note.txt.katame")); err != nil {
+		t.Error("note.txt.katame should exist")
 	}
-	if _, err := os.Stat(filepath.Join(encDir, "data.log.vpack")); err == nil {
-		t.Error("data.log.vpack should NOT exist")
+	if _, err := os.Stat(filepath.Join(encDir, "data.log.katame")); err == nil {
+		t.Error("data.log.katame should NOT exist")
 	}
 }
 

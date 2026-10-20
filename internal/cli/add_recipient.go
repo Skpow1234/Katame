@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/plugin"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/plugin"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
-// newAddRecipientCmd builds the `vaultpack add-recipient` command.
+// newAddRecipientCmd builds the `katame add-recipient` command.
 //
 // Given a bundle that uses hybrid encryption, unwrap the DEK with one of the
 // existing recipients' private keys and re-wrap it for one or more new
@@ -31,14 +31,14 @@ func newAddRecipientCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-recipient",
 		Short: "Add one or more recipients to an existing hybrid bundle",
-		Long: `Add one or more public-key recipients to an existing hybrid-encrypted .vpack bundle.
+		Long: `Add one or more public-key recipients to an existing hybrid-encrypted .katame bundle.
 
 You must provide --privkey for an existing recipient (used to unwrap the DEK);
 the unwrapped DEK is then re-wrapped under each --recipient public key and
 appended to the manifest. The ciphertext is unchanged.
 
 A single-recipient bundle is converted in-place to multi-recipient form. The
-previous manifest signature is cleared; re-sign with 'vaultpack sign'.`,
+previous manifest signature is cleared; re-sign with 'katame sign'.`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			printer := NewPrinter(flagJSON, flagQuiet)
 			defer func() {
@@ -174,13 +174,13 @@ previous manifest signature is cleared; re-sign with 'vaultpack sign'.`,
 					printer.Human("  + %s", fp)
 				}
 				printer.Human("Total recipients: %d", len(recipientEntries))
-				printer.Human("Signature: cleared; run 'vaultpack sign' to re-sign.")
+				printer.Human("Signature: cleared; run 'katame sign' to re-sign.")
 			}
 			return nil
 		},
 	}
 
-	cmd.Flags().StringVar(&inFile, "in", "", "input .vpack bundle (required)")
+	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle (required)")
 	cmd.Flags().StringVar(&outFile, "out", "", "output bundle path (defaults to --in)")
 	cmd.Flags().StringVar(&privKeyFile, "privkey", "", "private key of an existing recipient (to unwrap the DEK) (required)")
 	cmd.Flags().StringArrayVar(&newRecipients, "recipient", nil, "public key path of a new recipient (can be repeated)")
@@ -249,7 +249,7 @@ func writeBundleMaybeRemote(outURI string, ciphertext, manifestBytes []byte) err
 	remoteOut := ""
 	if isRemoteURI(outURI) {
 		remoteOut = outURI
-		tmp, err := os.CreateTemp("", "vaultpack-rot-*.vpack")
+		tmp, err := os.CreateTemp("", "katame-rot-*.katame")
 		if err != nil {
 			return fmt.Errorf("create temp output: %w", err)
 		}

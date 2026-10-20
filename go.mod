@@ -1,4 +1,4 @@
-module github.com/Skpow1234/Vaultpack
+module github.com/Skpow1234/Katame
 
 go 1.26.0
 

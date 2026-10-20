@@ -8,7 +8,7 @@ import (
 )
 
 // GCP AAD for DEK wrap (optional authenticated context).
-var gcpAAD = []byte("vaultpack-dek-wrap")
+var gcpAAD = []byte("katame-dek-wrap")
 
 // GCPProvider wraps and unwraps DEKs using GCP Cloud KMS (symmetric CryptoKey).
 // keyID must be the full resource name: projects/PROJECT_ID/locations/LOCATION/keyRings/RING/cryptoKeys/KEY_NAME.

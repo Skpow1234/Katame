@@ -16,7 +16,7 @@ import (
 //
 // Entries expire after TTL. When the cache exceeds MaxSize, entries are
 // evicted in insertion order (FIFO) to keep the implementation small;
-// for VaultPack workloads the working set is tiny (one DEK per bundle
+// for Katame workloads the working set is tiny (one DEK per bundle
 // version) so a more sophisticated LRU is overkill.
 //
 // All methods are safe for concurrent use.

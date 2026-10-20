@@ -6,15 +6,15 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Skpow1234/Vaultpack/internal/repo"
+	"github.com/Skpow1234/Katame/internal/repo"
 	"github.com/spf13/cobra"
 )
 
 func newRepoCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "repo",
-		Short: "Tamper-evident append-only repository of .vpack bundles (M27)",
-		Long: `Manage an append-only Merkle log of .vpack bundles. Each "repo add"
+		Short: "Tamper-evident append-only repository of .katame bundles (M27)",
+		Long: `Manage an append-only Merkle log of .katame bundles. Each "repo add"
 appends a new leaf to an RFC 6962-style history tree, signs the resulting
 root with the repo's signing key, and (optionally) anchors the root in
 Sigstore Rekor.
@@ -25,7 +25,7 @@ A repo is just a directory:
     repo.json        # config: schema, signing key fingerprint, ...
     entries.jsonl    # append-only: one entry per added bundle
     roots.jsonl      # append-only: one signed root per add
-    bundles/         # optional: copies of every added .vpack
+    bundles/         # optional: copies of every added .katame
 
 "repo verify" walks the entire log forward and recomputes every root,
 proving the chain has not been tampered with.`,
@@ -78,7 +78,7 @@ func newRepoInitCmd() *cobra.Command {
 	cmd.Flags().StringVar(&description, "description", "", "Human-readable description (stored in repo.json)")
 	cmd.Flags().StringVar(&signingKey, "signing-key", "", "PEM private key used to sign every new root (recommended)")
 	cmd.Flags().StringVar(&rekorURL, "rekor-url", "", "Default Sigstore Rekor URL used by 'repo anchor'")
-	cmd.Flags().BoolVar(&storeBundles, "store-bundles", false, "Keep a copy of every added .vpack in bundles/")
+	cmd.Flags().BoolVar(&storeBundles, "store-bundles", false, "Keep a copy of every added .katame in bundles/")
 	return cmd
 }
 
@@ -93,7 +93,7 @@ func newRepoAddCmd() *cobra.Command {
 	)
 	cmd := &cobra.Command{
 		Use:   "add",
-		Short: "Append a .vpack bundle to the repo",
+		Short: "Append a .katame bundle to the repo",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if dir == "" || bundlePath == "" {
 				return fmt.Errorf("--dir and --bundle are required")
@@ -141,11 +141,11 @@ func newRepoAddCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&dir, "dir", "", "Repo directory")
-	cmd.Flags().StringVar(&bundlePath, "bundle", "", "Path to the .vpack file to add")
+	cmd.Flags().StringVar(&bundlePath, "bundle", "", "Path to the .katame file to add")
 	cmd.Flags().StringVar(&bundleName, "name", "", "Friendly name to record (defaults to basename)")
 	cmd.Flags().StringVar(&signingKey, "signing-key", "", "PEM private key (overrides repo default, must match fingerprint)")
 	cmd.Flags().BoolVar(&embedManifest, "embed-manifest", false, "Embed the bundle's manifest (base64) in the entry")
-	cmd.Flags().BoolVar(&copyBundle, "copy", false, "Also write the .vpack into bundles/<sha>.vpack (requires --store-bundles at init)")
+	cmd.Flags().BoolVar(&copyBundle, "copy", false, "Also write the .katame into bundles/<sha>.katame (requires --store-bundles at init)")
 	return cmd
 }
 
@@ -297,7 +297,7 @@ func baseName(path string) string {
 		}
 	}
 	if path == "" {
-		return "bundle.vpack"
+		return "bundle.katame"
 	}
 	return strings.TrimSpace(path)
 }

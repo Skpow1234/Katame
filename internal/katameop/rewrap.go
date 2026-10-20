@@ -1,4 +1,4 @@
-package vpackop
+package katameop
 
 import (
 	"crypto/sha256"
@@ -7,10 +7,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/kms"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/kms"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 // RewrapParams re-wraps a KMS-protected DEK without decrypting the payload.
@@ -33,10 +33,10 @@ type RewrapResult struct {
 // Rewrap changes the KMS key wrapping the DEK while leaving ciphertext untouched.
 func Rewrap(p RewrapParams) (*RewrapResult, error) {
 	if p.KMSProvider == "" {
-		return nil, fmt.Errorf("vpackop.Rewrap: KMSProvider is required")
+		return nil, fmt.Errorf("katameop.Rewrap: KMSProvider is required")
 	}
 	if p.ToKeyID == "" {
-		return nil, fmt.Errorf("vpackop.Rewrap: ToKeyID is required")
+		return nil, fmt.Errorf("katameop.Rewrap: ToKeyID is required")
 	}
 	br, err := readBundle(DecryptParams{InputPath: p.InputPath, InputBytes: p.InputBytes})
 	if err != nil {

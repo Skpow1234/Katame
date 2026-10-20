@@ -3,14 +3,14 @@
 Load symmetric and signing keys from URI-style sources (`--key-source`, `--signing-key-source`).
 
 ```bash
-export VPACK_DATA_KEY="b64:$(base64 -w0 secret.key.raw)"
-vaultpack protect --in secret.txt --out secret.vpack --key-source env://VPACK_DATA_KEY
-vaultpack decrypt --in secret.vpack --out secret.out --key-source env://VPACK_DATA_KEY
+export KATAME_DATA_KEY="b64:$(base64 -w0 secret.key.raw)"
+katame protect --in secret.txt --out secret.katame --key-source env://KATAME_DATA_KEY
+katame decrypt --in secret.katame --out secret.out --key-source env://KATAME_DATA_KEY
 
-vaultpack decrypt --in secret.vpack --out secret.out --key-source file://secret.key
+katame decrypt --in secret.katame --out secret.out --key-source file://secret.key
 
-export VPACK_SIGNING_KEY="$(cat signing.key)"
-vaultpack sign --in secret.vpack --signing-key-source env://VPACK_SIGNING_KEY
+export KATAME_SIGNING_KEY="$(cat signing.key)"
+katame sign --in secret.katame --signing-key-source env://KATAME_SIGNING_KEY
 ```
 
 ## Portable schemes
@@ -25,12 +25,12 @@ vaultpack sign --in secret.vpack --signing-key-source env://VPACK_SIGNING_KEY
 
 | Scheme | Platform | Behavior |
 | ------ | -------- | -------- |
-| `dpapi://path` or `dpapi://b64:…` | **Windows** | DPAPI unprotect → VaultPack key / PEM |
+| `dpapi://path` or `dpapi://b64:…` | **Windows** | DPAPI unprotect → Katame key / PEM |
 | `keychain://SERVICE/ACCOUNT` | **macOS** | `security find-generic-password -w` |
-| `pkcs11://label` | All (shim) | Reads `$VAULTPACK_PKCS11_DIR/<label>.key` or `.pem` |
-| `piv://slot` | All (shim) | Reads `$VAULTPACK_PIV_DIR/<slot>.pem` (signing); not for symmetric DEKs |
+| `pkcs11://label` | All (shim) | Reads `$KATAME_PKCS11_DIR/<label>.key` or `.pem` |
+| `piv://slot` | All (shim) | Reads `$KATAME_PIV_DIR/<slot>.pem` (signing); not for symmetric DEKs |
 
-`vaultpack doctor` reports which schemes are `on`/`off` for this binary.
+`katame doctor` reports which schemes are `on`/`off` for this binary.
 
 Native SoftHSM / YubiKey PIV CGO bindings remain on the [backlog](milestones_backlog.md); the URI surface and file-backed shims are stable for CI and integration today.
 

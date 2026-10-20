@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/cloud"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/cloud"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -32,7 +32,7 @@ func newBatchProtectCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "batch-protect",
-		Short: "Encrypt all files in a directory into .vpack bundles",
+		Short: "Encrypt all files in a directory into .katame bundles",
 		Long: `Recursively encrypt every file in a directory, preserving the directory structure.
 
 By default a single shared key is generated for the entire batch.
@@ -41,10 +41,10 @@ Use --per-file-key to generate a unique key for each file.
 Azure: use az://container/prefix/ paths for --dir and/or --out-dir.
 
 Example:
-  vaultpack batch-protect --dir ./exports/ --out-dir ./encrypted/ --key-out batch.key
-  vaultpack batch-protect --dir ./data/ --out-dir ./enc/ --per-file-key --workers 8
-  vaultpack batch-protect --dir ./logs/ --out-dir ./enc/ --include "*.csv" --exclude "*.tmp" --dry-run
-  vaultpack batch-protect --dir az://mycontainer/data/ --out-dir az://mycontainer/encrypted/`,
+  katame batch-protect --dir ./exports/ --out-dir ./encrypted/ --key-out batch.key
+  katame batch-protect --dir ./data/ --out-dir ./enc/ --per-file-key --workers 8
+  katame batch-protect --dir ./logs/ --out-dir ./enc/ --include "*.csv" --exclude "*.tmp" --dry-run
+  katame batch-protect --dir az://mycontainer/data/ --out-dir az://mycontainer/encrypted/`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printer := NewPrinter(flagJSON, flagQuiet)
 
@@ -89,7 +89,7 @@ Example:
 					return fmt.Errorf("output scheme is read-only: %q", outDir)
 				}
 				remoteOutURI = outDir
-				tmpOut, err := os.MkdirTemp("", "vaultpack-remote-batch-out-*")
+				tmpOut, err := os.MkdirTemp("", "katame-remote-batch-out-*")
 				if err != nil {
 					return fmt.Errorf("create temp output dir: %w", err)
 				}
@@ -108,7 +108,7 @@ Example:
 				return nil
 			}
 
-			entries := buildBatchEntries(files, srcDir, outDir, ".vpack")
+			entries := buildBatchEntries(files, srcDir, outDir, ".katame")
 
 			// Dry-run: just list.
 			if dryRun {
@@ -332,7 +332,7 @@ Example:
 					printer.Human("Batch key: %s", keyOutFile)
 				}
 				if perFileKey {
-					printer.Human("Per-file keys: alongside each .vpack bundle")
+					printer.Human("Per-file keys: alongside each .katame bundle")
 				}
 				for _, r := range results {
 					if r.Status == "error" {
@@ -351,7 +351,7 @@ Example:
 
 	f := cmd.Flags()
 	f.StringVar(&srcDir, "dir", "", "source directory to encrypt (required)")
-	f.StringVar(&outDir, "out-dir", "", "output directory for .vpack bundles (required)")
+	f.StringVar(&outDir, "out-dir", "", "output directory for .katame bundles (required)")
 	f.StringVar(&keyOutFile, "key-out", "", "path for the batch key file (default: <out-dir>/batch.key)")
 	f.BoolVar(&perFileKey, "per-file-key", false, "generate a unique key per file instead of a shared batch key")
 	f.StringVar(&cipherName, "cipher", crypto.CipherAES256GCM, "AEAD cipher")

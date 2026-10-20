@@ -1,6 +1,6 @@
 # Milestones
 
-VaultPack grew as numbered milestones. Markers appear in CLI registration, package comments, and manifest fields.
+Katame grew as numbered milestones. Markers appear in CLI registration, package comments, and manifest fields.
 
 ## Completed (tagged in code)
 
@@ -11,7 +11,7 @@ VaultPack grew as numbered milestones. Markers appear in CLI registration, packa
 | **M22** | Key rotation & rewrap | Done |
 | **M23** | Policy / RBAC | Done (CLI now **fail-closed** on load error) |
 | **M24** | Sigstore Rekor transparency | Done |
-| **M26** | Service mode (`vaultpack serve`) | Done (`/metrics` auth by default; `--metrics-public` opt-out) |
+| **M26** | Service mode (`katame serve`) | Done (`/metrics` auth by default; `--metrics-public` opt-out) |
 | **M27** | Tamper-evident repo | Done |
 | **M28** | Key-source URIs | Done — portable + **dpapi://** (Windows), **keychain://** (macOS), **pkcs11://** / **piv://** file shims |
 | **M30** | Shell completions | Done |
@@ -25,7 +25,7 @@ Core CLI, streaming AEAD, integrity/audit, PQ crypto, cloud+KMS, batch/parallel,
 - **M28 complete:** platform key sources (`dpapi://`, `keychain://`, `pkcs11://` / `piv://` shims) — see `internal/keysource`
 - CLI policy **fail-closed** when a policy path is configured
 - Serve `/metrics` requires auth unless `--metrics-public`
-- C ABI / Python / WASM parity for hybrid, KMS, compress, Shamir, `vp_rewrap`
+- C ABI / Python / WASM parity for hybrid, KMS, compress, Shamir, `kt_rewrap`
 - Dockerfile Go builder image aligned to **1.25**
 
 ## Backlog (1000+)

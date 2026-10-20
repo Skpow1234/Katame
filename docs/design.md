@@ -2,10 +2,10 @@
 
 ## On-disk layout
 
-A `.vpack` file is a ZIP archive:
+A `.katame` file is a ZIP archive:
 
 ```text
-artifact.vpack
+artifact.katame
 ├── payload.bin        # ciphertext (chunked AEAD)
 ├── manifest.json      # encryption params, hashes, metadata
 ├── signature.sig      # optional detached signature
@@ -41,4 +41,4 @@ Canonical JSON of the manifest (plus payload digest) is what signatures cover. S
 
 ## Public SDK types
 
-`pkg/vaultpack` re-exports these types so CLI `--json` and SDK JSON share the same field names.
+`pkg/katame` re-exports these types so CLI `--json` and SDK JSON share the same field names.

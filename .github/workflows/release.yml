@@ -113,7 +113,7 @@ jobs:
         if: github.event.inputs.snapshot != 'true'
         run: |
           set -euo pipefail
-          archive=$(ls dist/vaultpack-linux-amd64.tar.gz 2>/dev/null | head -n1 || true)
+          archive=$(ls dist/katame-linux-amd64.tar.gz 2>/dev/null | head -n1 || true)
           if [ -z "$archive" ]; then
             echo "linux amd64 archive not found; listing dist/"
             ls -la dist/ || true
@@ -122,7 +122,7 @@ jobs:
           cosign verify-blob \
             --certificate "${archive}.pem" \
             --signature "${archive}.sig" \
-            --certificate-identity-regexp 'https://github.com/Skpow1234/Vaultpack' \
+            --certificate-identity-regexp 'https://github.com/Skpow1234/Katame' \
             --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
             "$archive"
           echo "cosign verify-blob ok for $archive"

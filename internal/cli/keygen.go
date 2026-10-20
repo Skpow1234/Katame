@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/plugin"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/plugin"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,7 @@ func newKeygenCmd() *cobra.Command {
 		Long: "Generate a new key pair for signing, verifying, or hybrid encryption.\n\n" +
 			"Signing algorithms: ed25519 (default), ed448, ecdsa-p256, ecdsa-p384, rsa-pss-2048, rsa-pss-4096, ml-dsa-65, ml-dsa-87, slh-dsa-128s.\n" +
 			"Hybrid encryption: x25519, ecies-p256, rsa-oaep-2048, rsa-oaep-4096, ml-kem-768, ml-kem-1024.\n" +
-			"Plugin schemes from VPACK_PLUGIN_DIR (or config plugin_dir) are added to --algo; see docs/plugins.md.",
+			"Plugin schemes from KATAME_PLUGIN_DIR (or config plugin_dir) are added to --algo; see docs/plugins.md.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printer := NewPrinter(flagJSON, flagQuiet)
 

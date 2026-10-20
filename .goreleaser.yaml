@@ -4,12 +4,12 @@
 
 version: 2
 
-project_name: vaultpack
+project_name: katame
 
 builds:
-  - id: vaultpack
-    main: ./cmd/vaultpack
-    binary: vaultpack
+  - id: katame
+    main: ./cmd/katame
+    binary: katame
     env:
       - CGO_ENABLED=0
     goos:
@@ -22,7 +22,7 @@ builds:
     flags:
       - -trimpath
     ldflags:
-      - -s -w -X github.com/Skpow1234/Vaultpack/internal/cli.Version={{.Version}}
+      - -s -w -X github.com/Skpow1234/Katame/internal/cli.Version={{.Version}}
 
 archives:
   - id: default
@@ -34,7 +34,7 @@ archives:
           - zip
     name_template: "{{ .Binary }}-{{ .Os }}-{{ .Arch }}"
     ids:
-      - vaultpack
+      - katame
 
 checksum:
   name_template: "checksums-sha256.txt"
@@ -52,7 +52,7 @@ changelog:
 release:
   github:
     owner: Skpow1234
-    name: Vaultpack
+    name: Katame
   name_template: "{{.Tag}}"
   draft: false
 
@@ -78,7 +78,7 @@ sboms:
 #   cosign verify-blob \
 #     --certificate <name>.pem \
 #     --signature <name>.sig \
-#     --certificate-identity-regexp 'https://github.com/Skpow1234/Vaultpack' \
+#     --certificate-identity-regexp 'https://github.com/Skpow1234/Katame' \
 #     --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
 #     <name>
 signs:
@@ -99,17 +99,17 @@ signs:
 # When the token is missing the cask step is skipped automatically by GoReleaser.
 # (Migrated from the deprecated `brews` formula section to `homebrew_casks`.)
 homebrew_casks:
-  - name: vaultpack
+  - name: katame
     binaries:
-      - vaultpack
+      - katame
     repository:
       owner: Skpow1234
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
-    homepage: https://github.com/Skpow1234/Vaultpack
-    description: "Encrypt, hash, and sign data into portable .vpack bundles."
+    homepage: https://github.com/Skpow1234/Katame
+    description: "Encrypt, hash, and sign data into portable .katame bundles."
     commit_author:
-      name: vaultpack-release-bot
+      name: katame-release-bot
       email: actions@github.com
     # Skip the tap push when no tap token is configured (env is always set by
     # the workflow, possibly to an empty string). Otherwise honor `auto`, which
@@ -121,39 +121,39 @@ homebrew_casks:
       post:
         install: |
           if OS.mac?
-            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/vaultpack"]
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/katame"]
           end
 
 # Scoop bucket (Windows). Requires a separate `Skpow1234/scoop-bucket` repository
 # and $SCOOP_BUCKET_GITHUB_TOKEN (PAT with contents:write on the bucket).
 scoops:
-  - name: vaultpack
-    description: "Encrypt, hash, and sign data into portable .vpack bundles."
-    homepage: https://github.com/Skpow1234/Vaultpack
+  - name: katame
+    description: "Encrypt, hash, and sign data into portable .katame bundles."
+    homepage: https://github.com/Skpow1234/Katame
     license: MIT
     repository:
       owner: Skpow1234
       name: scoop-bucket
       token: "{{ .Env.SCOOP_BUCKET_GITHUB_TOKEN }}"
     commit_author:
-      name: vaultpack-release-bot
+      name: katame-release-bot
       email: actions@github.com
     skip_upload: '{{ if eq .Env.SCOOP_BUCKET_GITHUB_TOKEN "" }}true{{ else }}auto{{ end }}'
 
 # Winget (Windows). Fork microsoft/winget-pkgs, then set $WINGET_PUBLISH_TOKEN
 # (PAT with repo scope). GoReleaser opens a PR to the community catalog.
 winget:
-  - name: vaultpack
+  - name: katame
     publisher: Skpow1234
-    package_identifier: Skpow1234.Vaultpack
-    short_description: "Encrypt, hash, and sign data into portable .vpack bundles."
+    package_identifier: Skpow1234.Katame
+    short_description: "Encrypt, hash, and sign data into portable .katame bundles."
     license: MIT
-    homepage: https://github.com/Skpow1234/Vaultpack
-    license_url: https://github.com/Skpow1234/Vaultpack/blob/main/LICENSE
+    homepage: https://github.com/Skpow1234/Katame
+    license_url: https://github.com/Skpow1234/Katame/blob/main/LICENSE
     publisher_url: https://github.com/Skpow1234
-    publisher_support_url: https://github.com/Skpow1234/Vaultpack/issues
+    publisher_support_url: https://github.com/Skpow1234/Katame/issues
     copyright: Skpow1234
-    release_notes_url: "https://github.com/Skpow1234/Vaultpack/releases/tag/v{{ .Version }}"
+    release_notes_url: "https://github.com/Skpow1234/Katame/releases/tag/v{{ .Version }}"
     tags:
       - encryption
       - signing
@@ -162,7 +162,7 @@ winget:
     repository:
       owner: Skpow1234
       name: winget-pkgs
-      branch: "vaultpack-{{ .Version }}"
+      branch: "katame-{{ .Version }}"
       token: "{{ .Env.WINGET_PUBLISH_TOKEN }}"
       pull_request:
         enabled: true
@@ -171,7 +171,7 @@ winget:
           name: winget-pkgs
           branch: master
     commit_author:
-      name: vaultpack-release-bot
+      name: katame-release-bot
       email: actions@github.com
     skip_upload: '{{ if eq .Env.WINGET_PUBLISH_TOKEN "" }}true{{ else }}auto{{ end }}'
 
@@ -179,22 +179,22 @@ winget:
 # Built on a Windows runner (choco is not available on Linux). When the API key is
 # empty the .nupkg is generated but not pushed to chocolatey.org.
 chocolateys:
-  - name: vaultpack
-    title: VaultPack
+  - name: katame
+    title: Katame
     authors: Skpow1234
-    project_url: https://github.com/Skpow1234/Vaultpack
-    license_url: https://github.com/Skpow1234/Vaultpack/blob/main/LICENSE
-    project_source_url: https://github.com/Skpow1234/Vaultpack
-    docs_url: https://github.com/Skpow1234/Vaultpack#readme
-    bug_tracker_url: https://github.com/Skpow1234/Vaultpack/issues
+    project_url: https://github.com/Skpow1234/Katame
+    license_url: https://github.com/Skpow1234/Katame/blob/main/LICENSE
+    project_source_url: https://github.com/Skpow1234/Katame
+    docs_url: https://github.com/Skpow1234/Katame#readme
+    bug_tracker_url: https://github.com/Skpow1234/Katame/issues
     copyright: "Skpow1234"
-    summary: "Encrypt, hash, and sign data into portable .vpack bundles."
+    summary: "Encrypt, hash, and sign data into portable .katame bundles."
     description: |
-      VaultPack encrypts, hashes, and signs data artifacts into portable .vpack bundles.
+      Katame encrypts, hashes, and signs data artifacts into portable .katame bundles.
       Supports AES-GCM, ChaCha20-Poly1305, AES-GCM-SIV, hybrid recipient encryption,
       multi-recipient bundles, Ed25519/Ed448/ECDSA/RSA-PSS/ML-DSA/SLH-DSA signing,
       KMS-wrapped DEKs (AWS/GCP/Azure), and Sigstore-signed releases.
-    release_notes: "https://github.com/Skpow1234/Vaultpack/releases/tag/v{{ .Version }}"
+    release_notes: "https://github.com/Skpow1234/Katame/releases/tag/v{{ .Version }}"
     tags: "encryption signing aead post-quantum kms cli"
     api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
     source_repo: "https://push.chocolatey.org/"
@@ -205,12 +205,12 @@ chocolateys:
 # under `publishers` and is gated on $CLOUDSMITH_API_KEY.
 nfpms:
   - id: linux-packages
-    package_name: vaultpack
+    package_name: katame
     vendor: Skpow1234
-    homepage: https://github.com/Skpow1234/Vaultpack
+    homepage: https://github.com/Skpow1234/Katame
     maintainer: Skpow1234 <noreply@github.com>
     description: |
-      Encrypt, hash, and sign data into portable .vpack bundles.
+      Encrypt, hash, and sign data into portable .katame bundles.
     license: MIT
     formats:
       - deb
@@ -230,4 +230,4 @@ publishers:
     cmd: >-
       sh -c '[ -z "$CLOUDSMITH_API_KEY" ] && echo "skipping cloudsmith publish (no API key)" && exit 0;
       curl --user "$CLOUDSMITH_API_KEY:" --upload-file {{ .ArtifactPath }}
-      https://upload.cloudsmith.io/skpow1234/vaultpack/{{ .ArtifactName }}'
+      https://upload.cloudsmith.io/skpow1234/katame/{{ .ArtifactName }}'

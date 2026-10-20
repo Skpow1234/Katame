@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
 func TestDiff_IdenticalBundle(t *testing.T) {
@@ -22,7 +22,7 @@ func TestDiff_IdenticalBundle(t *testing.T) {
 
 func TestDiff_MissingArgs(t *testing.T) {
 	root := NewRootCmd()
-	root.SetArgs([]string{"diff", "--a", "x.vpack"})
+	root.SetArgs([]string{"diff", "--a", "x.katame"})
 	if err := root.Execute(); err == nil {
 		t.Fatal("expected error when --b is missing")
 	}
@@ -35,8 +35,8 @@ func TestDiffManifests_PlaintextDifference(t *testing.T) {
 	os.WriteFile(inA, []byte("aaaa"), 0o600)
 	os.WriteFile(inB, []byte("bbbb"), 0o600)
 
-	pathA := filepath.Join(dir, "a.vpack")
-	pathB := filepath.Join(dir, "b.vpack")
+	pathA := filepath.Join(dir, "a.katame")
+	pathB := filepath.Join(dir, "b.katame")
 	keyA := filepath.Join(dir, "a.key")
 	keyB := filepath.Join(dir, "b.key")
 
@@ -76,8 +76,8 @@ func TestDiffManifests_IgnoreNonce(t *testing.T) {
 	in := filepath.Join(dir, "input.txt")
 	os.WriteFile(in, []byte("same data"), 0o600)
 
-	pathA := filepath.Join(dir, "a.vpack")
-	pathB := filepath.Join(dir, "b.vpack")
+	pathA := filepath.Join(dir, "a.katame")
+	pathB := filepath.Join(dir, "b.katame")
 	keyA := filepath.Join(dir, "a.key")
 	keyB := filepath.Join(dir, "b.key")
 

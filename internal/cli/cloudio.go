@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Skpow1234/Vaultpack/internal/cloud"
-	"github.com/Skpow1234/Vaultpack/internal/cloud/azureadp"
-	"github.com/Skpow1234/Vaultpack/internal/cloud/gcs"
-	"github.com/Skpow1234/Vaultpack/internal/cloud/httpfetch"
-	s3store "github.com/Skpow1234/Vaultpack/internal/cloud/s3"
+	"github.com/Skpow1234/Katame/internal/cloud"
+	"github.com/Skpow1234/Katame/internal/cloud/azureadp"
+	"github.com/Skpow1234/Katame/internal/cloud/gcs"
+	"github.com/Skpow1234/Katame/internal/cloud/httpfetch"
+	s3store "github.com/Skpow1234/Katame/internal/cloud/s3"
 )
 
 // Provider config set via CLI flags or environment variables.
@@ -81,7 +81,7 @@ func remoteDownload(uri string) (string, error) {
 	if ext == "" {
 		ext = ".tmp"
 	}
-	tmp, err := os.CreateTemp("", "vaultpack-remote-*"+ext)
+	tmp, err := os.CreateTemp("", "katame-remote-*"+ext)
 	if err != nil {
 		return "", fmt.Errorf("create temp file: %w", err)
 	}
@@ -157,7 +157,7 @@ func remoteDownloadDir(uri string) (string, func(), error) {
 		return "", nil, err
 	}
 
-	tmpDir, err := os.MkdirTemp("", "vaultpack-remote-dir-*")
+	tmpDir, err := os.MkdirTemp("", "katame-remote-dir-*")
 	if err != nil {
 		return "", nil, fmt.Errorf("create temp dir: %w", err)
 	}

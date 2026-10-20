@@ -62,7 +62,7 @@ func (r *Registry) SignAlgos() []string {
 	return names
 }
 
-// Discover scans dir for executables and registers capabilities from each (--vpack-list).
+// Discover scans dir for executables and registers capabilities from each (--katame-list).
 // Only registers names that are not already set (first plugin wins per name).
 func (r *Registry) Discover(dir string) error {
 	if dir == "" {
@@ -114,7 +114,7 @@ func (r *Registry) Discover(dir string) error {
 }
 
 func listCapabilities(pluginPath string) (*Capabilities, error) {
-	cmd := exec.Command(pluginPath, "--vpack-list")
+	cmd := exec.Command(pluginPath, "--katame-list")
 	cmd.Stdin = nil
 	out, err := cmd.Output()
 	if err != nil {

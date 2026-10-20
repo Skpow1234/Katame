@@ -1,9 +1,9 @@
-package vaultpack
+package katame
 
 import (
 	"io"
 
-	"github.com/Skpow1234/Vaultpack/internal/vpackop"
+	"github.com/Skpow1234/Katame/internal/katameop"
 )
 
 // ProtectOptions controls a single Protect call.
@@ -67,11 +67,11 @@ type ProtectResult struct {
 	Signature    []byte
 }
 
-// Protect encrypts the supplied plaintext and writes a .vpack bundle.
+// Protect encrypts the supplied plaintext and writes a .katame bundle.
 func Protect(opts ProtectOptions) (*ProtectResult, error) {
-	res, err := vpackop.Protect(toVpackopProtect(opts))
+	res, err := katameop.Protect(toKatameopProtect(opts))
 	if err != nil {
 		return nil, err
 	}
-	return fromVpackopProtect(res), nil
+	return fromKatameopProtect(res), nil
 }

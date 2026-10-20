@@ -1,13 +1,13 @@
-package vaultpack
+package katame
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
-// Read parses a .vpack file from disk and returns its contents.
+// Read parses a .katame file from disk and returns its contents.
 //
 // The returned Bundle.Manifest is fully populated; ManifestBytes is the raw
 // JSON exactly as stored, suitable for re-computing canonical signatures.
@@ -50,7 +50,7 @@ func InspectBytes(data []byte) (*Manifest, error) {
 }
 
 // MarshalManifest serializes a manifest to indented JSON in the canonical
-// VaultPack on-disk format. It is the inverse of bundle.UnmarshalManifest.
+// Katame on-disk format. It is the inverse of bundle.UnmarshalManifest.
 func MarshalManifest(m *Manifest) ([]byte, error) {
 	return bundle.MarshalManifest(m)
 }

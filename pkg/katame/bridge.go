@@ -1,22 +1,22 @@
-package vaultpack
+package katame
 
 import (
-	"github.com/Skpow1234/Vaultpack/internal/vpackop"
+	"github.com/Skpow1234/Katame/internal/katameop"
 )
 
 // Recipient identifies a hybrid-encryption recipient.
-type Recipient = vpackop.Recipient
+type Recipient = katameop.Recipient
 
 // Share is one Shamir share from Protect when SplitShares is set.
-type Share = vpackop.Share
+type Share = katameop.Share
 
 // CombineShares reconstructs a symmetric key from Shamir shares.
 func CombineShares(shares [][]byte) ([]byte, error) {
-	return vpackop.CombineShares(shares)
+	return katameop.CombineShares(shares)
 }
 
-func toVpackopProtect(p ProtectOptions) vpackop.ProtectParams {
-	params := vpackop.ProtectParams{
+func toKatameopProtect(p ProtectOptions) katameop.ProtectParams {
+	params := katameop.ProtectParams{
 		Plaintext:       p.Plaintext,
 		PlaintextReader: p.PlaintextReader,
 		InputPath:       p.InputPath,
@@ -39,7 +39,7 @@ func toVpackopProtect(p ProtectOptions) vpackop.ProtectParams {
 		ParallelWorkers: p.ParallelWorkers,
 	}
 	if p.Sign != nil {
-		params.Sign = &vpackop.SignParams{
+		params.Sign = &katameop.SignParams{
 			PrivateKey:     p.Sign.PrivateKey,
 			PrivateKeyPath: p.Sign.PrivateKeyPath,
 			Algo:           p.Sign.Algo,
@@ -48,7 +48,7 @@ func toVpackopProtect(p ProtectOptions) vpackop.ProtectParams {
 	return params
 }
 
-func fromVpackopProtect(r *vpackop.ProtectResult) *ProtectResult {
+func fromKatameopProtect(r *katameop.ProtectResult) *ProtectResult {
 	if r == nil {
 		return nil
 	}
@@ -62,8 +62,8 @@ func fromVpackopProtect(r *vpackop.ProtectResult) *ProtectResult {
 	}
 }
 
-func toVpackopDecrypt(d DecryptOptions) vpackop.DecryptParams {
-	return vpackop.DecryptParams{
+func toKatameopDecrypt(d DecryptOptions) katameop.DecryptParams {
+	return katameop.DecryptParams{
 		InputPath:       d.InputPath,
 		InputBytes:      d.InputBytes,
 		OutputPath:      d.OutputPath,

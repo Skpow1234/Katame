@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/serve"
+	"github.com/Skpow1234/Katame/internal/serve"
 	"github.com/spf13/cobra"
 )
 
@@ -38,8 +38,8 @@ func newServeCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "serve",
-		Short: "Run the VaultPack HTTP API server",
-		Long: `Run a long-running HTTP API exposing the VaultPack SDK to remote
+		Short: "Run the Katame HTTP API server",
+		Long: `Run a long-running HTTP API exposing the Katame SDK to remote
 clients. The wire contract matches the C-shared library and WASM
 bindings: JSON in, JSON out, {ok: true|false} envelope.
 
@@ -64,9 +64,9 @@ Policy and audit: pass --policy and --audit-log to enforce the same RBAC
 rules and tamper-evident logging as the CLI on every /v1/* call.
 
 Examples:
-  vaultpack serve --listen :8443 --auth-token "$(cat token.txt)" \
+  katame serve --listen :8443 --auth-token "$(cat token.txt)" \
                   --tls-cert server.crt --tls-key server.key
-  vaultpack serve --listen unix:/run/vaultpack.sock --auth-disabled`,
+  katame serve --listen unix:/run/katame.sock --auth-disabled`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if authToken == "" && authTokenFile != "" {
 				b, err := os.ReadFile(authTokenFile)
@@ -111,7 +111,7 @@ Examples:
 			defer cancel()
 
 			printer := NewPrinter(flagJSON, flagQuiet)
-			printer.Human("vaultpack serve: listening on %s (TLS=%v, mTLS=%v, auth-token=%v)",
+			printer.Human("katame serve: listening on %s (TLS=%v, mTLS=%v, auth-token=%v)",
 				listen,
 				tlsCert != "",
 				tlsClientCA != "",
@@ -120,7 +120,7 @@ Examples:
 			if err := srv.ListenAndServe(ctx); err != nil {
 				return fmt.Errorf("serve: %w", err)
 			}
-			printer.Human("vaultpack serve: shut down cleanly")
+			printer.Human("katame serve: shut down cleanly")
 			return nil
 		},
 	}

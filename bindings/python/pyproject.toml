@@ -3,14 +3,14 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "vaultpack"
+name = "katame"
 version = "0.1.0"
-description = "Python bindings for VaultPack (libvaultpack via ctypes)"
+description = "Python bindings for Katame (libkatame via ctypes)"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
 authors = [{ name = "Skpow1234" }]
-keywords = ["vaultpack", "encryption", "kms", "post-quantum", "signing"]
+keywords = ["katame", "encryption", "kms", "post-quantum", "signing"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "License :: OSI Approved :: MIT License",
@@ -19,9 +19,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Skpow1234/Vaultpack"
-Documentation = "https://github.com/Skpow1234/Vaultpack/tree/main/bindings/python"
-Issues = "https://github.com/Skpow1234/Vaultpack/issues"
+Homepage = "https://github.com/Skpow1234/Katame"
+Documentation = "https://github.com/Skpow1234/Katame/tree/main/bindings/python"
+Issues = "https://github.com/Skpow1234/Katame/issues"
 
 [tool.setuptools.packages.find]
-include = ["vaultpack*"]
+include = ["katame*"]

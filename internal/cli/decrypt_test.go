@@ -5,14 +5,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/kms"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/kms"
 )
 
 func TestDecryptCmd_Roundtrip(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	keyFile := filepath.Join(dir, "secret.key")
 	outFile := filepath.Join(dir, "recovered.txt")
 
@@ -60,7 +60,7 @@ func TestDecryptCmd_KMSRoundtrip(t *testing.T) {
 	_ = kms.Get("mock") // ensure mock is registered
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	outFile := filepath.Join(dir, "recovered.txt")
 
 	original := []byte("kms roundtrip data")
@@ -103,7 +103,7 @@ func TestDecryptCmd_KMSRoundtrip(t *testing.T) {
 func TestDecryptCmd_RoundtripWithAAD(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "data.json")
-	bundleFile := filepath.Join(dir, "data.vpack")
+	bundleFile := filepath.Join(dir, "data.katame")
 	keyFile := filepath.Join(dir, "data.key")
 	outFile := filepath.Join(dir, "data_out.json")
 
@@ -144,7 +144,7 @@ func TestDecryptCmd_RoundtripWithAAD(t *testing.T) {
 func TestDecryptCmd_WrongKey(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "secret.txt")
-	bundleFile := filepath.Join(dir, "secret.vpack")
+	bundleFile := filepath.Join(dir, "secret.katame")
 	keyFile := filepath.Join(dir, "secret.key")
 	wrongKeyFile := filepath.Join(dir, "wrong.key")
 	_ = filepath.Join(dir, "recovered.txt") // outFile unused; wrong key test only checks fingerprint
@@ -180,7 +180,7 @@ func TestDecryptCmd_RoundtripAllHashAlgos(t *testing.T) {
 		t.Run(algo, func(t *testing.T) {
 			dir := t.TempDir()
 			inFile := filepath.Join(dir, "data.bin")
-			bundleFile := filepath.Join(dir, "data.vpack")
+			bundleFile := filepath.Join(dir, "data.katame")
 			keyFile := filepath.Join(dir, "data.key")
 			outFile := filepath.Join(dir, "recovered.bin")
 
@@ -230,7 +230,7 @@ func TestDecryptCmd_RoundtripAllCiphers(t *testing.T) {
 		t.Run(c, func(t *testing.T) {
 			dir := t.TempDir()
 			inFile := filepath.Join(dir, "data.bin")
-			bundleFile := filepath.Join(dir, "data.vpack")
+			bundleFile := filepath.Join(dir, "data.katame")
 			keyFile := filepath.Join(dir, "data.key")
 			outFile := filepath.Join(dir, "recovered.bin")
 

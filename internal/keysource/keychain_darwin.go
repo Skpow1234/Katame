@@ -15,7 +15,7 @@ const (
 )
 
 // keychain://SERVICE/ACCOUNT — reads a generic-password secret (-w).
-// The secret must be a VaultPack key file body (b64:…) or PEM private key.
+// The secret must be a Katame key file body (b64:…) or PEM private key.
 func resolveKeychainSymmetric(value string) ([]byte, error) {
 	raw, err := keychainFindPassword(value)
 	if err != nil {

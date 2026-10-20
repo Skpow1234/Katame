@@ -3,13 +3,13 @@ package cli
 import (
 	"fmt"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
 	"github.com/spf13/cobra"
 )
 
-// newRemoveRecipientCmd builds the `vaultpack remove-recipient` command.
+// newRemoveRecipientCmd builds the `katame remove-recipient` command.
 //
 // Drops one or more RecipientEntry blocks from a multi-recipient hybrid
 // manifest. The ciphertext and DEK are unchanged, so anyone who previously
@@ -28,16 +28,16 @@ func newRemoveRecipientCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "remove-recipient",
 		Short: "Remove one or more recipients from a multi-recipient hybrid bundle",
-		Long: `Remove one or more public-key recipients from an existing multi-recipient .vpack bundle.
+		Long: `Remove one or more public-key recipients from an existing multi-recipient .katame bundle.
 
 Recipients can be identified by --recipient <pubkey.pem> (the file's
 fingerprint is computed automatically) or --fingerprint <b64>.
 
 The ciphertext and DEK are NOT changed by this command. Anyone who previously
 held access to the DEK can still decrypt the bundle's bytes if they kept them.
-To truly revoke a recipient, follow with 'vaultpack rotate-key'.
+To truly revoke a recipient, follow with 'katame rotate-key'.
 
-The previous manifest signature is cleared; re-sign with 'vaultpack sign'.`,
+The previous manifest signature is cleared; re-sign with 'katame sign'.`,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			printer := NewPrinter(flagJSON, flagQuiet)
 			defer func() {
@@ -138,14 +138,14 @@ The previous manifest signature is cleared; re-sign with 'vaultpack sign'.`,
 					printer.Human("  - %s", fp)
 				}
 				printer.Human("Remaining: %d recipient(s)", len(kept))
-				printer.Human("WARNING: anyone with a prior copy can still decrypt; run 'vaultpack rotate-key' to fully revoke.")
-				printer.Human("Signature: cleared; run 'vaultpack sign' to re-sign.")
+				printer.Human("WARNING: anyone with a prior copy can still decrypt; run 'katame rotate-key' to fully revoke.")
+				printer.Human("Signature: cleared; run 'katame sign' to re-sign.")
 			}
 			return nil
 		},
 	}
 
-	cmd.Flags().StringVar(&inFile, "in", "", "input .vpack bundle (required)")
+	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle (required)")
 	cmd.Flags().StringVar(&outFile, "out", "", "output bundle path (defaults to --in)")
 	cmd.Flags().StringArrayVar(&recipientPubs, "recipient", nil, "public key path of recipient to remove (can be repeated)")
 	cmd.Flags().StringArrayVar(&fingerprints, "fingerprint", nil, "base64 fingerprint of recipient to remove (can be repeated)")

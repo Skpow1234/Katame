@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
 	"github.com/spf13/cobra"
 )
 
@@ -17,11 +17,11 @@ func newInspectCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "inspect",
-		Short: "Show manifest details of a .vpack bundle",
-		Long: "Open a .vpack bundle and display its manifest in human-readable or JSON format.\n\n" +
+		Short: "Show manifest details of a .katame bundle",
+		Long: "Open a .katame bundle and display its manifest in human-readable or JSON format.\n\n" +
 			"With --redact, sensitive fields (plaintext digest, nonces, tags, key IDs, recipient fingerprints,\n" +
 			"wrapped DEKs, KDF salt, etc.) are omitted so the output is safe to share.\n\n" +
-			"Azure: use az://container/blob.vpack for --in.",
+			"Azure: use az://container/blob.katame for --in.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printer := NewPrinter(flagJSON, flagQuiet)
 
@@ -183,7 +183,7 @@ func newInspectCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&inFile, "in", "", "input .vpack bundle (required)")
+	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle (required)")
 	cmd.Flags().BoolVar(&redact, "redact", false, "omit sensitive fields (fingerprints, nonces, tags, wrapped DEKs, salts)")
 
 	return cmd

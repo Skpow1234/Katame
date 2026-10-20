@@ -24,7 +24,7 @@ func TestCompletionBash(t *testing.T) {
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("completion bash: %v", err)
 	}
-	if !bytes.Contains(out.Bytes(), []byte("vaultpack")) {
-		t.Fatalf("completion output did not mention vaultpack")
+	if !bytes.Contains(out.Bytes(), []byte("katame")) {
+		t.Fatalf("completion output did not mention katame")
 	}
 }

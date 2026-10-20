@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/cloud"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/cloud"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -26,18 +26,18 @@ func newBatchDecryptCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "batch-decrypt",
-		Short: "Decrypt all .vpack bundles in a directory",
-		Long: `Recursively find and decrypt all .vpack bundles in a directory, preserving
-the directory structure. The .vpack extension is stripped from the output filenames.
+		Short: "Decrypt all .katame bundles in a directory",
+		Long: `Recursively find and decrypt all .katame bundles in a directory, preserving
+the directory structure. The .katame extension is stripped from the output filenames.
 
 Use a shared key (--key), per-file keys (auto-detected alongside bundles), or a password.
 
 Azure: use az://container/prefix/ paths for --dir and/or --out-dir.
 
 Example:
-  vaultpack batch-decrypt --dir ./encrypted/ --out-dir ./decrypted/ --key batch.key
-  vaultpack batch-decrypt --dir ./encrypted/ --out-dir ./decrypted/ --password "passphrase"
-  vaultpack batch-decrypt --dir az://mycontainer/encrypted/ --out-dir az://mycontainer/decrypted/ --key batch.key`,
+  katame batch-decrypt --dir ./encrypted/ --out-dir ./decrypted/ --key batch.key
+  katame batch-decrypt --dir ./encrypted/ --out-dir ./decrypted/ --password "passphrase"
+  katame batch-decrypt --dir az://mycontainer/encrypted/ --out-dir az://mycontainer/decrypted/ --key batch.key`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printer := NewPrinter(flagJSON, flagQuiet)
 
@@ -71,7 +71,7 @@ Example:
 					return fmt.Errorf("output scheme is read-only: %q", outDir)
 				}
 				remoteOutURI = outDir
-				tmpOut, err := os.MkdirTemp("", "vaultpack-remote-bdec-out-*")
+				tmpOut, err := os.MkdirTemp("", "katame-remote-bdec-out-*")
 				if err != nil {
 					return fmt.Errorf("create temp output dir: %w", err)
 				}
@@ -90,13 +90,13 @@ Example:
 
 			usePassword := password != ""
 
-			// Collect .vpack files.
-			files, err := collectVpackFiles(srcDir)
+			// Collect .katame files.
+			files, err := collectKatameFiles(srcDir)
 			if err != nil {
 				return fmt.Errorf("scan directory: %w", err)
 			}
 			if len(files) == 0 {
-				printer.Human("No .vpack files found in %s", srcDir)
+				printer.Human("No .katame files found in %s", srcDir)
 				return nil
 			}
 
@@ -303,7 +303,7 @@ Example:
 	}
 
 	f := cmd.Flags()
-	f.StringVar(&srcDir, "dir", "", "source directory with .vpack bundles (required)")
+	f.StringVar(&srcDir, "dir", "", "source directory with .katame bundles (required)")
 	f.StringVar(&outDir, "out-dir", "", "output directory for decrypted files (required)")
 	f.StringVar(&keyFile, "key", "", "path to shared batch decryption key")
 	f.StringVar(&password, "password", "", "decrypt with a password")

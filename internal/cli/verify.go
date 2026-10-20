@@ -9,12 +9,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/plugin"
-	"github.com/Skpow1234/Vaultpack/internal/transparency"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/plugin"
+	"github.com/Skpow1234/Katame/internal/transparency"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -28,8 +28,8 @@ func newVerifyCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "verify",
-		Short: "Verify a .vpack bundle signature",
-		Long:  "Verify the detached signature of a .vpack bundle against the canonical manifest and payload hash.\n\nThe signing algorithm is auto-detected from the manifest's signature_algo field or the public key format.",
+		Short: "Verify a .katame bundle signature",
+		Long:  "Verify the detached signature of a .katame bundle against the canonical manifest and payload hash.\n\nThe signing algorithm is auto-detected from the manifest's signature_algo field or the public key format.",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			printer := NewPrinter(flagJSON, flagQuiet)
 			defer func() {
@@ -171,7 +171,7 @@ func newVerifyCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&inFile, "in", "", "input .vpack bundle to verify (required)")
+	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle to verify (required)")
 	cmd.Flags().StringVar(&pubKey, "pubkey", "", "path to public key (required)")
 	cmd.Flags().BoolVar(&checkTransparency, "check-transparency", false, "verify Sigstore Rekor inclusion proofs in the manifest")
 	cmd.Flags().StringVar(&rekorPubKeyFile, "rekor-pubkey", "", "PEM-encoded Rekor public key (defaults to live fetch from each entry's log_url)")

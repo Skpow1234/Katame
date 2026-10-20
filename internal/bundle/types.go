@@ -22,7 +22,7 @@ func IsSupportedManifestVersion(v string) bool {
 	return false
 }
 
-// Manifest represents the manifest.json inside a .vpack bundle.
+// Manifest represents the manifest.json inside a .katame bundle.
 type Manifest struct {
 	Version       string          `json:"version"`
 	CreatedAt     string          `json:"created_at"`

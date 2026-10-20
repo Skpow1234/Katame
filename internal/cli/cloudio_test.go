@@ -21,7 +21,7 @@ func TestIsRemoteURI(t *testing.T) {
 		{"http://example.com/f", true},
 		{"./local", false},
 		{"/abs/path", false},
-		{"file.vpack", false},
+		{"file.katame", false},
 	}
 	for _, c := range cases {
 		if got := isRemoteURI(c.in); got != c.want {
@@ -44,7 +44,7 @@ func TestCloudFlags_Registered(t *testing.T) {
 func TestInspectCmd_HTTPSInput(t *testing.T) {
 	tmpDir := t.TempDir()
 	inputFile := filepath.Join(tmpDir, "test.txt")
-	bundleFile := filepath.Join(tmpDir, "test.vpack")
+	bundleFile := filepath.Join(tmpDir, "test.katame")
 	keyFile := filepath.Join(tmpDir, "test.key")
 	if err := os.WriteFile(inputFile, []byte("hello https"), 0o600); err != nil {
 		t.Fatal(err)
@@ -67,7 +67,7 @@ func TestInspectCmd_HTTPSInput(t *testing.T) {
 	defer srv.Close()
 
 	cmd2 := NewRootCmd()
-	cmd2.SetArgs([]string{"inspect", "--in", srv.URL + "/test.vpack"})
+	cmd2.SetArgs([]string{"inspect", "--in", srv.URL + "/test.katame"})
 	if err := cmd2.Execute(); err != nil {
 		t.Fatalf("inspect over http failed: %v", err)
 	}
@@ -77,7 +77,7 @@ func TestInspectCmd_HTTPSInput(t *testing.T) {
 func TestDecryptCmd_HTTPSInput(t *testing.T) {
 	tmpDir := t.TempDir()
 	inputFile := filepath.Join(tmpDir, "secret.txt")
-	bundleFile := filepath.Join(tmpDir, "secret.vpack")
+	bundleFile := filepath.Join(tmpDir, "secret.katame")
 	keyFile := filepath.Join(tmpDir, "secret.key")
 	outFile := filepath.Join(tmpDir, "decrypted.txt")
 	want := "this is the plaintext"
@@ -100,7 +100,7 @@ func TestDecryptCmd_HTTPSInput(t *testing.T) {
 	defer srv.Close()
 
 	cmd2 := NewRootCmd()
-	cmd2.SetArgs([]string{"decrypt", "--in", srv.URL + "/secret.vpack", "--out", outFile, "--key", keyFile})
+	cmd2.SetArgs([]string{"decrypt", "--in", srv.URL + "/secret.katame", "--out", outFile, "--key", keyFile})
 	if err := cmd2.Execute(); err != nil {
 		t.Fatalf("decrypt: %v", err)
 	}
@@ -121,7 +121,7 @@ func TestProtectCmd_HTTPSOutputRejected(t *testing.T) {
 		t.Fatal(err)
 	}
 	cmd := NewRootCmd()
-	cmd.SetArgs([]string{"protect", "--in", inputFile, "--out", "https://example.com/out.vpack"})
+	cmd.SetArgs([]string{"protect", "--in", inputFile, "--out", "https://example.com/out.katame"})
 	err := cmd.Execute()
 	if err == nil {
 		t.Fatal("expected error when writing to https://")
@@ -134,11 +134,11 @@ func TestProtectCmd_HTTPSOutputRejected(t *testing.T) {
 // s3:// without AWS config should produce an AWS-related error.
 func TestProtectCmd_S3InputWithoutConfig(t *testing.T) {
 	tmpDir := t.TempDir()
-	outFile := filepath.Join(tmpDir, "out.vpack")
+	outFile := filepath.Join(tmpDir, "out.katame")
 	cmd := NewRootCmd()
 	cmd.SetArgs([]string{
 		"protect",
-		"--in", "s3://nonexistent-bucket-vpack-test/missing.txt",
+		"--in", "s3://nonexistent-bucket-katame-test/missing.txt",
 		"--out", outFile,
 	})
 	if err := cmd.Execute(); err == nil {
@@ -151,11 +151,11 @@ func TestProtectCmd_GCSInputWithoutConfig(t *testing.T) {
 	// Force a clean ADC state for this test.
 	t.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/nonexistent/creds.json")
 	tmpDir := t.TempDir()
-	outFile := filepath.Join(tmpDir, "out.vpack")
+	outFile := filepath.Join(tmpDir, "out.katame")
 	cmd := NewRootCmd()
 	cmd.SetArgs([]string{
 		"protect",
-		"--in", "gs://nonexistent-bucket-vpack-test/missing.txt",
+		"--in", "gs://nonexistent-bucket-katame-test/missing.txt",
 		"--out", outFile,
 	})
 	if err := cmd.Execute(); err == nil {

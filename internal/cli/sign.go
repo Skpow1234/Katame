@@ -8,13 +8,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/cloud"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/keysource"
-	"github.com/Skpow1234/Vaultpack/internal/plugin"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/cloud"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/keysource"
+	"github.com/Skpow1234/Katame/internal/plugin"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -33,8 +33,8 @@ func newSignCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "sign",
-		Short: "Sign a .vpack bundle",
-		Long:  "Add a detached signature to a .vpack bundle.\n\nThe signature covers the canonical manifest and the SHA-256 of the payload.\nSupported algorithms: ed25519 (default), ecdsa-p256, ecdsa-p384, rsa-pss-2048, rsa-pss-4096, ml-dsa-65, ml-dsa-87.\nThe algorithm is auto-detected from the key if --algo is not specified.",
+		Short: "Sign a .katame bundle",
+		Long:  "Add a detached signature to a .katame bundle.\n\nThe signature covers the canonical manifest and the SHA-256 of the payload.\nSupported algorithms: ed25519 (default), ecdsa-p256, ecdsa-p384, rsa-pss-2048, rsa-pss-4096, ml-dsa-65, ml-dsa-87.\nThe algorithm is auto-detected from the key if --algo is not specified.",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			printer := NewPrinter(flagJSON, flagQuiet)
 			defer func() {
@@ -314,7 +314,7 @@ func newSignCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&inFile, "in", "", "input .vpack bundle to sign (required)")
+	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle to sign (required)")
 	cmd.Flags().StringVar(&signingPriv, "signing-priv", "", "path to private key (required unless --signing-key-source or --keyless)")
 	cmd.Flags().StringVar(&signingKeySource, "signing-key-source", "", "signing key source URI (file://, env://, b64://; reserved HSM/keychain schemes)")
 	cmd.Flags().StringVar(&algo, "algo", "", "signing algorithm (auto-detected from key if omitted)")
@@ -322,7 +322,7 @@ func newSignCmd() *cobra.Command {
 	cmd.Flags().StringVar(&rekorURL, "rekor-url", "", "Rekor base URL (defaults to https://rekor.sigstore.dev)")
 	cmd.Flags().BoolVar(&keyless, "keyless", false, "use ephemeral key + Fulcio cert (requires --transparency and an OIDC token)")
 	cmd.Flags().StringVar(&fulcioURL, "fulcio-url", "", "Fulcio base URL (defaults to https://fulcio.sigstore.dev)")
-	cmd.Flags().StringVar(&oidcTokenFile, "oidc-token-file", "", "path to a file containing an OIDC ID token (or VAULTPACK_OIDC_TOKEN / SIGSTORE_ID_TOKEN env)")
+	cmd.Flags().StringVar(&oidcTokenFile, "oidc-token-file", "", "path to a file containing an OIDC ID token (or KATAME_OIDC_TOKEN / SIGSTORE_ID_TOKEN env)")
 
 	return cmd
 }

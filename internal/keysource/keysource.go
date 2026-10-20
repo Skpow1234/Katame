@@ -11,8 +11,8 @@ import (
 	"os"
 	"strings"
 
-	vpcrypto "github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	vpcrypto "github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 // UnsupportedSchemeError is returned for unknown schemes.
@@ -25,7 +25,7 @@ func (e UnsupportedSchemeError) Error() string {
 	return fmt.Sprintf("key source scheme %q is not supported: %s", e.Scheme, e.URI)
 }
 
-// ResolveSymmetricKey loads a raw 32-byte VaultPack content-encryption key.
+// ResolveSymmetricKey loads a raw 32-byte Katame content-encryption key.
 //
 // Supported forms:
 //   - file:///abs/path.key
@@ -34,7 +34,7 @@ func (e UnsupportedSchemeError) Error() string {
 //   - b64://BASE64_RAW_32_BYTE_KEY
 //   - dpapi://path|b64:… (Windows)
 //   - keychain://SERVICE/ACCOUNT (macOS)
-//   - pkcs11://label (VAULTPACK_PKCS11_DIR)
+//   - pkcs11://label (KATAME_PKCS11_DIR)
 func ResolveSymmetricKey(uri string) ([]byte, error) {
 	scheme, value, err := split(uri)
 	if err != nil {
@@ -74,8 +74,8 @@ func ResolveSymmetricKey(uri string) ([]byte, error) {
 //   - b64://BASE64_PEM_OR_LEGACY_KEY_BYTES
 //   - dpapi://path|b64:… (Windows)
 //   - keychain://SERVICE/ACCOUNT (macOS)
-//   - pkcs11://label (VAULTPACK_PKCS11_DIR)
-//   - piv://slot (VAULTPACK_PIV_DIR)
+//   - pkcs11://label (KATAME_PKCS11_DIR)
+//   - piv://slot (KATAME_PIV_DIR)
 func ResolvePrivateKey(uri string) ([]byte, error) {
 	scheme, value, err := split(uri)
 	if err != nil {

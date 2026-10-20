@@ -57,9 +57,9 @@ func TestParseURI(t *testing.T) {
 		},
 		{
 			name:          "deeply nested blob",
-			uri:           "az://bucket/a/b/c/d/file.vpack",
+			uri:           "az://bucket/a/b/c/d/file.katame",
 			wantContainer: "bucket",
-			wantBlob:      "a/b/c/d/file.vpack",
+			wantBlob:      "a/b/c/d/file.katame",
 		},
 		{
 			name:          "container with prefix dir",

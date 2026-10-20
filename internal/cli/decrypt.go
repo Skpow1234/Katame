@@ -7,15 +7,15 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/cloud"
-	"github.com/Skpow1234/Vaultpack/internal/config"
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/keysource"
-	"github.com/Skpow1234/Vaultpack/internal/kms"
-	"github.com/Skpow1234/Vaultpack/internal/plugin"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/cloud"
+	"github.com/Skpow1234/Katame/internal/config"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/keysource"
+	"github.com/Skpow1234/Katame/internal/kms"
+	"github.com/Skpow1234/Katame/internal/plugin"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -36,8 +36,8 @@ func newDecryptCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "decrypt",
-		Short: "Decrypt a .vpack bundle",
-		Long:  "Read a .vpack bundle, decrypt the payload using the provided key, and write the plaintext.\n\nAzure: use az://container/blob paths for --in and/or --out.\n\nUse --stdout to write decrypted plaintext to standard output.",
+		Short: "Decrypt a .katame bundle",
+		Long:  "Read a .katame bundle, decrypt the payload using the provided key, and write the plaintext.\n\nAzure: use az://container/blob paths for --in and/or --out.\n\nUse --stdout to write decrypted plaintext to standard output.",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			printer := NewPrinter(flagJSON, flagQuiet)
 			auditInFile := inFile
@@ -311,7 +311,7 @@ func newDecryptCmd() *cobra.Command {
 				}
 
 				var plaintextBuf bytes.Buffer
-				if parallelWorkers > 1 || parallelWorkers == 0 && os.Getenv("VPACK_PARALLEL_WORKERS") == "auto" {
+				if parallelWorkers > 1 || parallelWorkers == 0 && os.Getenv("KATAME_PARALLEL_WORKERS") == "auto" {
 					err = crypto.DecryptStreamParallel(
 						bytes.NewReader(br.Ciphertext),
 						&plaintextBuf,
@@ -409,7 +409,7 @@ func newDecryptCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&inFile, "in", "", "input .vpack bundle (required)")
+	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle (required)")
 	cmd.Flags().StringVar(&outFile, "out", "", "output plaintext path")
 	cmd.Flags().StringVar(&keyFile, "key", "", "path to the decryption key")
 	cmd.Flags().StringVar(&keySource, "key-source", "", "key source URI (file://, env://, b64://; reserved: pkcs11://, keychain://, dpapi://, piv://)")

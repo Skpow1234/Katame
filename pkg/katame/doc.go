@@ -1,16 +1,16 @@
-// Package vaultpack is the public, semver-stable Go SDK for VaultPack.
+// Package katame is the public, semver-stable Go SDK for Katame.
 //
-// It exposes the core operations of the vaultpack CLI — Protect, Decrypt,
+// It exposes the core operations of the katame CLI — Protect, Decrypt,
 // Sign, Verify, Inspect — as a programmable Go API. The SDK is a thin layer
-// over VaultPack's internal building blocks; it produces byte-for-byte
-// identical .vpack bundles to the CLI for matching inputs.
+// over Katame's internal building blocks; it produces byte-for-byte
+// identical .katame bundles to the CLI for matching inputs.
 //
 // # Stability
 //
 // The package follows Semantic Versioning 2.0.0. The public surface is:
 //
-//   - All exported identifiers in `pkg/vaultpack`.
-//   - The on-disk .vpack bundle format (a ZIP archive containing
+//   - All exported identifiers in `pkg/katame`.
+//   - The on-disk .katame bundle format (a ZIP archive containing
 //     payload.bin, manifest.json, and optionally signature.sig and
 //     provenance.json).
 //   - The manifest JSON schema as documented in docs/design.md.
@@ -22,19 +22,19 @@
 //
 // # Quick start
 //
-//	import "github.com/Skpow1234/Vaultpack/pkg/vaultpack"
+//	import "github.com/Skpow1234/Katame/pkg/katame"
 //
 //	// Encrypt a file with a freshly-generated key.
-//	res, err := vaultpack.Protect(vaultpack.ProtectOptions{
+//	res, err := katame.Protect(katame.ProtectOptions{
 //	    InputPath:  "secret.txt",
-//	    OutputPath: "secret.vpack",
+//	    OutputPath: "secret.katame",
 //	})
 //	if err != nil { panic(err) }
 //	os.WriteFile("secret.key", res.GeneratedKey, 0o600)
 //
 //	// Decrypt it later.
-//	dec, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
-//	    InputPath:  "secret.vpack",
+//	dec, err := katame.Decrypt(katame.DecryptOptions{
+//	    InputPath:  "secret.katame",
 //	    OutputPath: "secret.out",
 //	    Key:        keyBytes,
 //	})
@@ -53,4 +53,4 @@
 //   - Sigstore Rekor transparency upload and verification helpers.
 //   - SLSA-style provenance embedding (provenance.json).
 //   - Bundle inspection (manifest decoding).
-package vaultpack
+package katame

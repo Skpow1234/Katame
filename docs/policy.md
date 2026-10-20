@@ -1,8 +1,8 @@
 # Policy & RBAC
 
-Policy is resolved: `--policy <path>` → `VAULTPACK_POLICY` → `policy_file:` in `.vpack.yaml`. With no policy configured, operations run unrestricted.
+Policy is resolved: `--policy <path>` → `KATAME_POLICY` → `policy_file:` in `.katame.yaml`. With no policy configured, operations run unrestricted.
 
-**Fail-closed:** If `--policy` / `VAULTPACK_POLICY` / `policy_file` is set and the file cannot be loaded, the CLI aborts (same as `vaultpack serve`). Validate with `vaultpack policy validate` before deploying.
+**Fail-closed:** If `--policy` / `KATAME_POLICY` / `policy_file` is set and the file cannot be loaded, the CLI aborts (same as `katame serve`). Validate with `katame policy validate` before deploying.
 
 ## YAML example
 
@@ -58,7 +58,7 @@ JSON files use the same field names.
 `.rego` files load automatically. Expose `allow` and optional `deny_reason`:
 
 ```rego
-package vaultpack
+package katame
 
 default allow = false
 
@@ -76,9 +76,9 @@ deny_reason = sprintf("user %q cannot decrypt %q", [input.user, input.manifest.k
 ## Commands
 
 ```bash
-vaultpack policy validate --file policy.yaml
-vaultpack policy test --file policy.yaml --bundle secret.vpack --op decrypt --user alice
-vaultpack policy show --policy policy.yaml
+katame policy validate --file policy.yaml
+katame policy test --file policy.yaml --bundle secret.katame --op decrypt --user alice
+katame policy show --policy policy.yaml
 ```
 
 Denials are audited as `policy-deny` with rule name and reason.

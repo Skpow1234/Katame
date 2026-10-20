@@ -10,7 +10,7 @@ import (
 )
 
 // LoadOIDCToken resolves an OIDC ID token from (in order): a file path, the
-// VAULTPACK_OIDC_TOKEN environment variable, then SIGSTORE_ID_TOKEN (the
+// KATAME_OIDC_TOKEN environment variable, then SIGSTORE_ID_TOKEN (the
 // convention used by cosign and CI runners).
 func LoadOIDCToken(filePath string) (string, error) {
 	if filePath != "" {
@@ -20,13 +20,13 @@ func LoadOIDCToken(filePath string) (string, error) {
 		}
 		return strings.TrimSpace(string(raw)), nil
 	}
-	if v := os.Getenv("VAULTPACK_OIDC_TOKEN"); v != "" {
+	if v := os.Getenv("KATAME_OIDC_TOKEN"); v != "" {
 		return strings.TrimSpace(v), nil
 	}
 	if v := os.Getenv("SIGSTORE_ID_TOKEN"); v != "" {
 		return strings.TrimSpace(v), nil
 	}
-	return "", errors.New("no OIDC token: pass --oidc-token-file, or set VAULTPACK_OIDC_TOKEN / SIGSTORE_ID_TOKEN")
+	return "", errors.New("no OIDC token: pass --oidc-token-file, or set KATAME_OIDC_TOKEN / SIGSTORE_ID_TOKEN")
 }
 
 // OIDCClaims is the subset of standard JWT claims we need from the ID token

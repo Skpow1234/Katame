@@ -18,7 +18,7 @@ func TestSupportedCompression(t *testing.T) {
 
 func TestCompressDecompress_AllAlgos(t *testing.T) {
 	// Use a large-ish repeated payload so compression actually shrinks it.
-	original := bytes.Repeat([]byte("VaultPack compression test data. "), 1000)
+	original := bytes.Repeat([]byte("Katame compression test data. "), 1000)
 
 	for _, algo := range []string{CompressGzip, CompressZstd} {
 		t.Run(algo, func(t *testing.T) {

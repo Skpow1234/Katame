@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
 // RedactedManifest is a safe, fingerprint-free view of a bundle manifest.

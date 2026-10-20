@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
-	"github.com/Skpow1234/Vaultpack/internal/util"
-	"github.com/Skpow1234/Vaultpack/pkg/vaultpack"
+	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/util"
+	"github.com/Skpow1234/Katame/pkg/katame"
 )
 
 // registerRoutes wires the HTTP endpoints. The contract is the same as
@@ -41,7 +41,7 @@ func (s *Server) handleVersion(w http.ResponseWriter, r *http.Request) {
 	}
 	writeJSON(w, http.StatusOK, map[string]any{
 		"ok":          true,
-		"sdk_version": vaultpack.Version,
+		"sdk_version": katame.Version,
 		"api_version": "v1",
 	})
 }
@@ -115,7 +115,7 @@ func (s *Server) handleProtect(w http.ResponseWriter, r *http.Request) {
 		opts.OutputPath = ""
 	}
 
-	res, err := vaultpack.Protect(opts)
+	res, err := katame.Protect(opts)
 	if err != nil {
 		s.auditEntry(audit.OpProtect, inputRef, req.OutputPath, "", false, err.Error())
 		writeError(w, http.StatusBadRequest, err.Error())
@@ -186,7 +186,7 @@ func (s *Server) handleDecrypt(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	opts := vaultpack.DecryptOptions{
+	opts := katame.DecryptOptions{
 		InputPath:       req.InputPath,
 		OutputPath:      req.OutputPath,
 		Password:        req.Password,
@@ -225,7 +225,7 @@ func (s *Server) handleDecrypt(w http.ResponseWriter, r *http.Request) {
 		opts.AAD = a
 	}
 
-	res, err := vaultpack.Decrypt(opts)
+	res, err := katame.Decrypt(opts)
 	if err != nil {
 		s.auditEntry(audit.OpDecrypt, bundleRef, req.OutputPath, "", false, err.Error())
 		writeError(w, http.StatusBadRequest, err.Error())
@@ -274,7 +274,7 @@ func (s *Server) handleInspect(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.InputPath != "" {
-		m, err := vaultpack.Inspect(req.InputPath)
+		m, err := katame.Inspect(req.InputPath)
 		if err != nil {
 			s.auditEntry(audit.OpInspect, bundleRef, "", "", false, err.Error())
 			writeError(w, http.StatusBadRequest, err.Error())
@@ -289,7 +289,7 @@ func (s *Server) handleInspect(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "decode bundle_b64: "+err.Error())
 		return
 	}
-	m, err := vaultpack.InspectBytes(b)
+	m, err := katame.InspectBytes(b)
 	if err != nil {
 		s.auditEntry(audit.OpInspect, bundleRef, "", "", false, err.Error())
 		writeError(w, http.StatusBadRequest, err.Error())
@@ -328,7 +328,7 @@ func (s *Server) handleSign(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	signOpts := vaultpack.SignOptions{
+	signOpts := katame.SignOptions{
 		BundlePath:     req.BundlePath,
 		PrivateKeyPath: req.PrivateKeyPath,
 		Algo:           req.Algo,
@@ -343,7 +343,7 @@ func (s *Server) handleSign(w http.ResponseWriter, r *http.Request) {
 			writeError(w, http.StatusBadRequest, "decode bundle_b64: "+err.Error())
 			return
 		}
-		signed, sres, err := vaultpack.SignBytes(bundleBytes, signOpts)
+		signed, sres, err := katame.SignBytes(bundleBytes, signOpts)
 		if err != nil {
 			s.auditEntry(audit.OpSign, bundleRef, "", "", false, err.Error())
 			writeError(w, http.StatusBadRequest, err.Error())
@@ -363,7 +363,7 @@ func (s *Server) handleSign(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "one of bundle_path or bundle_b64 is required")
 		return
 	}
-	sres, err := vaultpack.SignBundle(signOpts)
+	sres, err := katame.SignBundle(signOpts)
 	if err != nil {
 		s.auditEntry(audit.OpSign, bundleRef, "", "", false, err.Error())
 		writeError(w, http.StatusBadRequest, err.Error())
@@ -406,7 +406,7 @@ func (s *Server) handleVerify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	verifyOpts := vaultpack.VerifyOptions{
+	verifyOpts := katame.VerifyOptions{
 		BundlePath:    req.BundlePath,
 		PublicKeyPath: req.PublicKeyPath,
 	}
@@ -414,7 +414,7 @@ func (s *Server) handleVerify(w http.ResponseWriter, r *http.Request) {
 		verifyOpts.PublicKey = []byte(req.PublicKeyPEM)
 	}
 	var (
-		vres *vaultpack.VerifyResult
+		vres *katame.VerifyResult
 	)
 	if req.BundleB64 != "" {
 		bundleBytes, derr := util.B64Decode(req.BundleB64)
@@ -422,9 +422,9 @@ func (s *Server) handleVerify(w http.ResponseWriter, r *http.Request) {
 			writeError(w, http.StatusBadRequest, "decode bundle_b64: "+derr.Error())
 			return
 		}
-		vres, err = vaultpack.VerifyBytes(bundleBytes, verifyOpts)
+		vres, err = katame.VerifyBytes(bundleBytes, verifyOpts)
 	} else if req.BundlePath != "" {
-		vres, err = vaultpack.Verify(verifyOpts)
+		vres, err = katame.Verify(verifyOpts)
 	} else {
 		writeError(w, http.StatusBadRequest, "one of bundle_path or bundle_b64 is required")
 		return
@@ -475,7 +475,7 @@ func (s *Server) handleRewrap(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	opts := vaultpack.RewrapOptions{
+	opts := katame.RewrapOptions{
 		InputPath:   req.InputPath,
 		OutputPath:  req.OutputPath,
 		KMSProvider: req.KMSProvider,
@@ -491,7 +491,7 @@ func (s *Server) handleRewrap(w http.ResponseWriter, r *http.Request) {
 		opts.InputBytes = b
 	}
 
-	res, err := vaultpack.Rewrap(opts)
+	res, err := katame.Rewrap(opts)
 	if err != nil {
 		s.auditEntry(audit.OpRewrap, bundleRef, req.OutputPath, "", false, err.Error())
 		writeError(w, http.StatusBadRequest, err.Error())
@@ -513,8 +513,8 @@ func (s *Server) handleRewrap(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, out)
 }
 
-func (req *protectRequest) toProtectOptions(maxBytes int64) (vaultpack.ProtectOptions, error) {
-	opts := vaultpack.ProtectOptions{
+func (req *protectRequest) toProtectOptions(maxBytes int64) (katame.ProtectOptions, error) {
+	opts := katame.ProtectOptions{
 		InputPath:       req.InputPath,
 		OutputPath:      req.OutputPath,
 		Password:        req.Password,
@@ -552,7 +552,7 @@ func (req *protectRequest) toProtectOptions(maxBytes int64) (vaultpack.ProtectOp
 		opts.AAD = a
 	}
 	if len(req.Recipients) > 0 {
-		recipients := make([]vaultpack.Recipient, len(req.Recipients))
+		recipients := make([]katame.Recipient, len(req.Recipients))
 		for i, r := range req.Recipients {
 			if r.PublicKeyPEM != "" {
 				recipients[i].PublicKeyPEM = []byte(r.PublicKeyPEM)
@@ -562,7 +562,7 @@ func (req *protectRequest) toProtectOptions(maxBytes int64) (vaultpack.ProtectOp
 		opts.Recipients = recipients
 	}
 	if req.SignPrivateKeyPEM != "" || req.SignPrivateKeyPath != "" {
-		opts.Sign = &vaultpack.SignParams{
+		opts.Sign = &katame.SignParams{
 			PrivateKey:     []byte(req.SignPrivateKeyPEM),
 			PrivateKeyPath: req.SignPrivateKeyPath,
 			Algo:           req.SignAlgo,

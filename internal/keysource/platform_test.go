@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	vpcrypto "github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	vpcrypto "github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 func TestPlatformSchemes_ReportsFour(t *testing.T) {
@@ -26,7 +26,7 @@ func TestPKCS11_FileShim_Symmetric(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "demo.key"), []byte(body), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	t.Setenv("VAULTPACK_PKCS11_DIR", dir)
+	t.Setenv("KATAME_PKCS11_DIR", dir)
 
 	got, err := ResolveSymmetricKey("pkcs11://demo")
 	if err != nil {
@@ -48,7 +48,7 @@ func TestPIV_FileShim_Private(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "9a.pem"), pem, 0o600); err != nil {
 		t.Fatal(err)
 	}
-	t.Setenv("VAULTPACK_PIV_DIR", dir)
+	t.Setenv("KATAME_PIV_DIR", dir)
 
 	got, err := ResolvePrivateKey("piv://9a")
 	if err != nil {
@@ -60,9 +60,9 @@ func TestPIV_FileShim_Private(t *testing.T) {
 }
 
 func TestPKCS11_RequiresDir(t *testing.T) {
-	t.Setenv("VAULTPACK_PKCS11_DIR", "")
+	t.Setenv("KATAME_PKCS11_DIR", "")
 	_, err := ResolveSymmetricKey("pkcs11://missing")
 	if err == nil {
-		t.Fatal("expected error without VAULTPACK_PKCS11_DIR")
+		t.Fatal("expected error without KATAME_PKCS11_DIR")
 	}
 }

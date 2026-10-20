@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 // zipNewWriter wraps zip.NewWriter to keep the test file clean.
@@ -45,7 +45,7 @@ func validManifest() *Manifest {
 
 func TestBundleRoundTrip(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "test.vpack")
+	bundlePath := filepath.Join(dir, "test.katame")
 
 	m := validManifest()
 	manifestBytes, err := MarshalManifest(m)
@@ -86,7 +86,7 @@ func TestBundleRoundTrip(t *testing.T) {
 
 func TestBundleWithSignature(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "signed.vpack")
+	bundlePath := filepath.Join(dir, "signed.katame")
 
 	m := validManifest()
 	manifestBytes, err := MarshalManifest(m)
@@ -117,7 +117,7 @@ func TestBundleWithSignature(t *testing.T) {
 func TestReadMissingPayload(t *testing.T) {
 	// Create a ZIP with only manifest.json, no payload.bin.
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "bad.vpack")
+	bundlePath := filepath.Join(dir, "bad.katame")
 
 	m := validManifest()
 	manifestBytes, err := MarshalManifest(m)
@@ -149,7 +149,7 @@ func TestReadMissingPayload(t *testing.T) {
 
 func TestReadManifestOnly(t *testing.T) {
 	dir := t.TempDir()
-	bundlePath := filepath.Join(dir, "test.vpack")
+	bundlePath := filepath.Join(dir, "test.katame")
 
 	m := validManifest()
 	manifestBytes, err := MarshalManifest(m)

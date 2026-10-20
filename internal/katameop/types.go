@@ -1,11 +1,11 @@
-// Package vpackop implements the core protect/decrypt pipeline shared by the
+// Package katameop implements the core protect/decrypt pipeline shared by the
 // public SDK, HTTP service, and CLI.
-package vpackop
+package katameop
 
 import (
 	"io"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
 // Recipient identifies a hybrid-encryption recipient by PEM bytes or file path.

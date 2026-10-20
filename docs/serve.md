@@ -1,4 +1,4 @@
-# Service mode (`vaultpack serve`)
+# Service mode (`katame serve`)
 
 Runs a long-running HTTP API exposing the SDK. The wire contract matches the C-shared library and WASM bindings: JSON in/out with an `{"ok": true|false, ...}` envelope.
 
@@ -8,22 +8,22 @@ Full route reference: [endpoints.md](endpoints.md) · OpenAPI: [openapi.yaml](op
 
 ```bash
 # Local development only
-vaultpack serve --listen :8443 --auth-disabled
+katame serve --listen :8443 --auth-disabled
 
 # Bearer token + TLS
-vaultpack serve \
+katame serve \
   --listen :8443 \
-  --auth-token "$(cat /etc/vaultpack/token)" \
-  --tls-cert /etc/ssl/vaultpack.crt \
-  --tls-key  /etc/ssl/vaultpack.key
+  --auth-token "$(cat /etc/katame/token)" \
+  --tls-cert /etc/ssl/katame.crt \
+  --tls-key  /etc/ssl/katame.key
 
 # mTLS
-vaultpack serve --listen :8443 \
+katame serve --listen :8443 \
   --tls-cert server.crt --tls-key server.key \
   --tls-client-ca client-ca.pem
 
 # UNIX socket sidecar
-vaultpack serve --listen unix:/run/vaultpack.sock --auth-disabled
+katame serve --listen unix:/run/katame.sock --auth-disabled
 ```
 
 ## Auth requirements
@@ -42,10 +42,10 @@ Prefer `--auth-token-file` in containers so the secret is not on argv.
 ## Policy, audit, rate limits
 
 ```bash
-vaultpack serve --listen :8443 \
+katame serve --listen :8443 \
   --auth-token-file /run/secrets/token \
-  --policy /etc/vaultpack/policy.yaml \
-  --audit-log /var/log/vaultpack-audit.jsonl \
+  --policy /etc/katame/policy.yaml \
+  --audit-log /var/log/katame-audit.jsonl \
   --rate-limit-rps 50 --rate-limit-burst 100
 ```
 
@@ -53,6 +53,6 @@ Serve **fails closed** if `--policy` cannot be loaded.
 
 ## KMS unwrap cache
 
-Cached by `(provider, key-id, wrapped-DEK)` for `--kms-cache-ttl` (default 5m), max `--kms-cache-size` (default 1024). Metrics: `vaultpack_kms_cache_*`.
+Cached by `(provider, key-id, wrapped-DEK)` for `--kms-cache-ttl` (default 5m), max `--kms-cache-size` (default 1024). Metrics: `katame_kms_cache_*`.
 
 See [deployment.md](deployment.md) for Docker/sidecar patterns.

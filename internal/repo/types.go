@@ -2,7 +2,7 @@ package repo
 
 import "time"
 
-// SchemaVersion is the on-disk schema for a `vaultpack repo` directory.
+// SchemaVersion is the on-disk schema for a `katame repo` directory.
 // Bumped only when a backwards-incompatible field is added; readers may
 // continue to handle older schemas indefinitely.
 const SchemaVersion = 1
@@ -60,7 +60,7 @@ type Root struct {
 
 // AddOptions controls a single Add operation.
 type AddOptions struct {
-	// BundleBytes is the .vpack file as raw bytes.
+	// BundleBytes is the .katame file as raw bytes.
 	BundleBytes []byte
 
 	// BundleName is the friendly filename recorded in the entry; if empty
@@ -69,10 +69,10 @@ type AddOptions struct {
 
 	// EmbedManifest, when true, base64-stores the manifest JSON in the
 	// entry. Useful for offline `list` / `verify` without keeping the
-	// .vpack around. False by default to keep entries.jsonl small.
+	// .katame around. False by default to keep entries.jsonl small.
 	EmbedManifest bool
 
-	// CopyBundle, when true, also writes the .vpack into bundles/<sha>.vpack.
+	// CopyBundle, when true, also writes the .katame into bundles/<sha>.katame.
 	// Only honored when the repo was opened with StoreBundles=true.
 	CopyBundle bool
 

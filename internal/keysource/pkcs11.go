@@ -8,22 +8,22 @@ import (
 
 const (
 	pkcs11Available = true
-	pkcs11Details   = "file-backed PKCS#11 shim via VAULTPACK_PKCS11_DIR (label → .key/.pem); native SoftHSM in later builds"
+	pkcs11Details   = "file-backed PKCS#11 shim via KATAME_PKCS11_DIR (label → .key/.pem); native SoftHSM in later builds"
 )
 
 // pkcs11://label[?pin=…] or pkcs11://module/path?label=NAME
 //
 // Production HSMs need a native PKCS#11 module. This build resolves labels from
-// VAULTPACK_PKCS11_DIR/<label>.key (symmetric) or .pem (private) so CI and
+// KATAME_PKCS11_DIR/<label>.key (symmetric) or .pem (private) so CI and
 // doctor can exercise the URI scheme without CGO SoftHSM bindings.
 func resolvePKCS11Symmetric(value string) ([]byte, error) {
 	label, _, err := parsePKCS11Ref(value)
 	if err != nil {
 		return nil, err
 	}
-	dir := os.Getenv("VAULTPACK_PKCS11_DIR")
+	dir := os.Getenv("KATAME_PKCS11_DIR")
 	if dir == "" {
-		return nil, fmt.Errorf("pkcs11://: set VAULTPACK_PKCS11_DIR to a directory of <label>.key files (native module support planned)")
+		return nil, fmt.Errorf("pkcs11://: set KATAME_PKCS11_DIR to a directory of <label>.key files (native module support planned)")
 	}
 	path := strings.TrimRight(dir, `/\`) + "/" + label + ".key"
 	data, err := os.ReadFile(path)
@@ -38,9 +38,9 @@ func resolvePKCS11Private(value string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	dir := os.Getenv("VAULTPACK_PKCS11_DIR")
+	dir := os.Getenv("KATAME_PKCS11_DIR")
 	if dir == "" {
-		return nil, fmt.Errorf("pkcs11://: set VAULTPACK_PKCS11_DIR to a directory of <label>.pem files (native module support planned)")
+		return nil, fmt.Errorf("pkcs11://: set KATAME_PKCS11_DIR to a directory of <label>.pem files (native module support planned)")
 	}
 	path := strings.TrimRight(dir, `/\`) + "/" + label + ".pem"
 	data, err := os.ReadFile(path)

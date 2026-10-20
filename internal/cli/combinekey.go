@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/crypto"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +23,7 @@ The threshold K is automatically read from the share metadata.
 Provide at least K share files; additional shares are accepted but only K are used.
 
 Example:
-  vaultpack combine-key --share data.key.share1 --share data.key.share3 --share data.key.share5 --out data.key`,
+  katame combine-key --share data.key.share1 --share data.key.share3 --share data.key.share5 --out data.key`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printer := NewPrinter(flagJSON, flagQuiet)
 

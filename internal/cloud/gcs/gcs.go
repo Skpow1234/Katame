@@ -19,7 +19,7 @@ import (
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
 
-	"github.com/Skpow1234/Vaultpack/internal/cloud"
+	"github.com/Skpow1234/Katame/internal/cloud"
 )
 
 // Store implements cloud.Store for Google Cloud Storage.

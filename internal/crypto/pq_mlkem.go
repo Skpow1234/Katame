@@ -137,7 +137,7 @@ func encapsulateMLKEM(recipientPub *MLKEMPublicKey) (*HybridResult, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ML-KEM encapsulate: %w", err)
 	}
-	dek, err := hkdfDerive(ss, nil, []byte("vaultpack-ml-kem-dek"), AES256KeySize)
+	dek, err := hkdfDerive(ss, nil, []byte("katame-ml-kem-dek"), AES256KeySize)
 	if err != nil {
 		return nil, fmt.Errorf("ML-KEM HKDF: %w", err)
 	}
@@ -162,7 +162,7 @@ func decapsulateMLKEM(privKey *MLKEMPrivateKey, ciphertext []byte) ([]byte, erro
 	if err != nil {
 		return nil, fmt.Errorf("ML-KEM decapsulate: %w", err)
 	}
-	return hkdfDerive(ss, nil, []byte("vaultpack-ml-kem-dek"), AES256KeySize)
+	return hkdfDerive(ss, nil, []byte("katame-ml-kem-dek"), AES256KeySize)
 }
 
 // wrapDEKMLKEM wraps an existing DEK for an ML-KEM recipient (multi-recipient).
@@ -179,7 +179,7 @@ func wrapDEKMLKEM(recipientPub *MLKEMPublicKey, dek []byte) (*HybridResult, erro
 	if err != nil {
 		return nil, fmt.Errorf("ML-KEM encapsulate: %w", err)
 	}
-	wrapKey, err := hkdfDerive(ss, nil, []byte("vaultpack-ml-kem-wrap"), AES256KeySize)
+	wrapKey, err := hkdfDerive(ss, nil, []byte("katame-ml-kem-wrap"), AES256KeySize)
 	if err != nil {
 		return nil, fmt.Errorf("ML-KEM HKDF: %w", err)
 	}
@@ -209,7 +209,7 @@ func unwrapDEKMLKEM(privKey *MLKEMPrivateKey, ciphertext, wrappedDEK []byte) ([]
 	if err != nil {
 		return nil, fmt.Errorf("ML-KEM decapsulate: %w", err)
 	}
-	wrapKey, err := hkdfDerive(ss, nil, []byte("vaultpack-ml-kem-wrap"), AES256KeySize)
+	wrapKey, err := hkdfDerive(ss, nil, []byte("katame-ml-kem-wrap"), AES256KeySize)
 	if err != nil {
 		return nil, err
 	}

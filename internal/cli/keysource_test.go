@@ -5,14 +5,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/crypto"
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/crypto"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 func TestKeySource_ProtectDecryptEnv(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "plain.txt")
-	bundleFile := filepath.Join(dir, "plain.vpack")
+	bundleFile := filepath.Join(dir, "plain.katame")
 	outFile := filepath.Join(dir, "plain.out")
 	plaintext := []byte("key-source round trip")
 	if err := os.WriteFile(inFile, plaintext, 0o600); err != nil {
@@ -23,14 +23,14 @@ func TestKeySource_ProtectDecryptEnv(t *testing.T) {
 	for i := range key {
 		key[i] = byte(255 - i)
 	}
-	t.Setenv("VP_TEST_KEYSOURCE_KEY", crypto.KeyFilePrefix+util.B64Encode(key))
+	t.Setenv("KT_TEST_KEYSOURCE_KEY", crypto.KeyFilePrefix+util.B64Encode(key))
 
 	root := NewRootCmd()
 	root.SetArgs([]string{
 		"protect",
 		"--in", inFile,
 		"--out", bundleFile,
-		"--key-source", "env://VP_TEST_KEYSOURCE_KEY",
+		"--key-source", "env://KT_TEST_KEYSOURCE_KEY",
 	})
 	if err := root.Execute(); err != nil {
 		t.Fatalf("protect --key-source: %v", err)
@@ -59,7 +59,7 @@ func TestKeySource_ProtectDecryptEnv(t *testing.T) {
 func TestSigningKeySource_SignVerify(t *testing.T) {
 	dir := t.TempDir()
 	inFile := filepath.Join(dir, "plain.txt")
-	bundleFile := filepath.Join(dir, "plain.vpack")
+	bundleFile := filepath.Join(dir, "plain.katame")
 	keyFile := filepath.Join(dir, "plain.key")
 	if err := os.WriteFile(inFile, []byte("signing key source"), 0o600); err != nil {
 		t.Fatal(err)
@@ -86,13 +86,13 @@ func TestSigningKeySource_SignVerify(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Setenv("VP_TEST_SIGNING_KEY", string(signPriv))
+	t.Setenv("KT_TEST_SIGNING_KEY", string(signPriv))
 
 	sign := NewRootCmd()
 	sign.SetArgs([]string{
 		"sign",
 		"--in", bundleFile,
-		"--signing-key-source", "env://VP_TEST_SIGNING_KEY",
+		"--signing-key-source", "env://KT_TEST_SIGNING_KEY",
 	})
 	if err := sign.Execute(); err != nil {
 		t.Fatalf("sign --signing-key-source: %v", err)

@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-// Provenance is a SLSA-style provenance statement for a .vpack bundle.
+// Provenance is a SLSA-style provenance statement for a .katame bundle.
 type Provenance struct {
 	SchemaVersion  string            `json:"schema_version"` // e.g. "v1"
 	Subject        ProvenanceSubject `json:"subject"`
@@ -26,8 +26,8 @@ type ProvenanceSubject struct {
 }
 
 type ProvenanceBuilder struct {
-	ID   string `json:"id"`   // e.g. "vaultpack"
-	Name string `json:"name"` // e.g. "VaultPack CLI"
+	ID   string `json:"id"`   // e.g. "katame"
+	Name string `json:"name"` // e.g. "Katame CLI"
 }
 
 // BuildProvenance creates a provenance statement for a bundle using manifest metadata and optional bundle digest.
@@ -56,7 +56,7 @@ func BuildProvenance(bundlePath, bundleDigestHex, inputName string, inputSize in
 	return &Provenance{
 		SchemaVersion:  "v1",
 		Subject:        subject,
-		Builder:        ProvenanceBuilder{ID: "vaultpack", Name: "VaultPack CLI"},
+		Builder:        ProvenanceBuilder{ID: "katame", Name: "Katame CLI"},
 		BuildTimestamp: time.Now().UTC().Format(time.RFC3339),
 		Environment:    env,
 	}

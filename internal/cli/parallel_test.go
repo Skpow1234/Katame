@@ -14,7 +14,7 @@ func TestProtectDecrypt_ParallelWorkers(t *testing.T) {
 		t.Run("w="+strconv.Itoa(workers), func(t *testing.T) {
 			dir := t.TempDir()
 			in := filepath.Join(dir, "input.bin")
-			out := filepath.Join(dir, "input.vpack")
+			out := filepath.Join(dir, "input.katame")
 			keyPath := filepath.Join(dir, "input.key")
 			dec := filepath.Join(dir, "input.dec")
 

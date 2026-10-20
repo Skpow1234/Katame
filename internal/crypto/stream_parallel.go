@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 // EncryptStreamParallel reads plaintext chunks from r, encrypts them in parallel

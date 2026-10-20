@@ -1,19 +1,19 @@
 # Plugin author guide
 
-Plugins are executables discovered from `VPACK_PLUGIN_DIR` or config `plugin_dir`. Each plugin is probed with `--vpack-list` and may register KEM schemes and/or signing algorithms. First plugin wins per name.
+Plugins are executables discovered from `KATAME_PLUGIN_DIR` or config `plugin_dir`. Each plugin is probed with `--katame-list` and may register KEM schemes and/or signing algorithms. First plugin wins per name.
 
 Example: [`examples/plugin-dummy-kem`](../examples/plugin-dummy-kem) (insecure demo only).
 
 ## Discovery
 
 ```bash
-export VPACK_PLUGIN_DIR=/path/to/plugins
-vaultpack keygen --out demo --algo <plugin-scheme>
+export KATAME_PLUGIN_DIR=/path/to/plugins
+katame keygen --out demo --algo <plugin-scheme>
 ```
 
 ## Capability listing
 
-When invoked as `plugin --vpack-list`, stdout must be JSON:
+When invoked as `plugin --katame-list`, stdout must be JSON:
 
 ```json
 {"kem": ["my-kem"], "sign": ["my-sign"]}
@@ -29,7 +29,7 @@ Either array may be empty/omitted.
 plugin keygen --type kem --algo <scheme> --out <prefix>
 ```
 
-Writes `<prefix>.key` and `<prefix>.pub` (may annotate pub with `VPACK-KEM-SCHEME`).
+Writes `<prefix>.key` and `<prefix>.pub` (may annotate pub with `KATAME-KEM-SCHEME`).
 
 ### `encapsulate`
 
@@ -37,7 +37,7 @@ Writes `<prefix>.key` and `<prefix>.pub` (may annotate pub with `VPACK-KEM-SCHEM
 plugin encapsulate --algo <scheme> --pubkey <path>
 ```
 
-Optional env `VPACK_DEK_B64` = base64 DEK to wrap (multi-recipient). Stdout JSON:
+Optional env `KATAME_DEK_B64` = base64 DEK to wrap (multi-recipient). Stdout JSON:
 
 ```json
 {
@@ -54,7 +54,7 @@ Optional env `VPACK_DEK_B64` = base64 DEK to wrap (multi-recipient). Stdout JSON
 plugin decapsulate --algo <scheme> --privkey <path>
 ```
 
-Input via `VPACK_CIPHERTEXT_B64` (base64 of JSON with `ephemeral_b64` / `wrapped_dek_b64`). Stdout: DEK as a single line of base64 or hex.
+Input via `KATAME_CIPHERTEXT_B64` (base64 of JSON with `ephemeral_b64` / `wrapped_dek_b64`). Stdout: DEK as a single line of base64 or hex.
 
 ## Sign contract
 

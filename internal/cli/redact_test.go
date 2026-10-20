@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 )
 
 func TestRedact_OmitsSensitiveFields(t *testing.T) {
@@ -70,7 +70,7 @@ func TestBatchInspect_RedactFlag(t *testing.T) {
 	// Create a couple of bundles in the dir.
 	for i := 0; i < 2; i++ {
 		in := filepath.Join(subDir, "in.txt")
-		out := filepath.Join(subDir, "b.vpack")
+		out := filepath.Join(subDir, "b.katame")
 		key := filepath.Join(subDir, "b.key")
 		os.WriteFile(in, []byte("data"), 0o600)
 		r := NewRootCmd()

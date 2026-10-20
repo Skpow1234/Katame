@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/Skpow1234/Vaultpack/internal/util"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
 const (
@@ -17,7 +17,7 @@ const (
 	provenanceEntry = "provenance.json"
 )
 
-// WriteParams holds everything needed to create a .vpack bundle.
+// WriteParams holds everything needed to create a .katame bundle.
 type WriteParams struct {
 	OutputPath    string
 	Ciphertext    []byte    // used for non-streaming writes
@@ -27,7 +27,7 @@ type WriteParams struct {
 	Writer        io.Writer // optional; if set, write to this instead of OutputPath
 }
 
-// Write creates a .vpack ZIP file containing payload.bin and manifest.json,
+// Write creates a .katame ZIP file containing payload.bin and manifest.json,
 // and optionally signature.sig.
 func Write(p *WriteParams) error {
 	var w io.Writer
@@ -83,7 +83,7 @@ func Write(p *WriteParams) error {
 	return nil
 }
 
-// ReadResult holds the extracted contents of a .vpack bundle.
+// ReadResult holds the extracted contents of a .katame bundle.
 type ReadResult struct {
 	Ciphertext    []byte
 	ManifestBytes []byte
@@ -91,7 +91,7 @@ type ReadResult struct {
 	Signature     []byte // nil if no signature present
 }
 
-// Read opens a .vpack ZIP file and extracts its contents.
+// Read opens a .katame ZIP file and extracts its contents.
 func Read(path string) (*ReadResult, error) {
 	zr, err := zip.OpenReader(path)
 	if err != nil {
@@ -101,7 +101,7 @@ func Read(path string) (*ReadResult, error) {
 	return readFromZip(&zr.Reader)
 }
 
-// ReadBytes parses a .vpack bundle from an in-memory byte slice and
+// ReadBytes parses a .katame bundle from an in-memory byte slice and
 // returns the same result type as Read. This is the entry point used by
 // the public SDK's in-memory and WASM paths.
 func ReadBytes(data []byte) (*ReadResult, error) {
@@ -152,7 +152,7 @@ func readFromZip(zr *zip.Reader) (*ReadResult, error) {
 	return result, nil
 }
 
-// ReadManifestOnly opens a .vpack and returns just the parsed manifest
+// ReadManifestOnly opens a .katame and returns just the parsed manifest
 // without loading the full ciphertext into memory.
 func ReadManifestOnly(path string) (*Manifest, []byte, error) {
 	zr, err := zip.OpenReader(path)

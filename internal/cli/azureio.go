@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
-	azuremod "github.com/Skpow1234/Vaultpack/internal/azure"
+	azuremod "github.com/Skpow1234/Katame/internal/azure"
 )
 
 // Azure configuration set via CLI flags or environment variables.
@@ -67,7 +67,7 @@ func azureDownload(uri string) (string, error) {
 	if ext == "" {
 		ext = ".tmp"
 	}
-	tmpFile, err := os.CreateTemp("", "vaultpack-az-*"+ext)
+	tmpFile, err := os.CreateTemp("", "katame-az-*"+ext)
 	if err != nil {
 		return "", fmt.Errorf("create temp file: %w", err)
 	}
@@ -168,7 +168,7 @@ func azureDownloadDir(uri string) (string, func(), error) {
 		return "", nil, err
 	}
 
-	tmpDir, err := os.MkdirTemp("", "vaultpack-az-dir-*")
+	tmpDir, err := os.MkdirTemp("", "katame-az-dir-*")
 	if err != nil {
 		return "", nil, fmt.Errorf("create temp dir: %w", err)
 	}

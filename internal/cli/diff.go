@@ -5,7 +5,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/Skpow1234/Vaultpack/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/bundle"
 	"github.com/spf13/cobra"
 )
 
@@ -26,11 +26,11 @@ func newDiffCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "diff",
-		Short: "Compare two .vpack bundles' manifests",
-		Long: "Compare two .vpack bundles by inspecting their manifests and plaintext hashes.\n\n" +
+		Short: "Compare two .katame bundles' manifests",
+		Long: "Compare two .katame bundles by inspecting their manifests and plaintext hashes.\n\n" +
 			"Reports per-field differences (plaintext hash, AEAD, key ID, scheme, recipients, signature, etc.).\n" +
 			"Exit codes: 0 = identical, 10 = differences found.\n\n" +
-			"Azure: use az://container/blob.vpack for either input.",
+			"Azure: use az://container/blob.katame for either input.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printer := NewPrinter(flagJSON, flagQuiet)
 

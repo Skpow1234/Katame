@@ -1,47 +1,47 @@
-# @vaultpack/wasm
+# @katame/wasm
 
-WebAssembly bindings for [VaultPack](https://github.com/Skpow1234/Vaultpack)
-— encrypt, decrypt, sign, and verify `.vpack` bundles directly in the
+WebAssembly bindings for [Katame](https://github.com/Skpow1234/Katame)
+— encrypt, decrypt, sign, and verify `.katame` bundles directly in the
 browser or in Node.js, with no native code required at install time.
 
 ## Installation
 
 ```bash
-npm install @vaultpack/wasm
+npm install @katame/wasm
 ```
 
 Two files ship with the package:
 
-- `vaultpack.wasm`         — the Go-compiled WASM module (~8 MB).
-- `vaultpack-loader.js`    — a tiny ESM loader that pulls in Go's
+- `katame.wasm`         — the Go-compiled WASM module (~8 MB).
+- `katame-loader.js`    — a tiny ESM loader that pulls in Go's
   `wasm_exec.js` and instantiates the module.
 
-Build from the VaultPack source tree with:
+Build from the Katame source tree with:
 
 ```bash
-GOOS=js GOARCH=wasm go build -o vaultpack.wasm ./cmd/vaultpack-wasm
+GOOS=js GOARCH=wasm go build -o katame.wasm ./cmd/katame-wasm
 cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" .
 ```
 
 ## Quick start (Node 20+)
 
 ```javascript
-import { loadVaultpack } from "@vaultpack/wasm";
+import { loadKatame } from "@katame/wasm";
 
-const Vaultpack = await loadVaultpack(
-  new URL("./vaultpack.wasm", import.meta.url)
+const Katame = await loadKatame(
+  new URL("./katame.wasm", import.meta.url)
 );
 
-console.log("Version:", Vaultpack.version());
+console.log("Version:", Katame.version());
 
 // Encrypt with a generated key.
 const plaintext = new TextEncoder().encode("hello, sdk");
-const enc = Vaultpack.protect({ plaintext });
+const enc = Katame.protect({ plaintext });
 if (!enc.ok) throw new Error(enc.error);
 console.log("manifest:", enc.manifest);
 
 // Decrypt.
-const dec = Vaultpack.decrypt({
+const dec = Katame.decrypt({
   bundle: enc.bundle,
   key: enc.generatedKey,
 });
@@ -53,15 +53,15 @@ console.log(new TextDecoder().decode(dec.plaintext));
 
 ```html
 <script type="module">
-  import { loadVaultpack } from "./vaultpack-loader.js";
-  const Vaultpack = await loadVaultpack("./vaultpack.wasm");
-  document.body.textContent = "VaultPack " + Vaultpack.version();
+  import { loadKatame } from "./katame-loader.js";
+  const Katame = await loadKatame("./katame.wasm");
+  document.body.textContent = "Katame " + Katame.version();
 </script>
 ```
 
 ## API
 
-See `vaultpack.d.ts` for the full TypeScript surface. The shape is the
+See `katame.d.ts` for the full TypeScript surface. The shape is the
 same as the C-shared and Python wrappers:
 
 - `version() -> string`
@@ -78,7 +78,7 @@ Every call returns either `{ok: true, ...}` on success or
 
 - Symmetric key (auto-generated or supplied).
 - Password-based (argon2id / scrypt / pbkdf2-sha256).
-- Hybrid recipients, KMS wrap, compression, Shamir split (see `ProtectOptions` / `DecryptOptions` in `vaultpack.d.ts`).
+- Hybrid recipients, KMS wrap, compression, Shamir split (see `ProtectOptions` / `DecryptOptions` in `katame.d.ts`).
 - Detached signatures (ed25519 / ecdsa / rsa-pss / ml-dsa / slh-dsa).
 - Bundle inspection.
 

@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Skpow1234/Vaultpack/internal/audit"
+	"github.com/Skpow1234/Katame/internal/audit"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +13,7 @@ func newAuditCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "audit",
 		Short: "Audit trail and export",
-		Long:  "Parent command for audit log export. Use 'vaultpack audit export --format csv' to export the audit log.",
+		Long:  "Parent command for audit log export. Use 'katame audit export --format csv' to export the audit log.",
 	}
 	cmd.AddCommand(newAuditExportCmd())
 	cmd.AddCommand(newAuditVerifyCmd())
@@ -29,11 +29,11 @@ func newAuditVerifyCmd() *cobra.Command {
 			if logPath == "" {
 				logPath = flagAuditLog
 				if logPath == "" {
-					logPath = os.Getenv("VAULTPACK_AUDIT_LOG")
+					logPath = os.Getenv("KATAME_AUDIT_LOG")
 				}
 			}
 			if logPath == "" {
-				return fmt.Errorf("audit log path required: set --audit-log, --log, or VAULTPACK_AUDIT_LOG")
+				return fmt.Errorf("audit log path required: set --audit-log, --log, or KATAME_AUDIT_LOG")
 			}
 			res, err := audit.VerifyFile(logPath)
 			if err != nil {
@@ -51,7 +51,7 @@ func newAuditVerifyCmd() *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&logPath, "log", "", "audit log file (default: --audit-log or VAULTPACK_AUDIT_LOG)")
+	cmd.Flags().StringVar(&logPath, "log", "", "audit log file (default: --audit-log or KATAME_AUDIT_LOG)")
 	return cmd
 }
 
@@ -75,11 +75,11 @@ func newAuditExportCmd() *cobra.Command {
 			if logPath == "" {
 				logPath = flagAuditLog
 				if logPath == "" {
-					logPath = os.Getenv("VAULTPACK_AUDIT_LOG")
+					logPath = os.Getenv("KATAME_AUDIT_LOG")
 				}
 			}
 			if logPath == "" {
-				return fmt.Errorf("audit log path required: set --audit-log, --log, or VAULTPACK_AUDIT_LOG")
+				return fmt.Errorf("audit log path required: set --audit-log, --log, or KATAME_AUDIT_LOG")
 			}
 
 			var filter audit.ExportFilter
@@ -130,7 +130,7 @@ func newAuditExportCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&logPath, "log", "", "audit log file (default: --audit-log or VAULTPACK_AUDIT_LOG)")
+	cmd.Flags().StringVar(&logPath, "log", "", "audit log file (default: --audit-log or KATAME_AUDIT_LOG)")
 	cmd.Flags().StringVar(&format, "format", "json", "output format: csv, json")
 	cmd.Flags().StringVar(&since, "since", "", "include entries on or after this time (RFC3339 or 2006-01-02)")
 	cmd.Flags().StringVar(&until, "until", "", "include entries before this time (RFC3339 or 2006-01-02)")

@@ -60,7 +60,7 @@ func HashFile(path string) ([]byte, error) {
 	return h[:], nil
 }
 
-// SealDir walks dir for *.vpack files, hashes each, and returns the Merkle root (hex).
+// SealDir walks dir for *.katame files, hashes each, and returns the Merkle root (hex).
 func SealDir(dir string) (rootHex string, leaves []Leaf, err error) {
 	var paths []string
 	err = filepath.Walk(dir, func(path string, info os.FileInfo, walkErr error) error {
@@ -70,7 +70,7 @@ func SealDir(dir string) (rootHex string, leaves []Leaf, err error) {
 		if info.IsDir() {
 			return nil
 		}
-		if filepath.Ext(path) != ".vpack" {
+		if filepath.Ext(path) != ".katame" {
 			return nil
 		}
 		paths = append(paths, path)
@@ -91,7 +91,7 @@ func SealDir(dir string) (rootHex string, leaves []Leaf, err error) {
 		leaves = append(leaves, Leaf{Path: rel, Hash: hash})
 	}
 	if len(leaves) == 0 {
-		return "", nil, fmt.Errorf("no .vpack files in %s", dir)
+		return "", nil, fmt.Errorf("no .katame files in %s", dir)
 	}
 	root, err := BuildMerkleRoot(leaves)
 	if err != nil {
