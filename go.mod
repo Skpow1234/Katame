@@ -19,7 +19,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.101.0
 	github.com/charmbracelet/huh v0.8.0
 	github.com/cloudflare/circl v1.6.3
-	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/klauspost/compress v1.18.5
 	github.com/open-policy-agent/opa v1.16.2
 	github.com/rs/zerolog v1.34.0
