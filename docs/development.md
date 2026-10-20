@@ -12,7 +12,7 @@ make docker-build
 make release-snapshot
 ```
 
-Requires Go **1.25.x** (see `go.mod` `toolchain`). CI pins `GOTOOLCHAIN=local` with setup-go `1.25.11`.
+Requires Go **1.26.x** (see `go.mod` `toolchain`). CI pins `GOTOOLCHAIN=local` with setup-go `1.26.10`.
 
 ## Project structure
 
