@@ -20,7 +20,7 @@ require (
 	github.com/charmbracelet/huh v0.8.0
 	github.com/cloudflare/circl v1.6.3
 	github.com/golang-jwt/jwt/v5 v5.3.0
-	github.com/klauspost/compress v1.18.5
+	github.com/klauspost/compress v1.20.3
 	github.com/open-policy-agent/opa v1.16.2
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.10.2
