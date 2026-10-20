@@ -18,7 +18,7 @@ const (
 func resolvePIVPrivate(value string) ([]byte, error) {
 	slot := strings.TrimPrefix(strings.ToLower(value), "/")
 	if slot == "" {
-		return "", fmt.Errorf("piv URI must be piv://SLOT (e.g. piv://9a)")
+		return nil, fmt.Errorf("piv URI must be piv://SLOT (e.g. piv://9a)")
 	}
 	dir := os.Getenv("VAULTPACK_PIV_DIR")
 	if dir == "" {
