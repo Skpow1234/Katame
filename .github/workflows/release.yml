@@ -22,7 +22,8 @@ permissions:
   id-token: write
 
 # Force the installed Go to be used (no toolchain auto-download) so the released
-# binaries are built with the patched stdlib.
+# binaries are built with the patched stdlib. With GOTOOLCHAIN=local, setup-go
+# installs the `go` line from go.mod — keep that patch version current.
 env:
   GOTOOLCHAIN: local
 

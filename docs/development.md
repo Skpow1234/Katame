@@ -12,7 +12,7 @@ make docker-build
 make release-snapshot
 ```
 
-Requires Go **1.26.x** (see `go.mod` `toolchain`). CI uses `setup-go` with `go-version-file: go.mod` and `GOTOOLCHAIN=local` so the patched stdlib from the `toolchain` directive is used without auto-download drift.
+Requires Go **1.26.10+** (see `go.mod`). CI uses `setup-go` with `go-version-file: go.mod` and `GOTOOLCHAIN=local`. With that env var, setup-go installs the version from the `go` directive (not `toolchain`), so the patch version on the `go` line is what clears stdlib findings in govulncheck.
 
 ## Project structure
 

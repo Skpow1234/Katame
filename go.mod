@@ -1,9 +1,9 @@
 module github.com/Skpow1234/Katame
 
-go 1.26.0
+// Patch version matters: CI sets GOTOOLCHAIN=local, so setup-go installs the
+// version from this `go` line (not `toolchain`). Keep both in sync on bumps.
+go 1.26.10
 
-// Pin the toolchain to the patched stdlib version that resolves the Go
-// vulnerabilities tracked in CI (govulncheck). Bump as new patch releases ship.
 toolchain go1.26.10
 
 require (

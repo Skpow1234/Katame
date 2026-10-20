@@ -15,8 +15,9 @@ permissions:
   contents: read
 
 # Force CI to use exactly the Go version installed by setup-go and to ignore
-# any `toolchain` directive auto-download. Without this, `go` may fetch a
-# different toolchain and reintroduce stdlib vulns.
+# any `toolchain` directive auto-download. With GOTOOLCHAIN=local, setup-go
+# reads the `go` line in go.mod (not `toolchain`) — keep that patch version
+# current so govulncheck sees the fixed stdlib.
 env:
   GOTOOLCHAIN: local
 

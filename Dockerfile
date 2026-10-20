@@ -2,7 +2,7 @@
 #   docker buildx build --platform linux/amd64,linux/arm64 -t katame:tag --push .
 # Or: make docker-buildx
 # ---- Build stage ----
-FROM golang:1.26-alpine AS builder
+FROM golang:1.26.10-alpine AS builder
 
 RUN apk add --no-cache git ca-certificates
 
