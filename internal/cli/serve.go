@@ -21,6 +21,7 @@ func newServeCmd() *cobra.Command {
 		authToken       string
 		authTokenFile   string
 		authDisabled    bool
+		metricsPublic   bool
 		kmsCacheTTL     time.Duration
 		kmsCacheSize    int
 		readTimeout     time.Duration
@@ -86,6 +87,7 @@ Examples:
 				TLSClientCAFile: tlsClientCA,
 				AuthToken:       authToken,
 				AuthDisabled:    authDisabled,
+				MetricsPublic:   metricsPublic,
 				KMSCacheTTL:     kmsCacheTTL,
 				KMSCacheMaxSize: kmsCacheSize,
 				ReadTimeout:     readTimeout,
@@ -130,6 +132,7 @@ Examples:
 	cmd.Flags().StringVar(&authToken, "auth-token", "", "Require Authorization: Bearer <token> on every request")
 	cmd.Flags().StringVar(&authTokenFile, "auth-token-file", "", "Read --auth-token from this file (trailing newline stripped)")
 	cmd.Flags().BoolVar(&authDisabled, "auth-disabled", false, "Explicit opt-out: serve without any authentication (LOCAL DEV ONLY)")
+	cmd.Flags().BoolVar(&metricsPublic, "metrics-public", false, "Leave GET /metrics unauthenticated (default: require auth when configured)")
 	cmd.Flags().DurationVar(&kmsCacheTTL, "kms-cache-ttl", 5*time.Minute, "TTL for cached KMS unwrap results")
 	cmd.Flags().IntVar(&kmsCacheSize, "kms-cache-size", 1024, "Max entries in the KMS unwrap cache")
 	cmd.Flags().DurationVar(&readTimeout, "read-timeout", 30*time.Second, "HTTP read timeout")

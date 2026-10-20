@@ -34,6 +34,8 @@ dec, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
 
 **Supported modes (v1.0):** symmetric key, password KDFs, hybrid/multi-recipient, KMS-wrapped DEKs, compression, Shamir splitting, detached signatures (including PQ), Rekor helpers, provenance embedding.
 
+C / Python / WASM bindings now accept the same hybrid, KMS, compress, and Shamir fields (plus `vp_rewrap` / `rewrap()`).
+
 ## Native shared library (C-shared)
 
 ```bash

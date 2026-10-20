@@ -9,15 +9,16 @@ The library is located via the following resolution order:
 
 from __future__ import annotations
 
+import base64
 import ctypes
 import ctypes.util
 import json
 import os
 import platform
 import sys
-from typing import Any, Optional
+from typing import Any, Optional, Sequence
 
-VERSION = "0.1.0"  # bumped together with the Go SDK.
+VERSION = "1.0.0"  # aligned with pkg/vaultpack.Version
 
 
 class VaultpackError(RuntimeError):
@@ -72,25 +73,19 @@ def _ext_for_msg() -> str:
 
 _LIB = _load_library()
 
-# Bind the C signatures.
 _LIB.vp_version.argtypes = []
 _LIB.vp_version.restype = ctypes.c_char_p
 _LIB.vp_free.argtypes = [ctypes.c_void_p]
 _LIB.vp_free.restype = None
 
-# For functions that return malloc'd strings we use c_void_p so we can
-# explicitly free() the pointer after copying the bytes out — using
-# c_char_p would let ctypes free it (or not) on its own, which is unsafe
-# across the Go/C boundary.
-for sym in ("vp_protect", "vp_decrypt", "vp_inspect", "vp_sign", "vp_verify"):
-    fn = getattr(_LIB, sym)
-    fn.argtypes = [ctypes.c_char_p]
-    fn.restype = ctypes.c_void_p
+for sym in ("vp_protect", "vp_decrypt", "vp_inspect", "vp_sign", "vp_verify", "vp_rewrap"):
+    if hasattr(_LIB, sym):
+        fn = getattr(_LIB, sym)
+        fn.argtypes = [ctypes.c_char_p]
+        fn.restype = ctypes.c_void_p
 
 
 def _call_json(symbol: str, payload: Any) -> dict:
-    """Marshal *payload* (str or dict) to JSON, call the C entry point, then
-    parse the JSON reply. Always frees the returned C string."""
     if isinstance(payload, str):
         encoded = payload.encode("utf-8")
     else:
@@ -117,10 +112,7 @@ def _call_json(symbol: str, payload: Any) -> dict:
     return reply
 
 
-# --- Public API ----------------------------------------------------------
-
 def version() -> str:
-    """Return the libvaultpack semver string (matches ``vaultpack.Version``)."""
     raw = _LIB.vp_version()
     if not raw:
         raise VaultpackError("vp_version returned null")
@@ -131,25 +123,34 @@ def protect(
     *,
     input_path: Optional[str] = None,
     plaintext: Optional[bytes] = None,
-    output_path: str,
+    output_path: Optional[str] = None,
     key: Optional[bytes] = None,
     password: Optional[str] = None,
+    kdf_algo: Optional[str] = None,
     cipher: Optional[str] = None,
     aad: Optional[bytes] = None,
     input_name: Optional[str] = None,
+    compress: Optional[str] = None,
+    kms_provider: Optional[str] = None,
+    kms_key_id: Optional[str] = None,
+    recipients: Optional[Sequence[dict[str, str]]] = None,
+    split_shares: Optional[int] = None,
+    split_threshold: Optional[int] = None,
+    hash_algo: Optional[str] = None,
 ) -> dict:
     """Encrypt a file or in-memory blob into a .vpack bundle.
 
-    Either ``input_path`` or ``plaintext`` must be supplied, but not both.
-    If neither ``key`` nor ``password`` is supplied a fresh 256-bit key is
-    generated and returned in the result as ``generated_key_b64`` (base64).
+    Supports symmetric key, password, hybrid recipients, KMS wrap, compression,
+    and Shamir key splitting (parity with the Go SDK / CLI).
     """
-    import base64
-
     if (input_path is None) == (plaintext is None):
         raise VaultpackError("protect: exactly one of input_path or plaintext is required")
+    if not output_path and plaintext is None and input_path is None:
+        raise VaultpackError("protect: output_path is required")
 
-    payload: dict[str, Any] = {"output_path": output_path}
+    payload: dict[str, Any] = {}
+    if output_path is not None:
+        payload["output_path"] = output_path
     if input_path is not None:
         payload["input_path"] = input_path
     if plaintext is not None:
@@ -158,12 +159,28 @@ def protect(
         payload["key_b64"] = base64.b64encode(key).decode("ascii")
     if password is not None:
         payload["password"] = password
+    if kdf_algo is not None:
+        payload["kdf_algo"] = kdf_algo
     if cipher is not None:
         payload["cipher"] = cipher
     if aad is not None:
         payload["aad_b64"] = base64.b64encode(aad).decode("ascii")
     if input_name is not None:
         payload["input_name"] = input_name
+    if compress is not None:
+        payload["compress"] = compress
+    if kms_provider is not None:
+        payload["kms_provider"] = kms_provider
+    if kms_key_id is not None:
+        payload["kms_key_id"] = kms_key_id
+    if recipients is not None:
+        payload["recipients"] = list(recipients)
+    if split_shares is not None:
+        payload["split_shares"] = split_shares
+    if split_threshold is not None:
+        payload["split_threshold"] = split_threshold
+    if hash_algo is not None:
+        payload["hash_algo"] = hash_algo
     return _call_json("vp_protect", payload)
 
 
@@ -176,20 +193,13 @@ def decrypt(
     key_b64: Optional[str] = None,
     password: Optional[str] = None,
     aad: Optional[bytes] = None,
+    kms_provider: Optional[str] = None,
+    private_key_pem: Optional[str] = None,
+    private_key_path: Optional[str] = None,
 ) -> dict:
-    """Decrypt a .vpack bundle.
-
-    Either ``input_path`` or ``bundle`` (raw bytes) must be supplied.
-    Either ``key``/``key_b64`` or ``password`` must be supplied.
-    If ``output_path`` is omitted, the plaintext is returned base64-encoded
-    as ``plaintext_b64`` in the result dict.
-    """
-    import base64
-
+    """Decrypt a .vpack bundle (symmetric, password, hybrid, or KMS)."""
     if (input_path is None) == (bundle is None):
         raise VaultpackError("decrypt: exactly one of input_path or bundle is required")
-    if (key is None and key_b64 is None) and password is None:
-        raise VaultpackError("decrypt: key or password is required")
 
     payload: dict[str, Any] = {}
     if input_path is not None:
@@ -206,12 +216,31 @@ def decrypt(
         payload["password"] = password
     if aad is not None:
         payload["aad_b64"] = base64.b64encode(aad).decode("ascii")
+    if kms_provider is not None:
+        payload["kms_provider"] = kms_provider
+    if private_key_pem is not None:
+        payload["private_key_pem"] = private_key_pem
+    if private_key_path is not None:
+        payload["private_key_path"] = private_key_path
     return _call_json("vp_decrypt", payload)
 
 
-def inspect(path: str) -> dict:
+def inspect(
+    path: Optional[str] = None,
+    *,
+    bundle: Optional[bytes] = None,
+    input_path: Optional[str] = None,
+) -> dict:
     """Return the parsed manifest of a .vpack bundle without decrypting it."""
-    return _call_json("vp_inspect", path)
+    if path is not None and bundle is None and input_path is None:
+        # Backward-compatible path-only call (raw string still accepted by C ABI).
+        return _call_json("vp_inspect", path)
+    payload: dict[str, Any] = {}
+    if input_path or path:
+        payload["input_path"] = input_path or path
+    if bundle is not None:
+        payload["bundle_b64"] = base64.b64encode(bundle).decode("ascii")
+    return _call_json("vp_inspect", payload)
 
 
 def sign(
@@ -221,7 +250,6 @@ def sign(
     private_key_path: Optional[str] = None,
     algo: Optional[str] = None,
 ) -> dict:
-    """Add (or replace) a detached signature in an existing .vpack file."""
     if (private_key_pem is None) == (private_key_path is None):
         raise VaultpackError(
             "sign: exactly one of private_key_pem or private_key_path is required"
@@ -242,7 +270,6 @@ def verify(
     public_key_pem: Optional[str] = None,
     public_key_path: Optional[str] = None,
 ) -> dict:
-    """Verify the detached signature of a .vpack file. Returns ``{"valid": bool, ...}``."""
     if (public_key_pem is None) == (public_key_path is None):
         raise VaultpackError(
             "verify: exactly one of public_key_pem or public_key_path is required"
@@ -255,6 +282,27 @@ def verify(
     return _call_json("vp_verify", payload)
 
 
-if __name__ == "__main__":  # pragma: no cover - quick smoke test
+def rewrap(
+    *,
+    input_path: str,
+    output_path: str,
+    kms_provider: str,
+    from_kms_key_id: str,
+    to_kms_key_id: str,
+) -> dict:
+    """Re-wrap a KMS-protected DEK without decrypting the payload."""
+    return _call_json(
+        "vp_rewrap",
+        {
+            "input_path": input_path,
+            "output_path": output_path,
+            "kms_provider": kms_provider,
+            "from_kms_key_id": from_kms_key_id,
+            "to_kms_key_id": to_kms_key_id,
+        },
+    )
+
+
+if __name__ == "__main__":  # pragma: no cover
     print("libvaultpack version:", version(), "(python wrapper", VERSION + ")")
     sys.exit(0)

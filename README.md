@@ -52,7 +52,7 @@ How to deploy (binaries, containers, `serve`, sidecars): **[docs/deployment.md](
 | SDK & bindings | [docs/sdk.md](docs/sdk.md) |
 | Policy, audit, repo, cloud | [docs/](docs/README.md) |
 | Recipes | [docs/recipes.md](docs/recipes.md) |
-| Milestones | [docs/milestones.md](docs/milestones.md) |
+| Milestones | [docs/milestones.md](docs/milestones.md) · [backlog (1000+)](docs/milestones_backlog.md) |
 | Development | [docs/development.md](docs/development.md) |
 
 ## Features at a glance

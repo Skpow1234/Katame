@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/Skpow1234/Vaultpack/internal/config"
@@ -33,7 +34,7 @@ func NewRootCmd() *cobra.Command {
 		Short:   "Protect data artifacts with encryption, hashing, and signing",
 		Long:    "VaultPack encrypts, hashes, and signs data artifacts into portable .vpack bundles.",
 		Version: Version,
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// Load config (optional): --config or VPACK_CONFIG, then ~/.vpack.yaml, ./.vpack.yaml.
 			// Profile: --profile or VPACK_PROFILE. Errors are ignored so commands run with defaults.
 			_, _ = config.Load(flagConfig, flagProfile)
@@ -71,13 +72,11 @@ func NewRootCmd() *cobra.Command {
 			if policyPath != "" {
 				ev, err := policy.Load(policyPath)
 				if err != nil {
-					// Surface but don't crash the entire CLI; "fail-closed" would block
-					// emergency use. The error is logged so operators see it.
-					l := zerolog.New(os.Stderr)
-					l.Error().Err(err).Str("policy", policyPath).Msg("policy load failed; enforcement disabled")
-				} else {
-					policy.SetGlobal(ev)
+					// Fail-closed: a configured policy that cannot be loaded must
+					// not silently disable enforcement (matches vaultpack serve).
+					return fmt.Errorf("policy load failed (%s): %w", policyPath, err)
 				}
+				policy.SetGlobal(ev)
 			}
 			// Plugin discovery: VPACK_PLUGIN_DIR or config plugin_dir.
 			pluginDir := os.Getenv(config.EnvPluginDir)
@@ -85,6 +84,7 @@ func NewRootCmd() *cobra.Command {
 				pluginDir = config.Get().PluginDir
 			}
 			plugin.DiscoverFromDir(pluginDir)
+			return nil
 		},
 		SilenceUsage:  true,
 		SilenceErrors: true,

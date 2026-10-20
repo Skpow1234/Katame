@@ -1,10 +1,8 @@
 // Package keysource resolves key material from URI-style references.
 //
 // M28 establishes the stable abstraction used by CLI flags such as
-// --key-source and --signing-key-source. Portable backends are implemented
-// here; hardware and OS-backed schemes are reserved with clear errors so
-// future platform-specific integrations can slot in without changing the
-// user-facing syntax.
+// --key-source and --signing-key-source. Portable backends (file/env/b64)
+// plus platform schemes (dpapi, keychain, pkcs11, piv) are implemented here.
 package keysource
 
 import (
@@ -17,15 +15,14 @@ import (
 	"github.com/Skpow1234/Vaultpack/internal/util"
 )
 
-// UnsupportedSchemeError is returned for reserved schemes that require
-// platform-specific integrations not compiled into this build.
+// UnsupportedSchemeError is returned for unknown schemes.
 type UnsupportedSchemeError struct {
 	Scheme string
 	URI    string
 }
 
 func (e UnsupportedSchemeError) Error() string {
-	return fmt.Sprintf("key source scheme %q is reserved but not available in this build: %s", e.Scheme, e.URI)
+	return fmt.Sprintf("key source scheme %q is not supported: %s", e.Scheme, e.URI)
 }
 
 // ResolveSymmetricKey loads a raw 32-byte VaultPack content-encryption key.
@@ -35,6 +32,9 @@ func (e UnsupportedSchemeError) Error() string {
 //   - file://relative/or/windows/path.key
 //   - env://ENV_VAR_CONTAINING_KEYFILE_OR_BASE64
 //   - b64://BASE64_RAW_32_BYTE_KEY
+//   - dpapi://path|b64:… (Windows)
+//   - keychain://SERVICE/ACCOUNT (macOS)
+//   - pkcs11://label (VAULTPACK_PKCS11_DIR)
 func ResolveSymmetricKey(uri string) ([]byte, error) {
 	scheme, value, err := split(uri)
 	if err != nil {
@@ -51,10 +51,16 @@ func ResolveSymmetricKey(uri string) ([]byte, error) {
 		return parseSymmetricKeyBytes([]byte(raw))
 	case "b64":
 		return parseSymmetricKeyBytes([]byte(value))
-	case "pkcs11", "keychain", "dpapi", "piv":
-		return nil, UnsupportedSchemeError{Scheme: scheme, URI: uri}
+	case "dpapi":
+		return resolveDPAPISymmetric(value)
+	case "keychain":
+		return resolveKeychainSymmetric(value)
+	case "pkcs11":
+		return resolvePKCS11Symmetric(value)
+	case "piv":
+		return resolvePIVSymmetric(value)
 	default:
-		return nil, fmt.Errorf("unsupported key source scheme %q", scheme)
+		return nil, UnsupportedSchemeError{Scheme: scheme, URI: uri}
 	}
 }
 
@@ -66,6 +72,10 @@ func ResolveSymmetricKey(uri string) ([]byte, error) {
 //   - file:///abs/signing.key
 //   - env://ENV_VAR_CONTAINING_PEM_OR_LEGACY_KEY
 //   - b64://BASE64_PEM_OR_LEGACY_KEY_BYTES
+//   - dpapi://path|b64:… (Windows)
+//   - keychain://SERVICE/ACCOUNT (macOS)
+//   - pkcs11://label (VAULTPACK_PKCS11_DIR)
+//   - piv://slot (VAULTPACK_PIV_DIR)
 func ResolvePrivateKey(uri string) ([]byte, error) {
 	scheme, value, err := split(uri)
 	if err != nil {
@@ -82,10 +92,16 @@ func ResolvePrivateKey(uri string) ([]byte, error) {
 		return []byte(raw), nil
 	case "b64":
 		return util.B64Decode(value)
-	case "pkcs11", "keychain", "dpapi", "piv":
-		return nil, UnsupportedSchemeError{Scheme: scheme, URI: uri}
+	case "dpapi":
+		return resolveDPAPIPrivate(value)
+	case "keychain":
+		return resolveKeychainPrivate(value)
+	case "pkcs11":
+		return resolvePKCS11Private(value)
+	case "piv":
+		return resolvePIVPrivate(value)
 	default:
-		return nil, fmt.Errorf("unsupported key source scheme %q", scheme)
+		return nil, UnsupportedSchemeError{Scheme: scheme, URI: uri}
 	}
 }
 

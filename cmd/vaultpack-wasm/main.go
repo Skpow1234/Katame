@@ -74,6 +74,14 @@ func optString(opts js.Value, key string) string {
 	return v.String()
 }
 
+func optInt(opts js.Value, key string) int {
+	v := opts.Get(key)
+	if v.IsUndefined() || v.IsNull() {
+		return 0
+	}
+	return v.Int()
+}
+
 func manifestJS(m *vaultpack.Manifest) any {
 	data, err := vaultpack.MarshalManifest(m)
 	if err != nil {
@@ -104,16 +112,36 @@ func jsProtect(this js.Value, args []js.Value) any {
 	if err != nil {
 		return jsError("protect: " + err.Error())
 	}
+	opts := vaultpack.ProtectOptions{
+		Plaintext:      plaintext,
+		Key:            key,
+		Password:       optString(o, "password"),
+		KDFAlgo:        optString(o, "kdfAlgo"),
+		Cipher:         optString(o, "cipher"),
+		InputName:      optString(o, "inputName"),
+		Compress:       optString(o, "compress"),
+		KMSProvider:    optString(o, "kmsProvider"),
+		KMSKeyID:       optString(o, "kmsKeyId"),
+		HashAlgo:       optString(o, "hashAlgo"),
+		AAD:            aad,
+		SplitShares:    optInt(o, "splitShares"),
+		SplitThreshold: optInt(o, "splitThreshold"),
+	}
+	if recs := o.Get("recipients"); !recs.IsUndefined() && !recs.IsNull() && recs.Length() > 0 {
+		for i := 0; i < recs.Length(); i++ {
+			r := recs.Index(i)
+			pem := optString(r, "publicKeyPEM")
+			path := optString(r, "publicKeyPath")
+			rec := vaultpack.Recipient{PublicKeyPath: path}
+			if pem != "" {
+				rec.PublicKeyPEM = []byte(pem)
+			}
+			opts.Recipients = append(opts.Recipients, rec)
+		}
+	}
 	var buf bytes.Buffer
-	res, err := vaultpack.Protect(vaultpack.ProtectOptions{
-		Plaintext:    plaintext,
-		Key:          key,
-		Password:     optString(o, "password"),
-		Cipher:       optString(o, "cipher"),
-		InputName:    optString(o, "inputName"),
-		AAD:          aad,
-		OutputWriter: &buf,
-	})
+	opts.OutputWriter = &buf
+	res, err := vaultpack.Protect(opts)
 	if err != nil {
 		return jsError(err.Error())
 	}
@@ -124,6 +152,16 @@ func jsProtect(this js.Value, args []js.Value) any {
 	}
 	if res.GeneratedKey != nil {
 		reply["generatedKey"] = bytesToJS(res.GeneratedKey)
+	}
+	if len(res.Shares) > 0 {
+		arr := js.Global().Get("Array").New(len(res.Shares))
+		for i, sh := range res.Shares {
+			item := js.Global().Get("Object").New()
+			item.Set("index", sh.Index)
+			item.Set("data", bytesToJS(sh.Data))
+			arr.SetIndex(i, item)
+		}
+		reply["shares"] = arr
 	}
 	return reply
 }
@@ -145,12 +183,18 @@ func jsDecrypt(this js.Value, args []js.Value) any {
 	if err != nil {
 		return jsError("decrypt: " + err.Error())
 	}
-	res, err := vaultpack.Decrypt(vaultpack.DecryptOptions{
-		InputBytes: bundleBytes,
-		Key:        key,
-		Password:   optString(o, "password"),
-		AAD:        aad,
-	})
+	decOpts := vaultpack.DecryptOptions{
+		InputBytes:     bundleBytes,
+		Key:            key,
+		Password:       optString(o, "password"),
+		KMSProvider:    optString(o, "kmsProvider"),
+		PrivateKeyPath: optString(o, "privateKeyPath"),
+		AAD:            aad,
+	}
+	if pem := optString(o, "privateKeyPEM"); pem != "" {
+		decOpts.PrivateKey = []byte(pem)
+	}
+	res, err := vaultpack.Decrypt(decOpts)
 	if err != nil {
 		return jsError(err.Error())
 	}

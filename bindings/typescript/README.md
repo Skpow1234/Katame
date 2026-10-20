@@ -74,16 +74,15 @@ same as the C-shared and Python wrappers:
 Every call returns either `{ok: true, ...}` on success or
 `{ok: false, error: "..."}` on failure.
 
-## Supported modes (v0.1)
+## Supported modes (v1.0)
 
 - Symmetric key (auto-generated or supplied).
 - Password-based (argon2id / scrypt / pbkdf2-sha256).
+- Hybrid recipients, KMS wrap, compression, Shamir split (see `ProtectOptions` / `DecryptOptions` in `vaultpack.d.ts`).
 - Detached signatures (ed25519 / ecdsa / rsa-pss / ml-dsa / slh-dsa).
 - Bundle inspection.
 
-Hybrid (recipient-based) encryption, KMS wrapping, key splitting,
-compression, and Sigstore transparency uploads currently require the
-`vaultpack` CLI; they will be added in a future minor release.
+Sigstore transparency uploads remain CLI-oriented for now.
 
 ## License
 

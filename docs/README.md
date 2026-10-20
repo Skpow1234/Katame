@@ -20,5 +20,6 @@
 | [Plugins](plugins.md) | Custom KEM / sign plugins |
 | [Recipes](recipes.md) | Common workflows |
 | [Deployment](deployment.md) | Binaries, Docker, sidecar, packages |
-| [Milestones](milestones.md) | Feature milestones tracked in code |
+| [Milestones](milestones.md) | Completed milestones |
+| [Milestone backlog](milestones_backlog.md) | M31+ improvement backlog (500+) |
 | [Development](development.md) | Build, test, lint, project layout |

@@ -1,6 +1,6 @@
 # Key-source URIs
 
-Load symmetric and signing keys from URI-style sources. This is the stable abstraction for future HSM / keychain backends.
+Load symmetric and signing keys from URI-style sources (`--key-source`, `--signing-key-source`).
 
 ```bash
 export VPACK_DATA_KEY="b64:$(base64 -w0 secret.key.raw)"
@@ -13,7 +13,7 @@ export VPACK_SIGNING_KEY="$(cat signing.key)"
 vaultpack sign --in secret.vpack --signing-key-source env://VPACK_SIGNING_KEY
 ```
 
-## Supported today
+## Portable schemes
 
 | Scheme | Purpose |
 | ------ | ------- |
@@ -21,15 +21,19 @@ vaultpack sign --in secret.vpack --signing-key-source env://VPACK_SIGNING_KEY
 | `env://` | Environment variable |
 | `b64://` | Inline base64 key material |
 
-## Reserved (not implemented)
+## Platform / HSM schemes (M28)
 
-These return a clear “not available in this build” error:
+| Scheme | Platform | Behavior |
+| ------ | -------- | -------- |
+| `dpapi://path` or `dpapi://b64:…` | **Windows** | DPAPI unprotect → VaultPack key / PEM |
+| `keychain://SERVICE/ACCOUNT` | **macOS** | `security find-generic-password -w` |
+| `pkcs11://label` | All (shim) | Reads `$VAULTPACK_PKCS11_DIR/<label>.key` or `.pem` |
+| `piv://slot` | All (shim) | Reads `$VAULTPACK_PIV_DIR/<slot>.pem` (signing); not for symmetric DEKs |
 
-| Scheme | Planned backend |
-| ------ | --------------- |
-| `pkcs11://` | PKCS#11 HSM |
-| `piv://` | PIV / YubiKey |
-| `keychain://` | macOS Keychain / Secret Service |
-| `dpapi://` | Windows DPAPI |
+`vaultpack doctor` reports which schemes are `on`/`off` for this binary.
 
-`vaultpack doctor` reports which schemes are available.
+Native SoftHSM / YubiKey PIV CGO bindings remain on the [backlog](milestones_backlog.md); the URI surface and file-backed shims are stable for CI and integration today.
+
+### Windows DPAPI helper
+
+Use `keysource.ProtectDPAPI` (Go) to create blobs, then store them and reference with `dpapi://path/to/blob`.

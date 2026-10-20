@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 
+	"github.com/Skpow1234/Vaultpack/internal/keysource"
 	"github.com/Skpow1234/Vaultpack/internal/kms"
 	"github.com/spf13/cobra"
 )
@@ -59,8 +61,20 @@ func runDoctorChecks() []doctorCheck {
 	}
 	checks = append(checks,
 		doctorCheck{Name: "key-source portable", OK: true, Details: "file:// env:// b64://"},
-		doctorCheck{Name: "hsm/keychain backends", OK: true, Details: "pkcs11:// piv:// keychain:// dpapi:// reserved; platform builds required"},
 	)
+	var parts []string
+	for _, s := range keysource.PlatformSchemes() {
+		status := "off"
+		if s.Implemented {
+			status = "on"
+		}
+		parts = append(parts, fmt.Sprintf("%s://=%s", s.Scheme, status))
+	}
+	checks = append(checks, doctorCheck{
+		Name:    "hsm/keychain backends",
+		OK:      true,
+		Details: strings.Join(parts, " "),
+	})
 	return checks
 }
 

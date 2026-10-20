@@ -2,7 +2,7 @@
 
 Policy is resolved: `--policy <path>` → `VAULTPACK_POLICY` → `policy_file:` in `.vpack.yaml`. With no policy configured, operations run unrestricted.
 
-**Note:** If the CLI fails to *load* a configured policy file, it currently logs an error and continues **without** enforcement (fail-open). `vaultpack serve` fails closed on a bad policy file. Prefer validating with `vaultpack policy validate` before deploying.
+**Fail-closed:** If `--policy` / `VAULTPACK_POLICY` / `policy_file` is set and the file cannot be loaded, the CLI aborts (same as `vaultpack serve`). Validate with `vaultpack policy validate` before deploying.
 
 ## YAML example
 

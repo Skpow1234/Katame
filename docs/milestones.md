@@ -1,41 +1,35 @@
 # Milestones
 
-VaultPack grew as numbered milestones. Markers appear in CLI registration, package comments, and manifest fields. There is no separate `ROADMAP.md`; this page reconstructs the map from the codebase.
+VaultPack grew as numbered milestones. Markers appear in CLI registration, package comments, and manifest fields.
 
-## Explicitly tagged in code
+## Completed (tagged in code)
 
-| ID | Feature | Evidence |
-| -- | ------- | -------- |
-| **M16** | Config file + profiles (`--config`, `--profile`) | `internal/cli/root.go` |
-| **M19** | Plugin system (subprocess KEM/sign) | `examples/plugin-dummy-kem`, `internal/plugin` |
-| **M22** | Key rotation & rewrap (`rewrap`, `rotate-key`, add/remove recipient); `rotated_from` | `internal/cli/root.go`, `bundle.RotationEntry` |
-| **M23** | Policy / RBAC (YAML/JSON/Rego) | `internal/cli/root.go`, `internal/policy` |
-| **M24** | Sigstore Rekor transparency entries on manifests | `bundle.TransparencyEntry` comment |
-| **M26** | Service mode (`vaultpack serve`) | `internal/cli/root.go`, `internal/serve` |
-| **M27** | Tamper-evident repo (`vaultpack repo`) | `internal/cli/root.go`, `internal/repo` |
-| **M30** | Shell completions | `internal/cli/root.go` |
+| ID | Feature | Status |
+| -- | ------- | ------ |
+| **M16** | Config file + profiles | Done |
+| **M19** | Plugin system | Done |
+| **M22** | Key rotation & rewrap | Done |
+| **M23** | Policy / RBAC | Done (CLI now **fail-closed** on load error) |
+| **M24** | Sigstore Rekor transparency | Done |
+| **M26** | Service mode (`vaultpack serve`) | Done (`/metrics` auth by default; `--metrics-public` opt-out) |
+| **M27** | Tamper-evident repo | Done |
+| **M28** | Key-source URIs | Done — portable + **dpapi://** (Windows), **keychain://** (macOS), **pkcs11://** / **piv://** file shims |
+| **M30** | Shell completions | Done |
 
-## Earlier capability layers (inferred)
+## Earlier layers (inferred, unnumbered historically)
 
-Not all early work is labeled `M*`, but the tree and commit history reflect roughly this order:
+Core CLI, streaming AEAD, integrity/audit, PQ crypto, cloud+KMS, batch/parallel, SDK/bindings, doctor/menu, hash-chained audit/`report`.
 
-| Area | What shipped |
-| ---- | ------------ |
-| Core CLI | `protect` / `decrypt` / `inspect` / `hash` / `keygen` / `sign` / `verify` |
-| Streaming crypto | Chunked AEAD, multiple ciphers, KDFs, Shamir |
-| Integrity | `verify-integrity`, audit log, attest, Merkle seal |
-| PQ / advanced crypto | ML-KEM, ML-DSA, SLH-DSA, Ed448, AES-GCM-SIV |
-| Cloud + KMS | AWS/GCP/Azure KMS wrap; `az://` `s3://` `gs://` HTTPS I/O |
-| Diff / batch / parallel | `diff`, batch-*, parallel chunk workers |
-| SDK & bindings | `pkg/vaultpack`, C-shared, Python, WASM |
-| UX | `doctor`, `menu`, key-source URIs, hash-chained audit + `report` |
+## Just shipped (this pass)
 
-## Likely open / reserved work
+- **M28 complete:** platform key sources (`dpapi://`, `keychain://`, `pkcs11://` / `piv://` shims) — see `internal/keysource`
+- CLI policy **fail-closed** when a policy path is configured
+- Serve `/metrics` requires auth unless `--metrics-public`
+- C ABI / Python / WASM parity for hybrid, KMS, compress, Shamir, `vp_rewrap`
+- Dockerfile Go builder image aligned to **1.25**
 
-| Item | Status |
-| ---- | ------ |
-| HSM key sources (`pkcs11://`, `piv://`, `keychain://`, `dpapi://`) | Reserved URI schemes; not implemented |
-| CLI policy fail-closed when policy path is set | Serve already fails closed; CLI still fail-open on load error |
-| Docs tree | Previously referenced but missing; restored under `docs/` |
+## Backlog (1000+)
 
-If you add a new milestone, tag it in `internal/cli/root.go` (or the owning package) and append a row here.
+See **[milestones_backlog.md](milestones_backlog.md)** for **M31–M1041** concrete improvement items from a full-repo code review (crypto, CLI, serve, policy, audit, repo, cloud, KMS, plugins, SDK/bindings, CI, security, UX, compliance, packaging, …).
+
+When completing an item, note it in the “Completed” table above and mark it done in the backlog.

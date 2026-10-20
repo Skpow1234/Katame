@@ -72,15 +72,17 @@ print(plaintext)
 Every call returns a `dict` (JSON-deserialized). On error a
 `vaultpack.VaultpackError` is raised with the underlying message.
 
-## Supported modes (v0.1)
+## Supported modes (v1.0)
 
 - Symmetric key file (auto-generated or supplied).
 - Password-based (argon2id / scrypt / pbkdf2-sha256).
-- Detached signatures (ed25519 / ecdsa-p256/p384 / rsa-pss / ml-dsa / slh-dsa).
+- Hybrid recipients (`recipients=[{"public_key_pem": "..."}]`).
+- KMS wrap (`kms_provider` / `kms_key_id`).
+- Compression and Shamir split (`compress`, `split_shares` / `split_threshold`).
+- Detached signatures (ed25519 / ecdsa / rsa-pss / ml-dsa / slh-dsa).
+- KMS rewrap via `rewrap(...)`.
 
-Hybrid (recipient-based) encryption, KMS wrapping, key splitting,
-compression, and transparency-log uploads currently require the
-`vaultpack` CLI; they will be added in a future minor release.
+Sigstore transparency uploads remain CLI-oriented for now.
 
 ## License
 

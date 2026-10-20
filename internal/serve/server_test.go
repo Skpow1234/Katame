@@ -360,6 +360,43 @@ func TestMetricsEndpoint(t *testing.T) {
 	}
 }
 
+func TestMetricsRequiresAuth(t *testing.T) {
+	token := "metrics-secret"
+	base, stop := startServer(t, serve.Options{AuthToken: token})
+	defer stop()
+
+	resp, err := http.Get(base + "/metrics")
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("unauthenticated /metrics: want 401, got %d", resp.StatusCode)
+	}
+
+	req, _ := http.NewRequest(http.MethodGet, base+"/metrics", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp2, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp2.Body.Close()
+	if resp2.StatusCode != http.StatusOK {
+		t.Fatalf("authenticated /metrics: want 200, got %d", resp2.StatusCode)
+	}
+
+	base2, stop2 := startServer(t, serve.Options{AuthToken: token, MetricsPublic: true})
+	defer stop2()
+	resp3, err := http.Get(base2 + "/metrics")
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp3.Body.Close()
+	if resp3.StatusCode != http.StatusOK {
+		t.Fatalf("MetricsPublic /metrics: want 200, got %d", resp3.StatusCode)
+	}
+}
+
 func TestKMSCache_HitsAndMisses(t *testing.T) {
 	cache := serve.NewKMSCache(0, 0) // never expire, unbounded
 	key := serve.CacheKey("aws", "alias/foo", []byte("wrapped-bytes"))

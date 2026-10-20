@@ -5,7 +5,7 @@ Base: `vaultpack serve`. All `/v1/*` replies use `{"ok": true|false, ...}`.
 | Method | Path | Auth | Purpose |
 | ------ | ---- | ---- | ------- |
 | `GET` | `/healthz` | no | Liveness |
-| `GET` | `/metrics` | no | Prometheus text exposition |
+| `GET` | `/metrics` | yes* | Prometheus text exposition (`*` public only with `--metrics-public`) |
 | `GET` | `/v1/version` | yes | SDK + API version |
 | `POST` | `/v1/protect` | yes | Encrypt → bundle |
 | `POST` | `/v1/decrypt` | yes | Decrypt bundle |
@@ -20,7 +20,7 @@ Machine-readable contract: [openapi.yaml](openapi.yaml).
 
 Send `Authorization: Bearer <token>` when using bearer auth, or present a client certificate for mTLS / OIDC JWT as configured.
 
-`/healthz` and `/metrics` skip auth by design — restrict network exposure or put metrics behind a sidecar proxy in production.
+`/healthz` always skips auth. `/metrics` requires the same auth as `/v1/*` unless you pass `--metrics-public` (legacy Prometheus scrape).
 
 ## curl round-trip
 

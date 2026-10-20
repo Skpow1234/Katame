@@ -38,15 +38,20 @@ type Options struct {
 	// a certificate signed by one of the CAs in this PEM bundle.
 	TLSClientCAFile string
 
-	// AuthToken, if non-empty, requires every request (except /healthz and
-	// /metrics) to carry `Authorization: Bearer <AuthToken>`. The
-	// comparison is constant-time.
+	// AuthToken, if non-empty, requires every request (except /healthz and,
+	// when MetricsPublic is set, /metrics) to carry `Authorization: Bearer
+	// <AuthToken>`. The comparison is constant-time.
 	AuthToken string
 
 	// AuthDisabled is an explicit opt-out for local development. If both
 	// AuthToken is empty AND TLSClientCAFile is empty, NewServer refuses
 	// to start unless this is set to true.
 	AuthDisabled bool
+
+	// MetricsPublic, when true, leaves GET /metrics unauthenticated (legacy
+	// Prometheus scrape). Default false: /metrics requires the same auth as
+	// /v1/* whenever authentication is configured.
+	MetricsPublic bool
 
 	// KMSCache configures the in-memory unwrap cache. Zero values mean
 	// "use sensible defaults": TTL=5m, MaxEntries=1024.
@@ -291,10 +296,13 @@ func (s *Server) maxBody(next http.Handler) http.Handler {
 
 func (s *Server) authGate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Health and metrics endpoints are always reachable; they expose
-		// no sensitive data and ops tooling depends on unauthenticated
-		// scraping.
-		if r.URL.Path == "/healthz" || r.URL.Path == "/metrics" {
+		// /healthz is always unauthenticated (liveness probes).
+		// /metrics requires auth unless MetricsPublic is set.
+		if r.URL.Path == "/healthz" {
+			next.ServeHTTP(w, r)
+			return
+		}
+		if r.URL.Path == "/metrics" && s.opts.MetricsPublic {
 			next.ServeHTTP(w, r)
 			return
 		}

@@ -37,6 +37,8 @@ The server refuses to start unless one of:
 
 Prefer `--auth-token-file` in containers so the secret is not on argv.
 
+`GET /metrics` requires auth whenever authentication is configured. Pass `--metrics-public` only if an unauthenticated Prometheus scraper must reach the port.
+
 ## Policy, audit, rate limits
 
 ```bash
