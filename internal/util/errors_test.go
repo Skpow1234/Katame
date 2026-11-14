@@ -13,6 +13,9 @@ func TestExitCodeForError(t *testing.T) {
 	}{
 		{"nil", nil, ExitSuccess},
 		{"verify failed", ErrVerifyFailed, ExitVerifyFailed},
+		{"bundles differ", ErrBundlesDiffer, ExitVerifyFailed},
+		{"policy denied", ErrPolicyDenied, ExitPolicyDenied},
+		{"wrapped policy", fmt.Errorf("context: %w", ErrPolicyDenied), ExitPolicyDenied},
 		{"decrypt failed", ErrDecryptFailed, ExitDecryptFailed},
 		{"key mismatch", ErrKeyMismatch, ExitDecryptFailed},
 		{"bundle corrupted", ErrBundleCorrupted, ExitDecryptFailed},

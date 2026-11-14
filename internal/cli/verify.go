@@ -71,9 +71,7 @@ func newVerifyCmd() *cobra.Command {
 
 			if br.Signature == nil {
 				auditLog(audit.OpVerify, inFile, "", "", "", false, "bundle is not signed")
-				printer.Error(util.ErrVerifyFailed, "bundle is not signed (no signature.sig)")
-				os.Exit(util.ExitVerifyFailed)
-				return nil
+				return fmt.Errorf("%w: bundle is not signed (no signature.sig)", util.ErrVerifyFailed)
 			}
 
 			// Determine signing algorithm: prefer manifest field, then load key to detect.
@@ -117,9 +115,7 @@ func newVerifyCmd() *cobra.Command {
 			}
 			if !valid {
 				auditLog(audit.OpVerify, inFile, "", "", "", false, "signature verification failed")
-				printer.Error(util.ErrVerifyFailed, "signature verification failed")
-				os.Exit(util.ExitVerifyFailed)
-				return nil
+				return fmt.Errorf("%w: signature verification failed", util.ErrVerifyFailed)
 			}
 
 			signedAt := ""

@@ -32,8 +32,15 @@ fuzz:
 	go test -fuzz=FuzzCanonicalManifest -fuzztime=30s ./internal/bundle
 	go test -fuzz=FuzzDecryptAESGCM -fuzztime=30s ./internal/crypto
 	go test -fuzz=FuzzEncryptDecryptRoundTrip -fuzztime=30s ./internal/crypto
+	go test -fuzz=FuzzDecryptChaCha20Poly1305 -fuzztime=30s ./internal/crypto
+	go test -fuzz=FuzzDecryptXChaCha20Poly1305 -fuzztime=30s ./internal/crypto
+	go test -fuzz=FuzzDecryptAES256GCMSIV -fuzztime=30s ./internal/crypto
 	go test -fuzz=FuzzStreamEncryptDecryptRoundTrip -fuzztime=30s ./internal/crypto
 	go test -fuzz=FuzzDecryptStreamCorrupted -fuzztime=30s ./internal/crypto
+	go test -fuzz=FuzzHybridX25519Decapsulate -fuzztime=30s ./internal/crypto
+	go test -fuzz=FuzzCombineSharesCorrupted -fuzztime=30s ./internal/crypto
+	go test -fuzz=FuzzDeriveKeyWeakParams -fuzztime=30s ./internal/crypto
+	go test -fuzz=FuzzMLDSA65Verify -fuzztime=30s ./internal/crypto
 
 ## fmt: Format code with gofumpt (falls back to gofmt)
 fmt:

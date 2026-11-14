@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/user"
@@ -9,12 +8,11 @@ import (
 	"github.com/Skpow1234/Katame/internal/audit"
 	"github.com/Skpow1234/Katame/internal/bundle"
 	"github.com/Skpow1234/Katame/internal/policy"
+	"github.com/Skpow1234/Katame/internal/util"
 )
 
-// ErrPolicyDenied is returned by enforcePolicy when the active policy rejects
-// the requested operation. CLI commands surface it directly so the user sees
-// the policy's reason verbatim.
-var ErrPolicyDenied = errors.New("policy denied")
+// ErrPolicyDenied aliases util.ErrPolicyDenied for CLI call sites.
+var ErrPolicyDenied = util.ErrPolicyDenied
 
 // enforcePolicy consults the global policy (if any) before an operation runs.
 // If the policy denies the action, an audit entry is written and an error is

@@ -31,9 +31,7 @@ func newHashCmd() *cobra.Command {
 				return fmt.Errorf("--in and --stdin are mutually exclusive")
 			}
 			if !crypto.SupportedHashAlgo(algo) {
-				printer.Error(util.ErrUnsupportedAlgorithm, fmt.Sprintf("algorithm %q is not supported", algo))
-				os.Exit(util.ExitUnsupportedVersion)
-				return nil
+				return fmt.Errorf("%w: algorithm %q is not supported", util.ErrUnsupportedAlgorithm, algo)
 			}
 
 			var (

@@ -110,6 +110,23 @@ func TestAuthFailure(t *testing.T) {
 	}
 }
 
+func TestOpenErrorsNotPanic(t *testing.T) {
+	key := make([]byte, 32)
+	aead, err := New(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	nonce := make([]byte, NonceSize)
+	ct := aead.Seal(nil, nonce, []byte("msg"), nil)
+
+	if _, err := aead.Open(nil, []byte("bad"), ct, nil); err != ErrIncorrectNonceSize {
+		t.Fatalf("wrong nonce: got %v, want %v", err, ErrIncorrectNonceSize)
+	}
+	if _, err := aead.Open(nil, nonce, []byte{1, 2, 3}, nil); err != ErrOpen {
+		t.Fatalf("short ct: got %v, want %v", err, ErrOpen)
+	}
+}
+
 func TestNonceMisuseResistance(t *testing.T) {
 	key := make([]byte, 32)
 	rand.Read(key)

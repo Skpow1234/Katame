@@ -34,8 +34,9 @@ func EncryptStreamParallel(r io.Reader, w io.Writer, key, aad []byte, chunkSize 
 	if err != nil {
 		return nil, fmt.Errorf("create aead: %w", err)
 	}
-	if chunkSize <= 0 {
-		chunkSize = DefaultChunkSize
+	chunkSize, err = normalizeChunkSize(chunkSize)
+	if err != nil {
+		return nil, err
 	}
 
 	baseNonce, err := GenerateNonce(probe.NonceSize())

@@ -12,12 +12,25 @@ const (
 	// DefaultChunkSize is the default plaintext chunk size for streaming encryption (64 KB).
 	// Good balance for small and large files; configurable via config chunk_size.
 	DefaultChunkSize = 64 * 1024
-	// MaxChunkSizeRecommended is the recommended maximum chunk size (1 MiB).
-	// Larger chunks use more memory per chunk; there is no hard limit (chunk index is uint64).
+	// MaxChunkSizeRecommended is the hard maximum chunk size (1 MiB).
+	// EncryptStream / DecryptStream reject larger values (M43).
 	MaxChunkSizeRecommended = 1024 * 1024
+	// MaxChunkSize is an alias for MaxChunkSizeRecommended.
+	MaxChunkSize = MaxChunkSizeRecommended
 	// lastChunkFlag is set on bit 63 of the counter for the final chunk to prevent truncation.
 	lastChunkFlag = uint64(1) << 63
 )
+
+// normalizeChunkSize applies the default and enforces MaxChunkSize.
+func normalizeChunkSize(chunkSize int) (int, error) {
+	if chunkSize <= 0 {
+		chunkSize = DefaultChunkSize
+	}
+	if chunkSize > MaxChunkSize {
+		return 0, fmt.Errorf("chunk size %d exceeds maximum %d", chunkSize, MaxChunkSize)
+	}
+	return chunkSize, nil
+}
 
 // Streaming and memory: EncryptStream and DecryptStream process one chunk at a time and use
 // O(chunkSize) memory (one plaintext chunk buffer, one ciphertext chunk buffer). The full file
@@ -47,8 +60,9 @@ func EncryptStream(r io.Reader, w io.Writer, key, aad []byte, chunkSize int, cip
 		return nil, fmt.Errorf("create aead: %w", err)
 	}
 
-	if chunkSize <= 0 {
-		chunkSize = DefaultChunkSize
+	chunkSize, err = normalizeChunkSize(chunkSize)
+	if err != nil {
+		return nil, err
 	}
 
 	baseNonce, err := GenerateNonce(aead.NonceSize())
@@ -142,8 +156,9 @@ func DecryptStream(r io.Reader, w io.Writer, key, baseNonce, aad []byte, chunkSi
 	if len(baseNonce) != aead.NonceSize() {
 		return fmt.Errorf("%w: got %d bytes, want %d", util.ErrInvalidNonceLength, len(baseNonce), aead.NonceSize())
 	}
-	if chunkSize <= 0 {
-		chunkSize = DefaultChunkSize
+	chunkSize, err = normalizeChunkSize(chunkSize)
+	if err != nil {
+		return err
 	}
 
 	tagSize := aead.Overhead()

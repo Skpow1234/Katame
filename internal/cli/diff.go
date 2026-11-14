@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/Skpow1234/Katame/internal/bundle"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -100,7 +101,7 @@ func newDiffCmd() *cobra.Command {
 			}
 
 			if len(diffs) > 0 {
-				os.Exit(10)
+				return fmt.Errorf("%w: %d field(s) differ", util.ErrBundlesDiffer, len(diffs))
 			}
 			return nil
 		},

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Skpow1234/Katame/internal/audit"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -45,7 +46,7 @@ func newAuditVerifyCmd() *cobra.Command {
 			}
 			if !res.OK {
 				printer.Human("FAIL entries=%d bad_line=%d reason=%s", res.Entries, res.BadLine, res.Reason)
-				os.Exit(1)
+				return fmt.Errorf("%w: audit log verification failed at line %d: %s", util.ErrVerifyFailed, res.BadLine, res.Reason)
 			}
 			printer.Human("OK entries=%d last_hash=%s", res.Entries, res.LastHash)
 			return nil

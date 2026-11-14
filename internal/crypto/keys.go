@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"crypto/sha256"
+	"crypto/subtle"
 	"fmt"
 	"os"
 	"strings"
@@ -50,4 +51,23 @@ func LoadKeyFile(path string) ([]byte, error) {
 func KeyFingerprint(key []byte) (algo string, digestB64 string) {
 	h := sha256.Sum256(key)
 	return "sha256", util.B64Encode(h[:])
+}
+
+// KeyEqual reports whether two key byte slices are equal using a
+// constant-time comparison. Slices of unequal length compare as not equal
+// without leaking which bytes differ.
+func KeyEqual(a, b []byte) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	return subtle.ConstantTimeCompare(a, b) == 1
+}
+
+// FingerprintEqual reports whether two fingerprint digests (raw hash bytes)
+// are equal using a constant-time comparison.
+func FingerprintEqual(a, b []byte) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	return subtle.ConstantTimeCompare(a, b) == 1
 }

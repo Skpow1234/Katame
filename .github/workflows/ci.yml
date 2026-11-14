@@ -173,9 +173,23 @@ jobs:
             package: ./internal/crypto
           - target: FuzzEncryptDecryptRoundTrip
             package: ./internal/crypto
+          - target: FuzzDecryptChaCha20Poly1305
+            package: ./internal/crypto
+          - target: FuzzDecryptXChaCha20Poly1305
+            package: ./internal/crypto
+          - target: FuzzDecryptAES256GCMSIV
+            package: ./internal/crypto
           - target: FuzzStreamEncryptDecryptRoundTrip
             package: ./internal/crypto
           - target: FuzzDecryptStreamCorrupted
+            package: ./internal/crypto
+          - target: FuzzHybridX25519Decapsulate
+            package: ./internal/crypto
+          - target: FuzzCombineSharesCorrupted
+            package: ./internal/crypto
+          - target: FuzzDeriveKeyWeakParams
+            package: ./internal/crypto
+          - target: FuzzMLDSA65Verify
             package: ./internal/crypto
 
     steps:

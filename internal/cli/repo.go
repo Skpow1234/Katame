@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Skpow1234/Katame/internal/repo"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -226,7 +227,7 @@ func newRepoVerifyCmd() *cobra.Command {
 				printer.Human("FAIL  bad_entry=%d  reason=%s", res.BadEntryIndex, res.Reason)
 			}
 			if !res.OK {
-				os.Exit(1)
+				return fmt.Errorf("%w: bad_entry=%d reason=%s", util.ErrVerifyFailed, res.BadEntryIndex, res.Reason)
 			}
 			return nil
 		},

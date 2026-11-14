@@ -1,6 +1,7 @@
 package crypto
 
 import (
+	"crypto/sha256"
 	"os"
 	"path/filepath"
 	"testing"
@@ -73,5 +74,39 @@ func TestKeyFingerprint(t *testing.T) {
 	algo2, digest2 := KeyFingerprint(key)
 	if algo != algo2 || digest != digest2 {
 		t.Error("fingerprint is not deterministic")
+	}
+}
+
+func TestKeyEqualAndFingerprintEqual(t *testing.T) {
+	a := []byte{1, 2, 3, 4}
+	b := []byte{1, 2, 3, 4}
+	c := []byte{1, 2, 3, 5}
+	if !KeyEqual(a, b) {
+		t.Error("equal keys compared unequal")
+	}
+	if KeyEqual(a, c) {
+		t.Error("unequal keys compared equal")
+	}
+	if KeyEqual(a, a[:3]) {
+		t.Error("different lengths compared equal")
+	}
+	ha := sha256.Sum256(a)
+	hb := sha256.Sum256(b)
+	hc := sha256.Sum256(c)
+	if !FingerprintEqual(ha[:], hb[:]) {
+		t.Error("equal fingerprints compared unequal")
+	}
+	if FingerprintEqual(ha[:], hc[:]) {
+		t.Error("unequal fingerprints compared equal")
+	}
+}
+
+func TestZeroize(t *testing.T) {
+	b := []byte{1, 2, 3, 4}
+	Zeroize(b)
+	for i, v := range b {
+		if v != 0 {
+			t.Fatalf("byte %d not zeroed: %d", i, v)
+		}
 	}
 }

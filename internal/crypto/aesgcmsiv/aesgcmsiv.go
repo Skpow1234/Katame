@@ -42,6 +42,19 @@ var (
 
 	// ErrInvalidKeySize is returned when the key is not 16 or 32 bytes.
 	ErrInvalidKeySize = errors.New("aesgcmsiv: invalid key size, must be 16 or 32 bytes")
+
+	// ErrIncorrectNonceSize is returned by Open (and used as Seal's panic value)
+	// when the nonce length is not NonceSize.
+	ErrIncorrectNonceSize = errors.New("aesgcmsiv: incorrect nonce length")
+
+	// ErrPlaintextTooLarge is returned when plaintext exceeds MaxPlaintextSize.
+	ErrPlaintextTooLarge = errors.New("aesgcmsiv: plaintext too large")
+
+	// ErrCiphertextTooLarge is returned when ciphertext exceeds MaxPlaintextSize+TagSize.
+	ErrCiphertextTooLarge = errors.New("aesgcmsiv: ciphertext too large")
+
+	// ErrAdditionalDataTooLarge is returned when AAD exceeds MaxAdditionalDataSize.
+	ErrAdditionalDataTooLarge = errors.New("aesgcmsiv: additional data too large")
 )
 
 // AEAD represents an AES-GCM-SIV cipher implementing cipher.AEAD.
@@ -80,14 +93,15 @@ func (a *AEAD) Overhead() int {
 // Seal encrypts and authenticates plaintext, authenticates the
 // additional data and appends the result to dst, returning the updated slice.
 func (a *AEAD) Seal(dst, nonce, plaintext, additionalData []byte) []byte {
+	// cipher.AEAD.Seal has no error return; panic on invalid inputs (same as stdlib GCM).
 	if len(nonce) != NonceSize {
-		panic("aesgcmsiv: incorrect nonce length")
+		panic(ErrIncorrectNonceSize)
 	}
 	if uint64(len(plaintext)) > MaxPlaintextSize {
-		panic("aesgcmsiv: plaintext too large")
+		panic(ErrPlaintextTooLarge)
 	}
 	if uint64(len(additionalData)) > MaxAdditionalDataSize {
-		panic("aesgcmsiv: additional data too large")
+		panic(ErrAdditionalDataTooLarge)
 	}
 
 	authKey, encKey := a.deriveKeys(nonce)
@@ -104,17 +118,18 @@ func (a *AEAD) Seal(dst, nonce, plaintext, additionalData []byte) []byte {
 // additional data and, if successful, appends the resulting plaintext
 // to dst, returning the updated slice.
 func (a *AEAD) Open(dst, nonce, ciphertext, additionalData []byte) ([]byte, error) {
+	// Prefer errors over panics for Open size checks (M34).
 	if len(nonce) != NonceSize {
-		panic("aesgcmsiv: incorrect nonce length")
+		return nil, ErrIncorrectNonceSize
 	}
 	if len(ciphertext) < TagSize {
 		return nil, ErrOpen
 	}
 	if uint64(len(ciphertext)) > MaxPlaintextSize+TagSize {
-		panic("aesgcmsiv: ciphertext too large")
+		return nil, ErrCiphertextTooLarge
 	}
 	if uint64(len(additionalData)) > MaxAdditionalDataSize {
-		panic("aesgcmsiv: additional data too large")
+		return nil, ErrAdditionalDataTooLarge
 	}
 
 	tag := ciphertext[len(ciphertext)-TagSize:]

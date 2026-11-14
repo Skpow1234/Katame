@@ -26,7 +26,8 @@ Core CLI, streaming AEAD, integrity/audit, PQ crypto, cloud+KMS, batch/parallel,
 - CLI policy **fail-closed** when a policy path is configured
 - Serve `/metrics` requires auth unless `--metrics-public`
 - C ABI / Python / WASM parity for hybrid, KMS, compress, Shamir, `kt_rewrap`
-- Dockerfile Go builder image aligned to **1.25**
+- **M31–M48:** crypto fuzz coverage (ChaCha/XChaCha/GCM-SIV/hybrid/PQ/SSS/KDF), aesgcmsiv `Open` errors, hard chunk-size cap, truncation/reorder tests, `Zeroize` / CT fingerprint helpers
+- **M73–M80:** CLI commands return errors instead of `os.Exit`; `Execute` maps sentinels (`ExitPolicyDenied=13`, `ErrBundlesDiffer`→10)
 
 ## Backlog (1000+)
 

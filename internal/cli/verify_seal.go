@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/Skpow1234/Katame/internal/audit"
 	"github.com/Skpow1234/Katame/internal/util"
@@ -37,9 +36,7 @@ func newVerifySealCmd() *cobra.Command {
 			auditLog(audit.OpVerifySeal, dir, "", root, "", ok, "")
 
 			if !ok {
-				printer.Error(util.ErrVerifyFailed, "Merkle root mismatch: directory was modified since seal")
-				os.Exit(util.ExitVerifyFailed)
-				return nil
+				return fmt.Errorf("%w: Merkle root mismatch: directory was modified since seal", util.ErrVerifyFailed)
 			}
 
 			switch printer.Mode {

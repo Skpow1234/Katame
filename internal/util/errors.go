@@ -10,6 +10,7 @@ const (
 	ExitVerifyFailed       = 10
 	ExitDecryptFailed      = 11
 	ExitUnsupportedVersion = 12
+	ExitPolicyDenied       = 13
 )
 
 // Sentinel errors used across the application.
@@ -24,6 +25,8 @@ var (
 	ErrManifestInvalid      = errors.New("invalid manifest")
 	ErrBundleCorrupted      = errors.New("bundle is corrupted or incomplete")
 	ErrKeyMismatch          = errors.New("key fingerprint does not match manifest")
+	ErrPolicyDenied         = errors.New("policy denied")
+	ErrBundlesDiffer        = errors.New("bundles differ")
 )
 
 // ExitCodeForError maps a sentinel error to its CLI exit code.
@@ -31,7 +34,9 @@ func ExitCodeForError(err error) int {
 	switch {
 	case err == nil:
 		return ExitSuccess
-	case errors.Is(err, ErrVerifyFailed):
+	case errors.Is(err, ErrPolicyDenied):
+		return ExitPolicyDenied
+	case errors.Is(err, ErrVerifyFailed), errors.Is(err, ErrBundlesDiffer):
 		return ExitVerifyFailed
 	case errors.Is(err, ErrDecryptFailed), errors.Is(err, ErrKeyMismatch), errors.Is(err, ErrBundleCorrupted):
 		return ExitDecryptFailed

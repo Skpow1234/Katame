@@ -194,9 +194,7 @@ func newDecryptCmd() *cobra.Command {
 						if decapErr != nil {
 							msg = fmt.Sprintf("multi-recipient decapsulation failed: %v", decapErr)
 						}
-						printer.Error(util.ErrDecryptFailed, msg)
-						os.Exit(util.ExitDecryptFailed)
-						return nil
+						return fmt.Errorf("%w: %s", util.ErrDecryptFailed, msg)
 					}
 				} else {
 					// Single-recipient.
@@ -219,9 +217,7 @@ func newDecryptCmd() *cobra.Command {
 						key, err = crypto.HybridDecapsulate(h.Scheme, privKeyFile, ephPub, wrappedDEK)
 					}
 					if err != nil {
-						printer.Error(util.ErrDecryptFailed, fmt.Sprintf("hybrid decapsulation failed: %v", err))
-						os.Exit(util.ExitDecryptFailed)
-						return nil
+						return fmt.Errorf("%w: hybrid decapsulation failed: %v", util.ErrDecryptFailed, err)
 					}
 				}
 			} else if useKMS {
@@ -235,9 +231,7 @@ func newDecryptCmd() *cobra.Command {
 				}
 				key, err = provider.UnwrapDEK(wrapped, br.Manifest.Encryption.KmsKeyID)
 				if err != nil {
-					printer.Error(util.ErrDecryptFailed, fmt.Sprintf("KMS unwrap failed: %v", err))
-					os.Exit(util.ExitDecryptFailed)
-					return nil
+					return fmt.Errorf("%w: KMS unwrap failed: %v", util.ErrDecryptFailed, err)
 				}
 			} else if usePassword {
 				if !bundleUsesKDF {
@@ -279,12 +273,9 @@ func newDecryptCmd() *cobra.Command {
 			_, keyDigest := crypto.KeyFingerprint(key)
 			if keyDigest != br.Manifest.Encryption.KeyID.DigestB64 {
 				if usePassword {
-					printer.Error(util.ErrDecryptFailed, "wrong password (key fingerprint mismatch)")
-				} else {
-					printer.Error(util.ErrKeyMismatch, "key fingerprint does not match manifest")
+					return fmt.Errorf("%w: wrong password (key fingerprint mismatch)", util.ErrDecryptFailed)
 				}
-				os.Exit(util.ExitDecryptFailed)
-				return nil
+				return fmt.Errorf("%w: key fingerprint does not match manifest", util.ErrKeyMismatch)
 			}
 
 			// Decode AAD if present in manifest, or use CLI flag.
@@ -329,9 +320,7 @@ func newDecryptCmd() *cobra.Command {
 					)
 				}
 				if err != nil {
-					printer.Error(err, "decryption failed")
-					os.Exit(util.ExitDecryptFailed)
-					return nil
+					return fmt.Errorf("%w: %v", util.ErrDecryptFailed, err)
 				}
 				plaintext = plaintextBuf.Bytes()
 			} else {
@@ -347,9 +336,7 @@ func newDecryptCmd() *cobra.Command {
 
 				plaintext, err = crypto.DecryptAEAD(cipherName, br.Ciphertext, key, nonce, tag, aad)
 				if err != nil {
-					printer.Error(err, "decryption failed")
-					os.Exit(util.ExitDecryptFailed)
-					return nil
+					return fmt.Errorf("%w: %v", util.ErrDecryptFailed, err)
 				}
 			}
 

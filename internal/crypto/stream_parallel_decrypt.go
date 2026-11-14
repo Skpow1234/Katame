@@ -31,8 +31,9 @@ func DecryptStreamParallel(r io.Reader, w io.Writer, key, baseNonce, aad []byte,
 	if len(baseNonce) != probe.NonceSize() {
 		return fmt.Errorf("%w: got %d bytes, want %d", util.ErrInvalidNonceLength, len(baseNonce), probe.NonceSize())
 	}
-	if chunkSize <= 0 {
-		chunkSize = DefaultChunkSize
+	chunkSize, err = normalizeChunkSize(chunkSize)
+	if err != nil {
+		return err
 	}
 	tagSize := probe.Overhead()
 	encChunkSize := chunkSize + tagSize

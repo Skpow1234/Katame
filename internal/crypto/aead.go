@@ -85,8 +85,8 @@ func DecryptAEAD(cipherName string, ciphertext, key, nonce, tag, aad []byte) ([]
 
 	// Open expects ciphertext with tag appended.
 	sealed := append(ciphertext, tag...)
-
 	plaintext, err := aead.Open(nil, nonce, sealed, aad)
+	Zeroize(sealed)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", util.ErrDecryptFailed, err)
 	}

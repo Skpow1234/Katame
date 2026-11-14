@@ -7,6 +7,7 @@ import (
 	"github.com/Skpow1234/Katame/internal/config"
 	"github.com/Skpow1234/Katame/internal/plugin"
 	"github.com/Skpow1234/Katame/internal/policy"
+	"github.com/Skpow1234/Katame/internal/util"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
@@ -156,10 +157,11 @@ func NewRootCmd() *cobra.Command {
 	return root
 }
 
-// Execute runs the root command and exits with the correct code.
+// Execute runs the root command and exits with the mapped sentinel exit code.
 func Execute() {
 	cmd := NewRootCmd()
 	if err := cmd.Execute(); err != nil {
-		os.Exit(1)
+		fmt.Fprintln(os.Stderr, "Error:", err.Error())
+		os.Exit(util.ExitCodeForError(err))
 	}
 }

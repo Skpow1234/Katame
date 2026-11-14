@@ -6,24 +6,24 @@ see [milestones.md](milestones.md).
 
 | ID | Milestone |
 | -- | --------- |
-| **M31** | Add fuzz for ChaCha20-Poly1305 decrypt/round-trip |
-| **M32** | Add fuzz for XChaCha20-Poly1305 decrypt/round-trip |
-| **M33** | Add fuzz for AES-256-GCM-SIV seal/open |
-| **M34** | Replace panic with errors in aesgcmsiv size checks |
-| **M35** | Add fuzz for hybrid encapsulate/decapsulate (X25519) |
-| **M36** | Add fuzz for hybrid ECIES-P256 |
-| **M37** | Add fuzz for hybrid RSA-OAEP |
-| **M38** | Add fuzz for ML-KEM encapsulate/decapsulate |
-| **M39** | Add fuzz for ML-DSA sign/verify |
-| **M40** | Add fuzz for SLH-DSA sign/verify |
-| **M41** | Add fuzz for Shamir corrupt-share rejection |
-| **M42** | Add fuzz for KDF weak-param rejection |
-| **M43** | Enforce MaxChunkSizeRecommended as hard cap |
-| **M44** | Property-test last-chunk truncation for all ciphers |
-| **M45** | Add reorder/duplicate chunk attack tests |
-| **M46** | Race-test parallel stream encrypt/decrypt at high workers |
-| **M47** | Zeroize DEK slices after AEAD use |
-| **M48** | Constant-time key fingerprint compare helper |
+| **M31** | Add fuzz for ChaCha20-Poly1305 decrypt/round-trip — **done** |
+| **M32** | Add fuzz for XChaCha20-Poly1305 decrypt/round-trip — **done** |
+| **M33** | Add fuzz for AES-256-GCM-SIV seal/open — **done** |
+| **M34** | Replace panic with errors in aesgcmsiv size checks — **done** (`Open` returns errors; `Seal` keeps AEAD panics) |
+| **M35** | Add fuzz for hybrid encapsulate/decapsulate (X25519) — **done** |
+| **M36** | Add fuzz for hybrid ECIES-P256 — **done** |
+| **M37** | Add fuzz for hybrid RSA-OAEP — **done** |
+| **M38** | Add fuzz for ML-KEM encapsulate/decapsulate — **done** |
+| **M39** | Add fuzz for ML-DSA sign/verify — **done** |
+| **M40** | Add fuzz for SLH-DSA sign/verify — **done** |
+| **M41** | Add fuzz for Shamir corrupt-share rejection — **done** |
+| **M42** | Add fuzz for KDF weak-param rejection — **done** |
+| **M43** | Enforce MaxChunkSizeRecommended as hard cap — **done** |
+| **M44** | Property-test last-chunk truncation for all ciphers — **done** |
+| **M45** | Add reorder/duplicate chunk attack tests — **done** |
+| **M46** | Race-test parallel stream encrypt/decrypt at high workers — **done** |
+| **M47** | Zeroize DEK slices after AEAD use — **done** (`Zeroize` helper + sealed buffer wipe) |
+| **M48** | Constant-time key fingerprint compare helper — **done** (`KeyEqual` / `FingerprintEqual`) |
 | **M49** | Document nonce derivation for 12B vs 24B nonces |
 | **M50** | Bench ML-KEM encapsulate |
 | **M51** | Bench ML-DSA sign |
@@ -48,14 +48,14 @@ see [milestones.md](milestones.md).
 | **M70** | Optional encrypted metadata without full decrypt |
 | **M71** | Validate provenance.json in bundle.Validate |
 | **M72** | Format capability bits for forward-compat fail-closed |
-| **M73** | Stop os.Exit in decrypt; return errors |
-| **M74** | Stop os.Exit in verify; return errors |
-| **M75** | Stop os.Exit in hash; return errors |
-| **M76** | Stop os.Exit in verify-integrity; return errors |
-| **M77** | Stop os.Exit in diff; return errors |
-| **M78** | Stop os.Exit in repo CLI; return errors |
-| **M79** | Stop os.Exit in audit export; return errors |
-| **M80** | Dedicated exit code for ErrPolicyDenied |
+| **M73** | Stop os.Exit in decrypt; return errors — **done** |
+| **M74** | Stop os.Exit in verify; return errors — **done** |
+| **M75** | Stop os.Exit in hash; return errors — **done** |
+| **M76** | Stop os.Exit in verify-integrity; return errors — **done** |
+| **M77** | Stop os.Exit in diff; return errors — **done** (`ErrBundlesDiffer`) |
+| **M78** | Stop os.Exit in repo CLI; return errors — **done** |
+| **M79** | Stop os.Exit in audit export; return errors — **done** |
+| **M80** | Dedicated exit code for ErrPolicyDenied — **done** (`ExitPolicyDenied=13`) |
 | **M81** | Thread config Cipher into protect defaults |
 | **M82** | Thread config ChunkSize into protect defaults |
 | **M83** | Thread config Recipients into protect defaults |
