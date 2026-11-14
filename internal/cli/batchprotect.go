@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/Skpow1234/Katame/internal/audit"
 	"github.com/Skpow1234/Katame/internal/bundle"
 	"github.com/Skpow1234/Katame/internal/cloud"
 	"github.com/Skpow1234/Katame/internal/crypto"
@@ -62,6 +63,9 @@ Example:
 			}
 			if compressAlgo != crypto.CompressNone && !crypto.SupportedCompression(compressAlgo) {
 				return fmt.Errorf("unsupported compression %q", compressAlgo)
+			}
+			if err := enforcePolicy(audit.OpBatchProtect, srcDir, nil); err != nil {
+				return err
 			}
 
 			// Remote source: download all objects under the prefix to a temp dir.
@@ -157,6 +161,9 @@ Example:
 
 			// Process function: encrypts one file.
 			protectOne := func(entry BatchFileEntry) error {
+				if err := enforcePolicy(audit.OpProtect, entry.InputPath, nil); err != nil {
+					return err
+				}
 				// Ensure output parent directory exists.
 				if err := ensureParentDir(entry.OutputPath); err != nil {
 					return fmt.Errorf("create output dir: %w", err)

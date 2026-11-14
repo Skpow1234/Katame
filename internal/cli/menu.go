@@ -37,6 +37,10 @@ func newMenuCmd() *cobra.Command {
 					huh.NewOption("Seal directory (Merkle root)", "seal"),
 					huh.NewOption("Verify seal", "verify-seal"),
 					huh.NewOption("Export audit log", "audit-export"),
+					huh.NewOption("Run doctor checks", "doctor"),
+					huh.NewOption("Policy validate / test / show", "policy"),
+					huh.NewOption("Repo init / add / list / verify", "repo"),
+					huh.NewOption("Start HTTP serve (print flags)", "serve"),
 					huh.NewOption("Exit", "exit"),
 				).
 				Value(&action).
@@ -80,6 +84,14 @@ func newMenuCmd() *cobra.Command {
 				return runVerifySealMenu()
 			case "audit-export":
 				return runAuditExportMenu()
+			case "doctor":
+				return runDoctorMenu()
+			case "policy":
+				return runPolicyMenu()
+			case "repo":
+				return runRepoMenu()
+			case "serve":
+				return runServeMenu()
 			case "exit":
 				fmt.Println("Goodbye.")
 				return nil
@@ -88,6 +100,108 @@ func newMenuCmd() *cobra.Command {
 		},
 	}
 	return cmd
+}
+
+func runDoctorMenu() error {
+	root := NewRootCmd()
+	root.SetArgs([]string{"doctor"})
+	return root.Execute()
+}
+
+func runPolicyMenu() error {
+	var (
+		action string
+		path   string
+	)
+	if err := huh.NewSelect[string]().
+		Title("Policy action").
+		Options(
+			huh.NewOption("Validate policy file", "validate"),
+			huh.NewOption("Show effective policy", "show"),
+			huh.NewOption("Test a decision", "test"),
+		).
+		Value(&action).
+		Run(); err != nil {
+		return err
+	}
+	if err := huh.NewInput().Title("Policy file path").Value(&path).Run(); err != nil {
+		return err
+	}
+	args := []string{"policy", action}
+	if path != "" {
+		args = append(args, "--policy", path)
+	}
+	root := NewRootCmd()
+	root.SetArgs(args)
+	return root.Execute()
+}
+
+func runRepoMenu() error {
+	var (
+		action string
+		dir    string
+		bundle string
+	)
+	if err := huh.NewSelect[string]().
+		Title("Repo action").
+		Options(
+			huh.NewOption("Init", "init"),
+			huh.NewOption("Add bundle", "add"),
+			huh.NewOption("List", "list"),
+			huh.NewOption("Verify", "verify"),
+		).
+		Value(&action).
+		Run(); err != nil {
+		return err
+	}
+	if err := huh.NewInput().Title("Repo directory").Value(&dir).Run(); err != nil {
+		return err
+	}
+	args := []string{"repo", action, "--dir", dir}
+	if action == "add" {
+		if err := huh.NewInput().Title("Bundle path").Value(&bundle).Run(); err != nil {
+			return err
+		}
+		args = append(args, "--bundle", bundle)
+	}
+	root := NewRootCmd()
+	root.SetArgs(args)
+	return root.Execute()
+}
+
+func runServeMenu() error {
+	var (
+		listen string
+		token  string
+		noAuth bool
+	)
+	_ = huh.NewInput().Title("Listen address").Value(&listen).Run()
+	_ = huh.NewInput().Title("Auth token (empty to skip)").Value(&token).Run()
+	_ = huh.NewConfirm().Title("Auth disabled (local only)?").Value(&noAuth).Run()
+	if listen == "" {
+		listen = "127.0.0.1:8443"
+	}
+	args := []string{"serve", "--listen", listen}
+	if noAuth {
+		args = append(args, "--auth-disabled")
+	} else if token != "" {
+		args = append(args, "--auth-token", token)
+	}
+	fmt.Println("Starting:", "katame", stringsJoin(args, " "))
+	root := NewRootCmd()
+	root.SetArgs(args)
+	return root.Execute()
+}
+
+func stringsJoin(parts []string, sep string) string {
+	if len(parts) == 0 {
+		return ""
+	}
+	out := parts[0]
+	for _, p := range parts[1:] {
+		out += sep + p
+	}
+	return out
 }
 
 func runProtectMenu(cmd *cobra.Command) error {

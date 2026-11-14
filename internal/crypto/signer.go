@@ -170,8 +170,12 @@ func PublicKeyOf(signer crypto.Signer) crypto.PublicKey {
 }
 
 // SaveKeyPEM writes PEM-encoded key data to a file.
+// On Windows the DACL is tightened to the current user only (M108).
 func SaveKeyPEM(path string, data []byte, mode os.FileMode) error {
-	return os.WriteFile(path, data, mode)
+	if err := os.WriteFile(path, data, mode); err != nil {
+		return err
+	}
+	return lockDownKeyFile(path)
 }
 
 // LoadPrivateKey loads a private key from a PEM file or legacy Ed25519 raw format.

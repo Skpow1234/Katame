@@ -5,6 +5,9 @@ testdata
 # Local toolchain downloads (optional)
 .tools/
 
+# Generated man pages (make man / cmd/gendocs)
+man/
+
 # Binaries
 bin/
 build/

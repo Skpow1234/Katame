@@ -70,11 +70,11 @@ func TestBatchInspect_RedactFlag(t *testing.T) {
 	// Create a couple of bundles in the dir.
 	for i := 0; i < 2; i++ {
 		in := filepath.Join(subDir, "in.txt")
-		out := filepath.Join(subDir, "b.katame")
-		key := filepath.Join(subDir, "b.key")
+		out := filepath.Join(subDir, "b"+string(rune('a'+i))+".katame")
+		key := filepath.Join(subDir, "b"+string(rune('a'+i))+".key")
 		os.WriteFile(in, []byte("data"), 0o600)
 		r := NewRootCmd()
-		r.SetArgs([]string{"protect", "--in", in, "--out", out, "--key-out", key})
+		r.SetArgs([]string{"protect", "--in", in, "--out", out, "--key-out", key, "--force"})
 		if err := r.Execute(); err != nil {
 			t.Fatalf("protect: %v", err)
 		}

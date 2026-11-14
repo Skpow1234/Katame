@@ -16,10 +16,14 @@ const (
 )
 
 // SaveKeyFile writes a symmetric key to a file as base64, prefixed with "b64:".
+// On Windows the DACL is tightened to the current user only (M108).
 func SaveKeyFile(path string, key []byte) error {
 	encoded := KeyFilePrefix + util.B64Encode(key) + "\n"
 	if err := os.WriteFile(path, []byte(encoded), 0o600); err != nil {
 		return fmt.Errorf("save key file: %w", err)
+	}
+	if err := lockDownKeyFile(path); err != nil {
+		return fmt.Errorf("lock down key file: %w", err)
 	}
 	return nil
 }

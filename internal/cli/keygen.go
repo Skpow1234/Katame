@@ -14,6 +14,7 @@ func newKeygenCmd() *cobra.Command {
 		outPrefix string
 		algo      string
 		listAlgos bool
+		force     bool
 	)
 
 	cmd := &cobra.Command{
@@ -56,6 +57,12 @@ func newKeygenCmd() *cobra.Command {
 				privPath = outPrefix + ".key"
 			}
 			pubPath := strings.TrimSuffix(privPath, ".key") + ".pub"
+			if err := refuseIfExists(privPath, force); err != nil {
+				return err
+			}
+			if err := refuseIfExists(pubPath, force); err != nil {
+				return err
+			}
 
 			var err error
 			var purpose string
@@ -123,6 +130,7 @@ func newKeygenCmd() *cobra.Command {
 	cmd.Flags().StringVar(&outPrefix, "out", "", "output path prefix (e.g. 'signing' produces signing.key + signing.pub)")
 	cmd.Flags().StringVar(&algo, "algo", crypto.SignAlgoEd25519, "algorithm (see --help for full list)")
 	cmd.Flags().BoolVar(&listAlgos, "list-algos", false, "list built-in and plugin signing/hybrid algorithms and exit")
+	cmd.Flags().BoolVar(&force, "force", false, "overwrite existing key files")
 	_ = cmd.RegisterFlagCompletionFunc("algo", completeKeygenAlgos)
 
 	return cmd

@@ -53,6 +53,7 @@ func newProtectCmd() *cobra.Command {
 		parallelWorkers  int
 		chunkSizeFlag    int
 		dryRun           bool
+		force            bool
 	)
 
 	cmd := &cobra.Command{
@@ -594,14 +595,18 @@ func newProtectCmd() *cobra.Command {
 
 			// Encrypt using chunked streaming (optionally parallel).
 			var ciphertextBuf bytes.Buffer
+			var encOut io.Writer = &ciphertextBuf
+			if flagVerbose && !flagJSON {
+				encOut = newProgressWriter(&ciphertextBuf, "encrypt", int64(plaintextBuf.Len()))
+			}
 			var streamResult *crypto.StreamEncryptResult
 			if parallelWorkers > 1 || parallelWorkers == 0 && os.Getenv("KATAME_PARALLEL_WORKERS") == "auto" {
 				streamResult, err = crypto.EncryptStreamParallel(
-					&plaintextBuf, &ciphertextBuf, key, aad, chunkSize, cipherName, parallelWorkers,
+					&plaintextBuf, encOut, key, aad, chunkSize, cipherName, parallelWorkers,
 				)
 			} else {
 				streamResult, err = crypto.EncryptStream(
-					&plaintextBuf, &ciphertextBuf, key, aad, chunkSize, cipherName,
+					&plaintextBuf, encOut, key, aad, chunkSize, cipherName,
 				)
 			}
 			if err != nil {
@@ -740,6 +745,14 @@ func newProtectCmd() *cobra.Command {
 					Writer:        os.Stdout,
 				})
 			} else {
+				if err := refuseIfExists(outFile, force); err != nil {
+					return err
+				}
+				if keyOutFile != "" && !useSplit {
+					if err := refuseIfExists(keyOutFile, force); err != nil {
+						return err
+					}
+				}
 				err = bundle.Write(&bundle.WriteParams{
 					OutputPath:    outFile,
 					Payload:       &ciphertextBuf,
@@ -884,6 +897,7 @@ func newProtectCmd() *cobra.Command {
 	cmd.Flags().StringVar(&cipherName, "cipher", crypto.CipherAES256GCM, "AEAD cipher: aes-256-gcm, chacha20-poly1305, xchacha20-poly1305, aes-256-gcm-siv (nonce-misuse-resistant)")
 	cmd.Flags().IntVar(&chunkSizeFlag, "chunk-size", 0, "AEAD chunk size in bytes (0 = config or default 65536)")
 	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "validate options and print the plan without writing a bundle")
+	cmd.Flags().BoolVar(&force, "force", false, "overwrite existing output / key files")
 	cmd.Flags().IntVar(&parallelWorkers, "parallel-workers", 1, "encrypt chunks in parallel using N goroutines (0 = NumCPU, 1 = sequential)")
 	cmd.Flags().BoolVar(&signFlag, "sign", false, "sign the bundle")
 	cmd.Flags().StringVar(&signingPriv, "signing-priv", "", "path to private signing key (required with --sign)")

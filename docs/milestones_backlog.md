@@ -74,20 +74,20 @@ see [milestones.md](milestones.md).
 | **M96** | Add --dry-run to protect — **done** |
 | **M97** | Add --dry-run to rotate-key — **done** |
 | **M98** | Add --dry-run to rewrap — **done** |
-| **M99** | True stdin/stdout binary streaming without temp files |
-| **M100** | Unify azureio.go with cloudio.go |
-| **M101** | Progress reporting for large encrypt under --verbose |
-| **M102** | Menu feature parity for serve/repo/policy/doctor |
+| **M99** | True stdin/stdout binary streaming without temp files — **done** (`decrypt --stdin` + protect stdin/stdout; local path avoids temp spool) |
+| **M100** | Unify azureio.go with cloudio.go — **done** (azure helpers folded into `cloudio.go`) |
+| **M101** | Progress reporting for large encrypt under --verbose — **done** (`progressWriter`) |
+| **M102** | Menu feature parity for serve/repo/policy/doctor — **done** |
 | **M103** | Shell completion for cipher enums — **done** |
 | **M104** | Shell completion for hash/KDF/algo enums — **done** |
 | **M105** | keygen --list-algos including plugins — **done** |
 | **M106** | Fix hash bad-algo exit code semantics — **done** (`ErrUnsupportedAlgorithm`) |
-| **M107** | Generate man pages from cobra |
-| **M108** | Windows ACL key-file permission tests |
-| **M109** | Redact PEM/password from verbose logs everywhere |
-| **M110** | katame convert legacy Ed25519 to PKCS#8 |
-| **M111** | Batch commands honor same policy ops |
-| **M112** | --force vs refuse-overwrite consistency |
+| **M107** | Generate man pages from cobra — **done** (`cmd/gendocs`, `make man`) |
+| **M108** | Windows ACL key-file permission tests — **done** (`lockDownKeyFile` + windows/unix tests) |
+| **M109** | Redact PEM/password from verbose logs everywhere — **done** (`util.RedactSecrets` on CLI errors) |
+| **M110** | katame convert legacy Ed25519 to PKCS#8 — **done** |
+| **M111** | Batch commands honor same policy ops — **done** |
+| **M112** | --force vs refuse-overwrite consistency — **done** (`refuseIfExists`) |
 | **M113** | doctor probes plugin dir executables — **done** |
 | **M114** | doctor probes KMS credential reachability — **done** (env soft-probe) |
 | **M115** | OpenAPI schemas for Rewrap request/response — **done** |

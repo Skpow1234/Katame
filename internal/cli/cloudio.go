@@ -22,7 +22,20 @@ var (
 	awsProfile     string
 	awsS3Endpoint  string
 	awsS3PathStyle bool
+
+	azureAccountName      string
+	azureConnectionString string
 )
+
+// resolveAzureEnv fills empty Azure config from environment variables.
+func resolveAzureEnv() {
+	if azureAccountName == "" {
+		azureAccountName = os.Getenv("AZURE_STORAGE_ACCOUNT")
+	}
+	if azureConnectionString == "" {
+		azureConnectionString = os.Getenv("AZURE_STORAGE_CONNECTION_STRING")
+	}
+}
 
 // isRemoteURI returns true if path is any supported remote URI (az/s3/gs/https).
 func isRemoteURI(path string) bool { return cloud.IsRemote(path) }

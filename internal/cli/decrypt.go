@@ -27,6 +27,8 @@ func newDecryptCmd() *cobra.Command {
 		keySource       string
 		aadStr          string
 		useStdout       bool
+		useStdin        bool
+		force           bool
 		password        string
 		passwordFile    string
 		privKeyFile     string
@@ -37,7 +39,7 @@ func newDecryptCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "decrypt",
 		Short: "Decrypt a .katame bundle",
-		Long:  "Read a .katame bundle, decrypt the payload using the provided key, and write the plaintext.\n\nAzure: use az://container/blob paths for --in and/or --out.\n\nUse --stdout to write decrypted plaintext to standard output.",
+		Long:  "Read a .katame bundle, decrypt the payload using the provided key, and write the plaintext.\n\nAzure: use az://container/blob paths for --in and/or --out.\n\nUse --stdin to read the bundle from standard input and --stdout to write decrypted plaintext to standard output.",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			printer := NewPrinter(flagJSON, flagQuiet)
 			auditInFile := inFile
@@ -50,16 +52,30 @@ func newDecryptCmd() *cobra.Command {
 				auditLog(audit.OpDecrypt, auditInFile, auditOutDesc, "", auditKeyFP, err == nil, errMsg)
 			}()
 
-			if inFile == "" {
-				return fmt.Errorf("--in is required")
+			if inFile == "" && !useStdin {
+				return fmt.Errorf("--in or --stdin is required")
+			}
+			if inFile != "" && useStdin {
+				return fmt.Errorf("--in and --stdin are mutually exclusive")
 			}
 			if outFile == "" && !useStdout {
 				return fmt.Errorf("--out or --stdout is required")
 			}
+			if useStdin {
+				auditInFile = "stdin"
+			}
+
+			var stdinBundle []byte
+			if useStdin {
+				stdinBundle, err = io.ReadAll(os.Stdin)
+				if err != nil {
+					return fmt.Errorf("read stdin: %w", err)
+				}
+			}
 
 			// Remote input (az://, s3://, gs://, https://): download to a temp file.
 			var remoteInputCleanup func()
-			if isRemoteURI(inFile) {
+			if inFile != "" && isRemoteURI(inFile) {
 				tmpPath, err := remoteDownload(inFile)
 				if err != nil {
 					return fmt.Errorf("download from remote: %w", err)
@@ -100,13 +116,18 @@ func newDecryptCmd() *cobra.Command {
 			usePrivKey := privKeyFile != ""
 
 			// Read bundle early to check for KMS (affects mode count).
-			br, err := bundle.Read(inFile)
+			var br *bundle.ReadResult
+			if useStdin {
+				br, err = bundle.ReadBytes(stdinBundle)
+			} else {
+				br, err = bundle.Read(inFile)
+			}
 			if err != nil {
 				return fmt.Errorf("read bundle: %w", err)
 			}
 
 			// M23: enforce policy *before* any DEK material is unwrapped.
-			if err := enforcePolicy(audit.OpDecrypt, inFile, br.Manifest); err != nil {
+			if err := enforcePolicy(audit.OpDecrypt, auditInFile, br.Manifest); err != nil {
 				return err
 			}
 
@@ -358,6 +379,9 @@ func newDecryptCmd() *cobra.Command {
 				if useStdout {
 					output = os.Stdout
 				} else {
+					if err := refuseIfExists(outFile, force); err != nil {
+						return err
+					}
 					f, err := os.Create(outFile)
 					if err != nil {
 						return fmt.Errorf("create output: %w", err)
@@ -396,12 +420,14 @@ func newDecryptCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle (required)")
+	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle (required unless --stdin)")
 	cmd.Flags().StringVar(&outFile, "out", "", "output plaintext path")
 	cmd.Flags().StringVar(&keyFile, "key", "", "path to the decryption key")
 	cmd.Flags().StringVar(&keySource, "key-source", "", "key source URI (file://, env://, b64://; reserved: pkcs11://, keychain://, dpapi://, piv://)")
 	cmd.Flags().StringVar(&aadStr, "aad", "", "additional authenticated data (overrides manifest AAD)")
+	cmd.Flags().BoolVar(&useStdin, "stdin", false, "read .katame bundle from standard input")
 	cmd.Flags().BoolVar(&useStdout, "stdout", false, "write decrypted plaintext to standard output")
+	cmd.Flags().BoolVar(&force, "force", false, "overwrite existing output file")
 	cmd.Flags().StringVar(&password, "password", "", "decrypt with a password")
 	cmd.Flags().StringVar(&passwordFile, "password-file", "", "read password from file")
 	cmd.Flags().StringVar(&privKeyFile, "privkey", "", "private key for hybrid decryption (PEM)")

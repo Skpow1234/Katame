@@ -126,6 +126,7 @@ func NewRootCmd() *cobra.Command {
 	root.AddCommand(newInspectCmd())
 	root.AddCommand(newDiffCmd())
 	root.AddCommand(newKeygenCmd())
+	root.AddCommand(newConvertCmd())
 	root.AddCommand(newSignCmd())
 	root.AddCommand(newVerifyCmd())
 	root.AddCommand(newVerifyIntegrityCmd())
@@ -163,7 +164,7 @@ func NewRootCmd() *cobra.Command {
 func Execute() {
 	cmd := NewRootCmd()
 	if err := cmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, "Error:", err.Error())
+		fmt.Fprintln(os.Stderr, "Error:", util.RedactSecrets(err.Error()))
 		os.Exit(util.ExitCodeForError(err))
 	}
 }

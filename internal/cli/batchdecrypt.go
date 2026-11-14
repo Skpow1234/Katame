@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Skpow1234/Katame/internal/audit"
 	"github.com/Skpow1234/Katame/internal/bundle"
 	"github.com/Skpow1234/Katame/internal/cloud"
 	"github.com/Skpow1234/Katame/internal/crypto"
@@ -46,6 +47,9 @@ Example:
 			}
 			if outDir == "" {
 				return fmt.Errorf("--out-dir is required")
+			}
+			if err := enforcePolicy(audit.OpBatchDecrypt, srcDir, nil); err != nil {
+				return err
 			}
 
 			// Remote source: download all objects to temp dir.
@@ -118,13 +122,15 @@ Example:
 
 			// Process function: decrypts one bundle.
 			decryptOne := func(entry BatchFileEntry) error {
-				if err := ensureParentDir(entry.OutputPath); err != nil {
-					return fmt.Errorf("create output dir: %w", err)
-				}
-
 				br, err := bundle.Read(entry.InputPath)
 				if err != nil {
 					return fmt.Errorf("read bundle: %w", err)
+				}
+				if err := enforcePolicy(audit.OpDecrypt, entry.InputPath, br.Manifest); err != nil {
+					return err
+				}
+				if err := ensureParentDir(entry.OutputPath); err != nil {
+					return fmt.Errorf("create output dir: %w", err)
 				}
 
 				// Determine key.

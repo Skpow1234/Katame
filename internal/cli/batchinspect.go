@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Skpow1234/Katame/internal/audit"
 	"github.com/Skpow1234/Katame/internal/bundle"
 	"github.com/spf13/cobra"
 )
@@ -33,6 +34,9 @@ Example:
 
 			if srcDir == "" {
 				return fmt.Errorf("--dir is required")
+			}
+			if err := enforcePolicy(audit.OpBatchInspect, srcDir, nil); err != nil {
+				return err
 			}
 
 			// Check for batch-manifest.json.
