@@ -3,7 +3,7 @@ module github.com/Skpow1234/Katame
 // Patch version matters: CI sets GOTOOLCHAIN=local, so setup-go installs this
 // exact Go (stdlib patches for govulncheck). Do not add a matching `toolchain`
 // line — `go mod tidy` removes it when it equals the `go` version.
-go 1.26.10
+go 1.26.11
 
 require (
 	cloud.google.com/go/kms v1.36.1
