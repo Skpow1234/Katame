@@ -3,7 +3,7 @@
 // the same JSON envelope used by the C-shared library
 // (`cmd/katame-c`) and the WASM bindings: every endpoint takes a JSON
 // body and returns a JSON object whose top-level shape is either
-// `{"ok": true, ...}` or `{"ok": false, "error": "..."}`.
+// `{"ok": true, ...}` or `{"ok": false, "error": "...", "error_code": "..."}`.
 package serve
 
 import (
@@ -73,10 +73,13 @@ type Options struct {
 	// AuditLogFile, if set, appends tamper-evident JSON-lines audit records.
 	AuditLogFile string
 
-	// RateLimitRPS limits requests per client IP (0 = disabled).
+	// RateLimitRPS limits requests per client IP or JWT sub (0 = disabled).
 	RateLimitRPS float64
 	// RateLimitBurst is the token bucket burst size (default: RPS+1).
 	RateLimitBurst int
+
+	// MaxInFlightProtect caps concurrent /v1/protect handlers (0 = unlimited).
+	MaxInFlightProtect int
 
 	// OIDC enables JWT bearer auth validated against an IdP JWKS.
 	OIDC OIDCOptions
@@ -84,15 +87,16 @@ type Options struct {
 
 // Server is a configured but not-yet-started HTTP service.
 type Server struct {
-	opts      Options
-	mux       *http.ServeMux
-	httpSrv   *http.Server
-	kms       *KMSCache
-	metrics   *Metrics
-	auth      *authMiddleware
-	policy    policy.Evaluator
-	audit     audit.Logger
-	rateLimit *rateLimiter
+	opts           Options
+	mux            *http.ServeMux
+	httpSrv        *http.Server
+	kms            *KMSCache
+	metrics        *Metrics
+	auth           *authMiddleware
+	policy         policy.Evaluator
+	audit          audit.Logger
+	rateLimit      *rateLimiter
+	protectSem     chan struct{}
 }
 
 // NewServer validates Options and returns a Server ready to call ListenAndServe.
@@ -126,6 +130,9 @@ func NewServer(opts Options) (*Server, error) {
 		kms:       NewKMSCache(opts.KMSCacheTTL, opts.KMSCacheMaxSize),
 		metrics:   NewMetrics(),
 		rateLimit: newRateLimiter(opts.RateLimitRPS, opts.RateLimitBurst),
+	}
+	if opts.MaxInFlightProtect > 0 {
+		s.protectSem = make(chan struct{}, opts.MaxInFlightProtect)
 	}
 	if opts.PolicyFile != "" {
 		ev, err := policy.Load(opts.PolicyFile)
@@ -269,9 +276,9 @@ func (s *Server) tlsConfig() (*tls.Config, error) {
 }
 
 // middleware composes the standard request pipeline: panic recovery,
-// metrics, rate limit, max-body cap, auth.
+// request id, metrics, max-body, auth (attaches principal), then rate limit.
 func (s *Server) middleware(next http.Handler) http.Handler {
-	return s.recover(s.metricsMW(s.rateLimitMW(s.maxBody(s.authGate(next)))))
+	return s.recover(s.requestIDMW(s.metricsMW(s.maxBody(s.authGate(s.rateLimitMW(next))))))
 }
 
 func (s *Server) recover(next http.Handler) http.Handler {
@@ -296,9 +303,9 @@ func (s *Server) maxBody(next http.Handler) http.Handler {
 
 func (s *Server) authGate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// /healthz is always unauthenticated (liveness probes).
+		// /healthz and /readyz are always unauthenticated (probes).
 		// /metrics requires auth unless MetricsPublic is set.
-		if r.URL.Path == "/healthz" {
+		if r.URL.Path == "/healthz" || r.URL.Path == "/readyz" {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -306,10 +313,14 @@ func (s *Server) authGate(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-		if !s.auth.check(r) {
+		principal, ok := s.auth.authenticate(r)
+		if !ok {
 			s.metrics.AuthDenied.Add(1)
 			writeError(w, http.StatusUnauthorized, "unauthorized")
 			return
+		}
+		if principal != "" {
+			r = r.WithContext(context.WithValue(r.Context(), ctxKeyPrincipal, principal))
 		}
 		next.ServeHTTP(w, r)
 	})

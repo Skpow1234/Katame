@@ -648,13 +648,9 @@ func newProtectCmd() *cobra.Command {
 					detectedAlgo string
 				)
 				if signingKeySource != "" {
-					keyBytes, err := keysource.ResolvePrivateKey(signingKeySource)
+					privKey, detectedAlgo, err = keysource.ResolveSigner(signingKeySource)
 					if err != nil {
 						return fmt.Errorf("load signing key source: %w", err)
-					}
-					privKey, detectedAlgo, err = crypto.ParsePrivateKey(keyBytes)
-					if err != nil {
-						return fmt.Errorf("parse signing key source: %w", err)
 					}
 				} else {
 					privKey, detectedAlgo, err = crypto.LoadPrivateKey(signingPriv)
@@ -853,7 +849,7 @@ func newProtectCmd() *cobra.Command {
 	cmd.Flags().IntVar(&parallelWorkers, "parallel-workers", 1, "encrypt chunks in parallel using N goroutines (0 = NumCPU, 1 = sequential)")
 	cmd.Flags().BoolVar(&signFlag, "sign", false, "sign the bundle")
 	cmd.Flags().StringVar(&signingPriv, "signing-priv", "", "path to private signing key (required with --sign)")
-	cmd.Flags().StringVar(&signingKeySource, "signing-key-source", "", "signing key source URI (file://, env://, b64://; reserved HSM/keychain schemes)")
+	cmd.Flags().StringVar(&signingKeySource, "signing-key-source", "", "signing key source URI (file://, env://, b64://, pkcs11://, piv://, …)")
 	cmd.Flags().StringVar(&signAlgo, "sign-algo", "", "signing algorithm (auto-detected from key if omitted)")
 	cmd.Flags().BoolVar(&useStdin, "stdin", false, "read plaintext from standard input")
 	cmd.Flags().BoolVar(&useStdout, "stdout", false, "write bundle to standard output")

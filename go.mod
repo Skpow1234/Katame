@@ -18,8 +18,10 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.114.6
 	github.com/charmbracelet/huh v0.8.0
 	github.com/cloudflare/circl v1.6.3
+	github.com/go-piv/piv-go/v2 v2.6.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/klauspost/compress v1.20.2
+	github.com/miekg/pkcs11 v1.1.2
 	github.com/open-policy-agent/opa v1.22.2
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.10.2

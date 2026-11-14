@@ -29,11 +29,12 @@ func newServeCmd() *cobra.Command {
 		maxRequestBytes int64
 		policyFile      string
 		auditLogFile    string
-		rateLimitRPS    float64
-		rateLimitBurst  int
-		oidcIssuer      string
-		oidcAudience    string
-		oidcJWKSURL     string
+		rateLimitRPS       float64
+		rateLimitBurst     int
+		maxInFlightProtect int
+		oidcIssuer         string
+		oidcAudience       string
+		oidcJWKSURL        string
 	)
 
 	cmd := &cobra.Command{
@@ -44,17 +45,22 @@ clients. The wire contract matches the C-shared library and WASM
 bindings: JSON in, JSON out, {ok: true|false} envelope.
 
 Endpoints (all under /v1):
-  GET  /v1/version       SDK + API version
-  POST /v1/protect       Encrypt → bundle
-  POST /v1/decrypt       Decrypt bundle
-  POST /v1/inspect       Decode manifest
-  POST /v1/sign          Add/replace detached signature
-  POST /v1/verify        Verify detached signature
-  POST /v1/rewrap        Re-wrap KMS DEK (rotation)
+  GET  /v1/version            SDK + API version
+  POST /v1/protect            Encrypt → bundle
+  POST /v1/decrypt            Decrypt bundle
+  POST /v1/inspect            Decode manifest
+  POST /v1/sign               Add/replace detached signature
+  POST /v1/verify             Verify detached signature
+  POST /v1/rewrap             Re-wrap KMS DEK (rotation)
+  POST /v1/keygen             Generate signing key pair
+  POST /v1/hash               Hash data or file
+  POST /v1/verify-integrity   Decrypt + verify plaintext hash
+  POST /v1/attest             Build provenance statement
 
-Operational endpoints (always reachable, no auth):
+Operational endpoints (probes unauthenticated):
   GET  /healthz          Liveness probe
-  GET  /metrics          Prometheus exposition
+  GET  /readyz           Readiness probe
+  GET  /metrics          Prometheus exposition (auth unless --metrics-public)
 
 Authentication: provide --auth-token, --tls-client-ca (mTLS), OIDC JWT
 (--oidc-issuer + --oidc-audience), or both. Pass --auth-disabled only for
@@ -95,8 +101,9 @@ Examples:
 				MaxRequestBytes: maxRequestBytes,
 				PolicyFile:      policyFile,
 				AuditLogFile:    auditLogFile,
-				RateLimitRPS:    rateLimitRPS,
-				RateLimitBurst:  rateLimitBurst,
+				RateLimitRPS:       rateLimitRPS,
+				RateLimitBurst:     rateLimitBurst,
+				MaxInFlightProtect: maxInFlightProtect,
 				OIDC: serve.OIDCOptions{
 					Issuer:   oidcIssuer,
 					Audience: oidcAudience,
@@ -140,8 +147,9 @@ Examples:
 	cmd.Flags().Int64Var(&maxRequestBytes, "max-request-bytes", 64<<20, "Maximum request body size in bytes")
 	cmd.Flags().StringVar(&policyFile, "policy", "", "Policy file (YAML/JSON/Rego) enforced on every /v1/* call")
 	cmd.Flags().StringVar(&auditLogFile, "audit-log", "", "Append-only audit log file for /v1/* operations")
-	cmd.Flags().Float64Var(&rateLimitRPS, "rate-limit-rps", 0, "Per-IP request rate limit (requests/sec; 0 = disabled)")
+	cmd.Flags().Float64Var(&rateLimitRPS, "rate-limit-rps", 0, "Per-principal (JWT sub) or per-IP rate limit (requests/sec; 0 = disabled)")
 	cmd.Flags().IntVar(&rateLimitBurst, "rate-limit-burst", 0, "Rate limit burst size (default: rps+1)")
+	cmd.Flags().IntVar(&maxInFlightProtect, "max-inflight-protect", 0, "Max concurrent /v1/protect jobs (0 = unlimited; 503 when full)")
 	cmd.Flags().StringVar(&oidcIssuer, "oidc-issuer", "", "OIDC issuer URL for JWT bearer auth")
 	cmd.Flags().StringVar(&oidcAudience, "oidc-audience", "", "Expected JWT audience claim for OIDC auth")
 	cmd.Flags().StringVar(&oidcJWKSURL, "oidc-jwks-url", "", "JWKS URL (optional; derived from issuer when empty)")

@@ -28,6 +28,9 @@ Core CLI, streaming AEAD, integrity/audit, PQ crypto, cloud+KMS, batch/parallel,
 - C ABI / Python / WASM parity for hybrid, KMS, compress, Shamir, `kt_rewrap`
 - **M31–M48:** crypto fuzz coverage (ChaCha/XChaCha/GCM-SIV/hybrid/PQ/SSS/KDF), aesgcmsiv `Open` errors, hard chunk-size cap, truncation/reorder tests, `Zeroize` / CT fingerprint helpers
 - **M73–M80:** CLI commands return errors instead of `os.Exit`; `Execute` maps sentinels (`ExitPolicyDenied=13`, `ErrBundlesDiffer`→10)
+- **M251–M252 / M256:** optional native SoftHSM (`-tags katame_pkcs11`) and YubiKey PIV (`-tags katame_piv`); `ResolveSigner`; doctor reports shim vs native details
+- **M115–M132 (partial):** serve `/readyz`, `/v1/{keygen,hash,verify-integrity,attest}`, `X-Request-Id`, `error_code`, principal rate limits, protect concurrency cap, OpenAPI Rewrap + CI lint; deferred multipart/OTel/KMS ctx
+- **M230–M233:** release ships `libkatame` archives, Python wheels with vendored lib + `.pyi`, WASM tarball / optional npm publish
 
 ## Backlog (1000+)
 

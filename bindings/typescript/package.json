@@ -27,5 +27,13 @@
     "type": "git",
     "url": "git+https://github.com/Skpow1234/Katame.git"
   },
-  "homepage": "https://github.com/Skpow1234/Katame/tree/main/bindings/typescript"
+  "homepage": "https://github.com/Skpow1234/Katame/tree/main/bindings/typescript",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build:wasm": "bash ../../scripts/build-wasm.sh",
+    "test": "node --test test/smoke.mjs"
+  }
 }

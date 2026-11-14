@@ -90,24 +90,24 @@ see [milestones.md](milestones.md).
 | **M112** | --force vs refuse-overwrite consistency |
 | **M113** | doctor probes plugin dir executables |
 | **M114** | doctor probes KMS credential reachability |
-| **M115** | OpenAPI schemas for Rewrap request/response |
-| **M116** | Add /v1/keygen endpoint |
-| **M117** | Add /v1/hash endpoint |
-| **M118** | Add /v1/verify-integrity endpoint |
-| **M119** | Add /v1/attest endpoint |
-| **M120** | X-Request-Id on serve requests |
-| **M121** | Structured error_code in JSON errors |
+| **M115** | OpenAPI schemas for Rewrap request/response — **done** |
+| **M116** | Add /v1/keygen endpoint — **done** |
+| **M117** | Add /v1/hash endpoint — **done** |
+| **M118** | Add /v1/verify-integrity endpoint — **done** |
+| **M119** | Add /v1/attest endpoint — **done** |
+| **M120** | X-Request-Id on serve requests — **done** |
+| **M121** | Structured error_code in JSON errors — **done** |
 | **M122** | Multipart upload for large protect/decrypt |
-| **M123** | GET /readyz separate from /healthz |
+| **M123** | GET /readyz separate from /healthz — **done** |
 | **M124** | Pass request context into KMS unwrap |
 | **M125** | mTLS+OIDC combination tests |
-| **M126** | Per-principal (JWT sub) rate limits |
+| **M126** | Per-principal (JWT sub) rate limits — **done** |
 | **M127** | OpenTelemetry traces for protect/decrypt handlers |
-| **M128** | Cap concurrent in-flight protect jobs |
-| **M129** | UNIX socket umask tests |
-| **M130** | Expand server_test for OIDC failure |
-| **M131** | Expand server_test for rate-limit 429 |
-| **M132** | Validate OpenAPI fixtures in CI |
+| **M128** | Cap concurrent in-flight protect jobs — **done** (`--max-inflight-protect`) |
+| **M129** | UNIX socket umask tests — **done** (skipped on Windows) |
+| **M130** | Expand server_test for OIDC failure — **done** |
+| **M131** | Expand server_test for rate-limit 429 — **done** |
+| **M132** | Validate OpenAPI fixtures in CI — **done** (Redocly lint job) |
 | **M133** | CORS docs for WASM clients |
 | **M134** | Audit logger reopen without restart |
 | **M135** | HTTP 401 vs 403 for auth vs policy deny |
@@ -205,10 +205,10 @@ see [milestones.md](milestones.md).
 | **M227** | Write API symmetric to Read for Bundle |
 | **M228** | Experimental PQ opt-in gate |
 | **M229** | examples/sdk-* programs |
-| **M230** | Ship libkatame in GitHub Releases |
-| **M231** | Python wheels vendoring shared lib |
-| **M232** | Python .pyi type stubs |
-| **M233** | Publish @katame/wasm to npm |
+| **M230** | Ship libkatame in GitHub Releases — **done** (`scripts/build-libkatame.sh` + release job) |
+| **M231** | Python wheels vendoring shared lib — **done** (`scripts/build-python-wheel.sh` + release upload) |
+| **M232** | Python .pyi type stubs — **done** (`katame/__init__.pyi` + `py.typed`) |
+| **M233** | Publish @katame/wasm to npm — **done** (`scripts/build-wasm.sh` + release npm job; needs `NPM_TOKEN`) |
 | **M234** | WASM size budget / trimmed build |
 | **M235** | Playwright browser smoke for WASM |
 | **M236** | Node ESM/CJS dual package tests |
@@ -226,12 +226,12 @@ see [milestones.md](milestones.md).
 | **M248** | Retry/backoff for Rekor 429 |
 | **M249** | Private Rekor/Fulcio via config file |
 | **M250** | Sigstore staging e2e (opt-in) |
-| **M251** | Native SoftHSM PKCS#11 module binding |
-| **M252** | Native YubiKey PIV via go-piv |
+| **M251** | Native SoftHSM PKCS#11 module binding — **done** (`-tags katame_pkcs11`, `ResolveSigner`, Makefile `build-pkcs11`) |
+| **M252** | Native YubiKey PIV via go-piv — **done** (`-tags katame_piv`, hardware `crypto.Signer`, Makefile `build-piv`) |
 | **M253** | tpm:// sealed DEK support |
 | **M254** | Windows file:// drive-letter round-trip CI |
 | **M255** | age:// or SSH recipient key support |
-| **M256** | doctor reports build tags for schemes |
+| **M256** | doctor reports build tags for schemes — **done** (per-scheme details include native vs shim) |
 | **M257** | Password memory lock / wipe after KDF |
 | **M258** | Refuse --auth-disabled on non-loopback without confirm |
 | **M259** | Sandbox ZIP max uncompressed size |

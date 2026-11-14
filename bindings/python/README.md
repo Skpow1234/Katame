@@ -6,25 +6,34 @@ at install time, but the native library must be present on the host.
 
 ## Installation
 
-```bash
-pip install katame
-```
-
-Then make `libkatame.{so,dylib,dll}` discoverable by one of:
-
-- Setting `$KATAME_LIB=/abs/path/to/libkatame.so`.
-- Dropping it next to the installed `katame/` package directory.
-- Putting it on `LD_LIBRARY_PATH` / `DYLD_LIBRARY_PATH` / `PATH` so the
-  system loader finds it.
-
-Build the library from the Katame source tree:
+Release wheels (GitHub Releases) vendor `libkatame` for the build platform:
 
 ```bash
-go build -buildmode=c-shared -tags cshared \
-  -o libkatame.so ./cmd/katame-c
+pip install https://github.com/Skpow1234/Katame/releases/download/vX.Y.Z/katame-X.Y.Z-py3-none-linux_x86_64.whl
 ```
 
-(See `cmd/katame-c/README.md` for per-OS instructions.)
+Or install from source and provide the shared library:
+
+```bash
+pip install .
+```
+
+Library discovery order:
+
+1. `$KATAME_LIB` absolute path
+2. Vendored `katame/libkatame.{so,dylib,dll}` next to the package (wheel builds)
+3. System loader (`ctypes.util.find_library`)
+
+Build from the Katame tree:
+
+```bash
+bash scripts/build-libkatame.sh
+bash scripts/build-python-wheel.sh
+```
+
+Type checkers: the package ships `py.typed` and `__init__.pyi` stubs.
+
+(See `cmd/katame-c/README.md` for per-OS C ABI details.)
 
 ## Quick start
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"strings"
 
 	"github.com/Skpow1234/Katame/internal/keysource"
 	"github.com/Skpow1234/Katame/internal/kms"
@@ -62,19 +61,21 @@ func runDoctorChecks() []doctorCheck {
 	checks = append(checks,
 		doctorCheck{Name: "key-source portable", OK: true, Details: "file:// env:// b64://"},
 	)
-	var parts []string
 	for _, s := range keysource.PlatformSchemes() {
 		status := "off"
 		if s.Implemented {
 			status = "on"
 		}
-		parts = append(parts, fmt.Sprintf("%s://=%s", s.Scheme, status))
+		detail := fmt.Sprintf("%s://=%s", s.Scheme, status)
+		if s.Details != "" {
+			detail += " (" + s.Details + ")"
+		}
+		checks = append(checks, doctorCheck{
+			Name:    "key-source " + s.Scheme,
+			OK:      true,
+			Details: detail,
+		})
 	}
-	checks = append(checks, doctorCheck{
-		Name:    "hsm/keychain backends",
-		OK:      true,
-		Details: strings.Join(parts, " "),
-	})
 	return checks
 }
 

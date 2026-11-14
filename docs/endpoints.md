@@ -5,6 +5,7 @@ Base: `katame serve`. All `/v1/*` replies use `{"ok": true|false, ...}`.
 | Method | Path | Auth | Purpose |
 | ------ | ---- | ---- | ------- |
 | `GET` | `/healthz` | no | Liveness |
+| `GET` | `/readyz` | no | Readiness |
 | `GET` | `/metrics` | yes* | Prometheus text exposition (`*` public only with `--metrics-public`) |
 | `GET` | `/v1/version` | yes | SDK + API version |
 | `POST` | `/v1/protect` | yes | Encrypt → bundle |
@@ -13,14 +14,18 @@ Base: `katame serve`. All `/v1/*` replies use `{"ok": true|false, ...}`.
 | `POST` | `/v1/sign` | yes | Add/replace detached signature |
 | `POST` | `/v1/verify` | yes | Verify signature |
 | `POST` | `/v1/rewrap` | yes | Re-wrap KMS DEK |
+| `POST` | `/v1/keygen` | yes | Generate signing key pair |
+| `POST` | `/v1/hash` | yes | Hash data or file |
+| `POST` | `/v1/verify-integrity` | yes | Decrypt + verify plaintext hash |
+| `POST` | `/v1/attest` | yes | Build provenance statement |
 
-Machine-readable contract: [openapi.yaml](openapi.yaml).
+Errors include `error_code`. Responses echo `X-Request-Id`. Machine-readable contract: [openapi.yaml](openapi.yaml).
 
 ## Authentication
 
 Send `Authorization: Bearer <token>` when using bearer auth, or present a client certificate for mTLS / OIDC JWT as configured.
 
-`/healthz` always skips auth. `/metrics` requires the same auth as `/v1/*` unless you pass `--metrics-public` (legacy Prometheus scrape).
+`/healthz` and `/readyz` always skip auth. `/metrics` requires the same auth as `/v1/*` unless you pass `--metrics-public` (legacy Prometheus scrape).
 
 ## curl round-trip
 

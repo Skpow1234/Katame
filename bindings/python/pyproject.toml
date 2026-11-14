@@ -25,3 +25,12 @@ Issues = "https://github.com/Skpow1234/Katame/issues"
 
 [tool.setuptools.packages.find]
 include = ["katame*"]
+
+[tool.setuptools.package-data]
+katame = [
+  "py.typed",
+  "*.pyi",
+  "libkatame.so",
+  "libkatame.dylib",
+  "libkatame.dll",
+]

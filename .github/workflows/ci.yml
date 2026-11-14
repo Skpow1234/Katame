@@ -278,6 +278,27 @@ jobs:
           if-no-files-found: error
 
   # -------------------------------------------------------------------------
+  # OpenAPI contract (M132)
+  # -------------------------------------------------------------------------
+  openapi:
+    name: OpenAPI lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Lint OpenAPI
+        run: npx --yes @redocly/cli@1 lint docs/openapi.yaml
+
+      - name: Paths covered by serve handlers
+        run: |
+          set -euo pipefail
+          for p in /healthz /readyz /v1/version /v1/protect /v1/decrypt /v1/inspect /v1/sign /v1/verify /v1/rewrap /v1/keygen /v1/hash /v1/verify-integrity /v1/attest; do
+            grep -q " $p:" docs/openapi.yaml || grep -q "^  $p:" docs/openapi.yaml
+          done
+          echo "openapi path checklist ok"
+
+  # -------------------------------------------------------------------------
   # Container image
   # -------------------------------------------------------------------------
   docker:
@@ -312,7 +333,7 @@ jobs:
   ci-success:
     name: CI success
     if: always()
-    needs: [tidy, lint, test, security, fuzz, build, docker]
+    needs: [tidy, lint, test, security, fuzz, build, docker, openapi]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -325,6 +346,7 @@ jobs:
           echo "fuzz=${{ needs.fuzz.result }}"
           echo "build=${{ needs.build.result }}"
           echo "docker=${{ needs.docker.result }}"
+          echo "openapi=${{ needs.openapi.result }}"
           for r in \
             "${{ needs.tidy.result }}" \
             "${{ needs.lint.result }}" \
@@ -332,7 +354,8 @@ jobs:
             "${{ needs.security.result }}" \
             "${{ needs.fuzz.result }}" \
             "${{ needs.build.result }}" \
-            "${{ needs.docker.result }}"; do
+            "${{ needs.docker.result }}" \
+            "${{ needs.openapi.result }}"; do
             if [ "$r" != "success" ]; then
               echo "::error::Required job finished with '$r' (want success)"
               exit 1

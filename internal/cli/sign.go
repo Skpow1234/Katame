@@ -147,13 +147,9 @@ func newSignCmd() *cobra.Command {
 					detectedAlgo string
 				)
 				if signingKeySource != "" {
-					keyBytes, err := keysource.ResolvePrivateKey(signingKeySource)
+					privKey, detectedAlgo, err = keysource.ResolveSigner(signingKeySource)
 					if err != nil {
 						return fmt.Errorf("load signing key source: %w", err)
-					}
-					privKey, detectedAlgo, err = crypto.ParsePrivateKey(keyBytes)
-					if err != nil {
-						return fmt.Errorf("parse signing key source: %w", err)
 					}
 				} else {
 					privKey, detectedAlgo, err = crypto.LoadPrivateKey(signingPriv)
@@ -214,13 +210,9 @@ func newSignCmd() *cobra.Command {
 				} else {
 					var signer stdcrypto.Signer
 					if signingKeySource != "" {
-						keyBytes, err := keysource.ResolvePrivateKey(signingKeySource)
+						signer, _, err = keysource.ResolveSigner(signingKeySource)
 						if err != nil {
 							return fmt.Errorf("re-load signing key source for rekor: %w", err)
-						}
-						signer, _, err = crypto.ParsePrivateKey(keyBytes)
-						if err != nil {
-							return fmt.Errorf("parse signing key source for rekor: %w", err)
 						}
 					} else {
 						signer, _, err = crypto.LoadPrivateKey(signingPriv)
@@ -316,7 +308,7 @@ func newSignCmd() *cobra.Command {
 
 	cmd.Flags().StringVar(&inFile, "in", "", "input .katame bundle to sign (required)")
 	cmd.Flags().StringVar(&signingPriv, "signing-priv", "", "path to private key (required unless --signing-key-source or --keyless)")
-	cmd.Flags().StringVar(&signingKeySource, "signing-key-source", "", "signing key source URI (file://, env://, b64://; reserved HSM/keychain schemes)")
+	cmd.Flags().StringVar(&signingKeySource, "signing-key-source", "", "signing key source URI (file://, env://, b64://, pkcs11://, piv://, …)")
 	cmd.Flags().StringVar(&algo, "algo", "", "signing algorithm (auto-detected from key if omitted)")
 	cmd.Flags().BoolVar(&useTransparency, "transparency", false, "upload the signature to a Sigstore Rekor transparency log")
 	cmd.Flags().StringVar(&rekorURL, "rekor-url", "", "Rekor base URL (defaults to https://rekor.sigstore.dev)")

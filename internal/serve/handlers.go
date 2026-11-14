@@ -18,6 +18,7 @@ import (
 // {"ok": true|false, ...} envelope.
 func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("/healthz", s.handleHealth)
+	s.mux.HandleFunc("/readyz", s.handleReady)
 	s.metrics.AttachKMSCache(s.kms)
 	s.mux.Handle("/metrics", s.metrics)
 
@@ -28,10 +29,27 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("/v1/sign", s.handleSign)
 	s.mux.HandleFunc("/v1/verify", s.handleVerify)
 	s.mux.HandleFunc("/v1/rewrap", s.handleRewrap)
+	s.mux.HandleFunc("/v1/keygen", s.handleKeygen)
+	s.mux.HandleFunc("/v1/hash", s.handleHash)
+	s.mux.HandleFunc("/v1/verify-integrity", s.handleVerifyIntegrity)
+	s.mux.HandleFunc("/v1/attest", s.handleAttest)
 }
 
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true, "status": "ok"})
+}
+
+func (s *Server) handleReady(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "GET required")
+		return
+	}
+	// Liveness is /healthz; readiness confirms the process can accept /v1 traffic.
+	writeJSON(w, http.StatusOK, map[string]any{
+		"ok":     true,
+		"status": "ready",
+		"auth":   !s.opts.AuthDisabled || s.opts.AuthToken != "" || s.opts.TLSClientCAFile != "" || s.opts.OIDC.Issuer != "",
+	})
 }
 
 func (s *Server) handleVersion(w http.ResponseWriter, r *http.Request) {
@@ -82,6 +100,15 @@ func (s *Server) handleProtect(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeError(w, http.StatusMethodNotAllowed, "POST required")
 		return
+	}
+	if s.protectSem != nil {
+		select {
+		case s.protectSem <- struct{}{}:
+			defer func() { <-s.protectSem }()
+		default:
+			writeError(w, http.StatusServiceUnavailable, "too many concurrent protect requests")
+			return
+		}
 	}
 	var req protectRequest
 	if err := readJSON(r, &req); err != nil {
@@ -630,7 +657,11 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 }
 
 func writeError(w http.ResponseWriter, status int, msg string) {
-	writeJSON(w, status, map[string]any{"ok": false, "error": msg})
+	writeJSON(w, status, map[string]any{
+		"ok":         false,
+		"error":      msg,
+		"error_code": errorCodeForStatus(status),
+	})
 }
 
 type limitedBuffer struct {

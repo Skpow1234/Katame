@@ -46,18 +46,18 @@ func newOIDCValidator(opts OIDCOptions) (*oidcValidator, error) {
 	return v, nil
 }
 
-func (v *oidcValidator) validate(token string) error {
+func (v *oidcValidator) validate(token string) (sub string, err error) {
 	if token == "" {
-		return errors.New("empty token")
+		return "", errors.New("empty token")
 	}
 	if err := v.ensureKeys(); err != nil {
-		return err
+		return "", err
 	}
 	v.mu.RLock()
 	keys := v.keys
 	v.mu.RUnlock()
 
-	_, err := jwt.Parse(token, func(t *jwt.Token) (any, error) {
+	parsed, err := jwt.Parse(token, func(t *jwt.Token) (any, error) {
 		kid, _ := t.Header["kid"].(string)
 		if kid != "" {
 			if k, ok := keys[kid]; ok {
@@ -73,7 +73,15 @@ func (v *oidcValidator) validate(token string) error {
 		jwt.WithAudience(v.opts.Audience),
 		jwt.WithValidMethods([]string{"RS256", "RS384", "RS512", "ES256", "ES384", "ES512"}),
 	)
-	return err
+	if err != nil {
+		return "", err
+	}
+	if claims, ok := parsed.Claims.(jwt.MapClaims); ok {
+		if s, _ := claims["sub"].(string); s != "" {
+			return s, nil
+		}
+	}
+	return "", nil
 }
 
 func (v *oidcValidator) ensureKeys() error {

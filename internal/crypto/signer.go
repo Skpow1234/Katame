@@ -343,6 +343,31 @@ func parsePublicKeyBytes(data []byte) (crypto.PublicKey, string, error) {
 	}
 }
 
+// AlgoFromPublicKey maps a crypto.PublicKey to a Katame signature algorithm name.
+// Used for HSM/PIV crypto.Signer backends that never export private key bytes.
+func AlgoFromPublicKey(pub crypto.PublicKey) (string, error) {
+	switch k := pub.(type) {
+	case ed25519.PublicKey:
+		return SignAlgoEd25519, nil
+	case *ecdsa.PublicKey:
+		switch k.Curve {
+		case elliptic.P256():
+			return SignAlgoECDSAP256, nil
+		case elliptic.P384():
+			return SignAlgoECDSAP384, nil
+		default:
+			return "", fmt.Errorf("unsupported ECDSA curve: %v", k.Curve.Params().Name)
+		}
+	case *rsa.PublicKey:
+		if k.N.BitLen() <= 2048 {
+			return SignAlgoRSAPSS2048, nil
+		}
+		return SignAlgoRSAPSS4096, nil
+	default:
+		return "", fmt.Errorf("unsupported public key type: %T", pub)
+	}
+}
+
 // SignMessage signs a message using the given private key and algorithm.
 func SignMessage(signer crypto.Signer, algo string, message []byte) ([]byte, error) {
 	switch algo {
@@ -354,24 +379,23 @@ func SignMessage(signer crypto.Signer, algo string, message []byte) ([]byte, err
 		return ed25519.Sign(edKey, message), nil
 
 	case SignAlgoECDSAP256, SignAlgoECDSAP384:
-		ecKey, ok := signer.(*ecdsa.PrivateKey)
-		if !ok {
-			return nil, fmt.Errorf("key type mismatch: expected ecdsa, got %T", signer)
-		}
 		hash := sha256.Sum256(message)
-		return ecdsa.SignASN1(rand.Reader, ecKey, hash[:])
+		if ecKey, ok := signer.(*ecdsa.PrivateKey); ok {
+			return ecdsa.SignASN1(rand.Reader, ecKey, hash[:])
+		}
+		// HSM/PIV crypto.Signer backends (e.g. go-piv) are not *ecdsa.PrivateKey.
+		return signer.Sign(rand.Reader, hash[:], crypto.SHA256)
 
 	case SignAlgoRSAPSS2048, SignAlgoRSAPSS4096:
-		rsaKey, ok := signer.(*rsa.PrivateKey)
-		if !ok {
-			return nil, fmt.Errorf("key type mismatch: expected rsa, got %T", signer)
-		}
 		hash := sha256.Sum256(message)
 		opts := &rsa.PSSOptions{
 			SaltLength: rsa.PSSSaltLengthEqualsHash,
 			Hash:       crypto.SHA256,
 		}
-		return rsa.SignPSS(rand.Reader, rsaKey, crypto.SHA256, hash[:], opts)
+		if rsaKey, ok := signer.(*rsa.PrivateKey); ok {
+			return rsa.SignPSS(rand.Reader, rsaKey, crypto.SHA256, hash[:], opts)
+		}
+		return signer.Sign(rand.Reader, hash[:], opts)
 
 	case SignAlgoMLDSA65, SignAlgoMLDSA87:
 		mldsa, ok := signer.(*MLDSASigner)

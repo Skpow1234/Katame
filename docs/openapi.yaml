@@ -22,6 +22,21 @@ paths:
                 properties:
                   ok: { type: boolean }
                   status: { type: string }
+  /readyz:
+    get:
+      summary: Readiness probe
+      security: []
+      responses:
+        "200":
+          description: Ready to accept /v1 traffic
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  status: { type: string }
+                  auth: { type: boolean }
   /metrics:
     get:
       summary: Prometheus metrics
@@ -143,11 +158,70 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties: true
+              $ref: "#/components/schemas/RewrapRequest"
       responses:
         "200":
           description: Rewrap result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RewrapResponse"
+  /v1/keygen:
+    post:
+      summary: Generate a signing key pair
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KeygenRequest"
+      responses:
+        "200":
+          description: Keygen result
+  /v1/hash:
+    post:
+      summary: Hash data or a file
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HashRequest"
+      responses:
+        "200":
+          description: Hash result
+  /v1/verify-integrity:
+    post:
+      summary: Decrypt and verify plaintext hash against the manifest
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyIntegrityRequest"
+      responses:
+        "200":
+          description: Integrity verification result
+  /v1/attest:
+    post:
+      summary: Build a provenance statement for a bundle
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttestRequest"
+      responses:
+        "200":
+          description: Provenance result
 components:
   securitySchemes:
     bearerAuth:
@@ -226,3 +300,59 @@ components:
         bundle_b64: { type: string }
         public_key_pem: { type: string }
         public_key_path: { type: string }
+    RewrapRequest:
+      type: object
+      properties:
+        input_path: { type: string }
+        bundle_b64: { type: string }
+        output_path: { type: string }
+        kms_provider: { type: string }
+        from_key_id: { type: string }
+        to_key_id: { type: string }
+        return_bundle: { type: boolean }
+    RewrapResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        manifest: { type: object }
+        bundle_path: { type: string }
+        bundle_b64: { type: string }
+    KeygenRequest:
+      type: object
+      properties:
+        algo: { type: string, description: "Signing algorithm (default ed25519)" }
+    HashRequest:
+      type: object
+      properties:
+        data_b64: { type: string }
+        input_path: { type: string }
+        algo: { type: string }
+    VerifyIntegrityRequest:
+      type: object
+      properties:
+        input_path: { type: string }
+        bundle_b64: { type: string }
+        key_b64: { type: string }
+        password: { type: string }
+        kms_provider: { type: string }
+        private_key_pem: { type: string }
+        private_key_path: { type: string }
+        aad_b64: { type: string }
+    AttestRequest:
+      type: object
+      properties:
+        input_path: { type: string }
+        bundle_b64: { type: string }
+    ErrorResponse:
+      type: object
+      required: [ok, error, error_code]
+      properties:
+        ok: { type: boolean }
+        error: { type: string }
+        error_code:
+          type: string
+          description: "Machine-readable code (bad_request, unauthorized, policy_denied, rate_limited, …)"
+  headers:
+    X-Request-Id:
+      description: Echoed or generated request correlation id
+      schema: { type: string }

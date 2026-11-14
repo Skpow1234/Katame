@@ -187,3 +187,105 @@ jobs:
             exit 1
           fi
           gh release upload "v${{ needs.goreleaser.outputs.version }}" "$nupkg" --clobber
+
+  # -------------------------------------------------------------------------
+  # libkatame c-shared (M230) + Python wheel (M231)
+  # -------------------------------------------------------------------------
+  libkatame:
+    name: libkatame (${{ matrix.os }})
+    needs: [preflight, goreleaser]
+    if: github.event.inputs.snapshot != 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build libkatame
+        env:
+          CGO_ENABLED: "1"
+        run: bash scripts/build-libkatame.sh dist/libkatame
+
+      - name: Upload to GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(dist/libkatame/libkatame-*.tar.gz dist/libkatame/libkatame-*.zip)
+          gh release upload "v${{ needs.goreleaser.outputs.version }}" "${files[@]}" --clobber
+
+      - name: Build Python wheel (linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          bash scripts/build-python-wheel.sh dist/wheels dist/libkatame
+          gh release upload "v${{ needs.goreleaser.outputs.version }}" dist/wheels/*.whl --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # -------------------------------------------------------------------------
+  # @katame/wasm npm publish (M233)
+  # -------------------------------------------------------------------------
+  npm-wasm:
+    name: Publish @katame/wasm
+    needs: [preflight, goreleaser]
+    if: github.event.inputs.snapshot != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Build WASM package
+        run: bash scripts/build-wasm.sh
+
+      - name: Sync package version from tag
+        run: |
+          node -e "
+            const fs=require('fs');
+            const p='bindings/typescript/package.json';
+            const j=JSON.parse(fs.readFileSync(p,'utf8'));
+            j.version='${{ needs.goreleaser.outputs.version }}';
+            fs.writeFileSync(p, JSON.stringify(j,null,2)+'\n');
+          "
+
+      - name: Upload wasm artifacts to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p dist/wasm
+          cp bindings/typescript/katame.wasm bindings/typescript/wasm_exec.js dist/wasm/
+          tar -C dist/wasm -czf "dist/katame-wasm-${{ needs.goreleaser.outputs.version }}.tar.gz" .
+          gh release upload "v${{ needs.goreleaser.outputs.version }}" \
+            "dist/katame-wasm-${{ needs.goreleaser.outputs.version }}.tar.gz" --clobber
+
+      - name: Publish to npm
+        working-directory: bindings/typescript
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "NPM_TOKEN unset; skipping npm publish (wasm tarball still on GitHub Release)"
+            exit 0
+          fi
+          npm publish --access public

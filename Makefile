@@ -4,11 +4,19 @@ BUILD_DIR  := bin
 VERSION    ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS    := -ldflags "-s -w -X $(MODULE)/internal/cli.Version=$(VERSION)"
 
-.PHONY: build test lint fmt vet vulncheck fuzz clean docker-build docker-buildx release release-snapshot sbom help
+.PHONY: build build-pkcs11 build-piv test lint fmt vet vulncheck fuzz clean docker-build docker-buildx release release-snapshot sbom help
 
 ## build: Compile the binary into bin/
 build:
 	go build $(LDFLAGS) -o $(BUILD_DIR)/$(APP_NAME) ./cmd/katame
+
+## build-pkcs11: Binary with native SoftHSM PKCS#11 (M251; requires CGO + SoftHSM)
+build-pkcs11:
+	CGO_ENABLED=1 go build -tags katame_pkcs11 $(LDFLAGS) -o $(BUILD_DIR)/$(APP_NAME) ./cmd/katame
+
+## build-piv: Binary with native YubiKey PIV (M252; requires CGO + PC/SC)
+build-piv:
+	CGO_ENABLED=1 go build -tags katame_piv $(LDFLAGS) -o $(BUILD_DIR)/$(APP_NAME) ./cmd/katame
 
 ## test: Run all tests with race detector
 test:
