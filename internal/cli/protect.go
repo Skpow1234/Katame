@@ -51,6 +51,8 @@ func newProtectCmd() *cobra.Command {
 		kmsProvider      string
 		kmsKeyID         string
 		parallelWorkers  int
+		chunkSizeFlag    int
+		dryRun           bool
 	)
 
 	cmd := &cobra.Command{
@@ -87,6 +89,26 @@ func newProtectCmd() *cobra.Command {
 			if !crypto.SupportedHashAlgo(hashAlgo) {
 				return fmt.Errorf("unsupported hash algorithm %q; supported: sha256, sha512, sha3-256, sha3-512, blake2b-256, blake2b-512, blake3", hashAlgo)
 			}
+
+			// Apply config defaults before validation / mode detection (CLI > env > config).
+			if c := config.Get(); c != nil {
+				if !cmd.Flags().Changed("cipher") && c.Cipher != "" {
+					cipherName = c.Cipher
+				}
+				if !cmd.Flags().Changed("recipient") && len(c.Recipients) > 0 {
+					recipients = append([]string(nil), c.Recipients...)
+				}
+				if !cmd.Flags().Changed("kms-provider") && c.KmsProvider != "" {
+					kmsProvider = c.KmsProvider
+				}
+				if !cmd.Flags().Changed("kms-key-id") && c.KmsKeyID != "" {
+					kmsKeyID = c.KmsKeyID
+				}
+				if !cmd.Flags().Changed("chunk-size") && chunkSizeFlag == 0 && c.ChunkSize > 0 {
+					chunkSizeFlag = c.ChunkSize
+				}
+			}
+
 			if !crypto.SupportedCipher(cipherName) {
 				return fmt.Errorf("unsupported cipher %q; supported: aes-256-gcm, chacha20-poly1305, xchacha20-poly1305, aes-256-gcm-siv", cipherName)
 			}
@@ -123,14 +145,45 @@ func newProtectCmd() *cobra.Command {
 				return fmt.Errorf("--key and --key-source are mutually exclusive")
 			}
 
-			// Apply config defaults when flags not set (precedence: CLI > env > config).
-			if c := config.Get(); c != nil {
-				if !cmd.Flags().Changed("cipher") && c.Cipher != "" {
-					cipherName = c.Cipher
+			if dryRun {
+				mode := "generated-key"
+				switch {
+				case usePassword:
+					mode = "password"
+				case keyFile != "" || keySource != "":
+					mode = "key"
+				case useRecipient:
+					mode = fmt.Sprintf("recipient(%d)", len(recipients))
+				case useKMS:
+					mode = "kms:" + kmsProvider
 				}
-				if !cmd.Flags().Changed("recipient") && len(c.Recipients) > 0 {
-					recipients = append([]string(nil), c.Recipients...)
+				inDesc := inFile
+				if useStdin {
+					inDesc = "stdin"
 				}
+				outDesc := outFile
+				if useStdout {
+					outDesc = "stdout"
+				} else if outDesc == "" && inFile != "" {
+					outDesc = inFile + ".katame"
+				}
+				out := map[string]any{
+					"dry_run":  true,
+					"in":       inDesc,
+					"out":      outDesc,
+					"cipher":   cipherName,
+					"hash":     hashAlgo,
+					"compress": compressAlgo,
+					"mode":     mode,
+				}
+				if chunkSizeFlag > 0 {
+					out["chunk_size"] = chunkSizeFlag
+				}
+				if flagJSON {
+					return printer.JSON(out)
+				}
+				printer.Human("dry-run: would protect %s → %s (cipher=%s mode=%s)", inDesc, outDesc, cipherName, mode)
+				return nil
 			}
 
 			// Validate key splitting.
@@ -275,23 +328,6 @@ func newProtectCmd() *cobra.Command {
 			// For stdin, we now know the size.
 			if inputSize < 0 {
 				inputSize = int64(plaintextBuf.Len())
-			}
-
-			// Apply config for KMS when flags not set.
-			if c := config.Get(); c != nil && !useKMS {
-				if !cmd.Flags().Changed("kms-provider") && c.KmsProvider != "" {
-					kmsProvider = c.KmsProvider
-				}
-				if !cmd.Flags().Changed("kms-key-id") && c.KmsKeyID != "" {
-					kmsKeyID = c.KmsKeyID
-				}
-				if kmsProvider != "" && kmsKeyID != "" {
-					useKMS = true
-					keyModes++
-				}
-			}
-			if useKMS && keyModes > 1 {
-				return fmt.Errorf("--password, --key, --recipient, and --kms-provider/--kms-key-id are mutually exclusive")
 			}
 
 			// Derive, encapsulate, or load key.
@@ -550,10 +586,10 @@ func newProtectCmd() *cobra.Command {
 				plaintextBuf.Write(compressed)
 			}
 
-			// Chunk size: config override or default.
+			// Chunk size: --chunk-size > config > default.
 			chunkSize := crypto.DefaultChunkSize
-			if c := config.Get(); c != nil && c.ChunkSize > 0 {
-				chunkSize = c.ChunkSize
+			if chunkSizeFlag > 0 {
+				chunkSize = chunkSizeFlag
 			}
 
 			// Encrypt using chunked streaming (optionally parallel).
@@ -846,6 +882,8 @@ func newProtectCmd() *cobra.Command {
 	cmd.Flags().StringVar(&aadStr, "aad", "", "additional authenticated data (e.g. 'env=prod,app=payments')")
 	cmd.Flags().StringVar(&hashAlgo, "hash-algo", "sha256", "hash algorithm for plaintext: sha256, sha512, sha3-256, sha3-512, blake2b-256, blake2b-512, blake3")
 	cmd.Flags().StringVar(&cipherName, "cipher", crypto.CipherAES256GCM, "AEAD cipher: aes-256-gcm, chacha20-poly1305, xchacha20-poly1305, aes-256-gcm-siv (nonce-misuse-resistant)")
+	cmd.Flags().IntVar(&chunkSizeFlag, "chunk-size", 0, "AEAD chunk size in bytes (0 = config or default 65536)")
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "validate options and print the plan without writing a bundle")
 	cmd.Flags().IntVar(&parallelWorkers, "parallel-workers", 1, "encrypt chunks in parallel using N goroutines (0 = NumCPU, 1 = sequential)")
 	cmd.Flags().BoolVar(&signFlag, "sign", false, "sign the bundle")
 	cmd.Flags().StringVar(&signingPriv, "signing-priv", "", "path to private signing key (required with --sign)")
@@ -864,6 +902,10 @@ func newProtectCmd() *cobra.Command {
 	cmd.Flags().IntVar(&splitThreshold, "split-threshold", 0, "minimum shares to reconstruct (K-of-N, requires --split-shares)")
 	cmd.Flags().StringVar(&kmsProvider, "kms-provider", "", "KMS provider for DEK wrap: aws, gcp, azure, mock (or from config)")
 	cmd.Flags().StringVar(&kmsKeyID, "kms-key-id", "", "KMS key ID (AWS alias/ARN; GCP full resource name; Azure key URL; mock-key-id for mock)")
+	_ = cmd.RegisterFlagCompletionFunc("cipher", completeCipher)
+	_ = cmd.RegisterFlagCompletionFunc("hash-algo", completeHashAlgo)
+	_ = cmd.RegisterFlagCompletionFunc("kdf", completeKDF)
+	_ = cmd.RegisterFlagCompletionFunc("compress", completeCompress)
 
 	return cmd
 }

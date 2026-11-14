@@ -13,6 +13,7 @@ func newKeygenCmd() *cobra.Command {
 	var (
 		outPrefix string
 		algo      string
+		listAlgos bool
 	)
 
 	cmd := &cobra.Command{
@@ -24,6 +25,27 @@ func newKeygenCmd() *cobra.Command {
 			"Plugin schemes from KATAME_PLUGIN_DIR (or config plugin_dir) are added to --algo; see docs/plugins.md.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			printer := NewPrinter(flagJSON, flagQuiet)
+
+			if listAlgos {
+				reg := plugin.GlobalRegistry()
+				signing := append([]string{}, crypto.SupportedSignAlgos...)
+				hybrid := append([]string{}, crypto.SupportedHybridSchemes...)
+				for _, a := range reg.SignAlgos() {
+					signing = append(signing, a)
+				}
+				for _, a := range reg.KEMSchemes() {
+					hybrid = append(hybrid, a)
+				}
+				if flagJSON {
+					return printer.JSON(map[string]any{
+						"signing": signing,
+						"hybrid":  hybrid,
+					})
+				}
+				printer.Human("Signing: %s", strings.Join(signing, ", "))
+				printer.Human("Hybrid:  %s", strings.Join(hybrid, ", "))
+				return nil
+			}
 
 			if outPrefix == "" {
 				return fmt.Errorf("--out is required (e.g. --out signing)")
@@ -100,6 +122,8 @@ func newKeygenCmd() *cobra.Command {
 
 	cmd.Flags().StringVar(&outPrefix, "out", "", "output path prefix (e.g. 'signing' produces signing.key + signing.pub)")
 	cmd.Flags().StringVar(&algo, "algo", crypto.SignAlgoEd25519, "algorithm (see --help for full list)")
+	cmd.Flags().BoolVar(&listAlgos, "list-algos", false, "list built-in and plugin signing/hybrid algorithms and exit")
+	_ = cmd.RegisterFlagCompletionFunc("algo", completeKeygenAlgos)
 
 	return cmd
 }

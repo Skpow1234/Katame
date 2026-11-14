@@ -56,40 +56,40 @@ see [milestones.md](milestones.md).
 | **M78** | Stop os.Exit in repo CLI; return errors — **done** |
 | **M79** | Stop os.Exit in audit export; return errors — **done** |
 | **M80** | Dedicated exit code for ErrPolicyDenied — **done** (`ExitPolicyDenied=13`) |
-| **M81** | Thread config Cipher into protect defaults |
-| **M82** | Thread config ChunkSize into protect defaults |
-| **M83** | Thread config Recipients into protect defaults |
-| **M84** | Thread config KMS defaults into protect |
-| **M85** | Add PolicyFile to config Profile struct |
-| **M86** | Surface config.Load errors instead of ignoring |
-| **M87** | CLI tests for serve command |
-| **M88** | CLI tests for repo command |
-| **M89** | CLI tests for menu command |
-| **M90** | CLI tests for attest/seal |
-| **M91** | CLI tests for add/remove recipient |
-| **M92** | CLI tests for rewrap |
-| **M93** | CLI tests for audit export |
-| **M94** | CLI tests for completion |
-| **M95** | Subprocess tests for exit codes |
-| **M96** | Add --dry-run to protect |
-| **M97** | Add --dry-run to rotate-key |
-| **M98** | Add --dry-run to rewrap |
+| **M81** | Thread config Cipher into protect defaults — **done** |
+| **M82** | Thread config ChunkSize into protect defaults — **done** (`--chunk-size` + config) |
+| **M83** | Thread config Recipients into protect defaults — **done** (before mode detection) |
+| **M84** | Thread config KMS defaults into protect — **done** |
+| **M85** | Add PolicyFile to config Profile struct — **done** |
+| **M86** | Surface config.Load errors instead of ignoring — **done** |
+| **M87** | CLI tests for serve command — **done** |
+| **M88** | CLI tests for repo command — **done** |
+| **M89** | CLI tests for menu command — **done** (help smoke) |
+| **M90** | CLI tests for attest/seal — **done** (pre-existing) |
+| **M91** | CLI tests for add/remove recipient — **done** (pre-existing) |
+| **M92** | CLI tests for rewrap — **done** (pre-existing + dry-run) |
+| **M93** | CLI tests for audit export — **done** (pre-existing) |
+| **M94** | CLI tests for completion — **done** (pre-existing) |
+| **M95** | Subprocess tests for exit codes — **done** (hash bad-algo → 12) |
+| **M96** | Add --dry-run to protect — **done** |
+| **M97** | Add --dry-run to rotate-key — **done** |
+| **M98** | Add --dry-run to rewrap — **done** |
 | **M99** | True stdin/stdout binary streaming without temp files |
 | **M100** | Unify azureio.go with cloudio.go |
 | **M101** | Progress reporting for large encrypt under --verbose |
 | **M102** | Menu feature parity for serve/repo/policy/doctor |
-| **M103** | Shell completion for cipher enums |
-| **M104** | Shell completion for hash/KDF/algo enums |
-| **M105** | keygen --list-algos including plugins |
-| **M106** | Fix hash bad-algo exit code semantics |
+| **M103** | Shell completion for cipher enums — **done** |
+| **M104** | Shell completion for hash/KDF/algo enums — **done** |
+| **M105** | keygen --list-algos including plugins — **done** |
+| **M106** | Fix hash bad-algo exit code semantics — **done** (`ErrUnsupportedAlgorithm`) |
 | **M107** | Generate man pages from cobra |
 | **M108** | Windows ACL key-file permission tests |
 | **M109** | Redact PEM/password from verbose logs everywhere |
 | **M110** | katame convert legacy Ed25519 to PKCS#8 |
 | **M111** | Batch commands honor same policy ops |
 | **M112** | --force vs refuse-overwrite consistency |
-| **M113** | doctor probes plugin dir executables |
-| **M114** | doctor probes KMS credential reachability |
+| **M113** | doctor probes plugin dir executables — **done** |
+| **M114** | doctor probes KMS credential reachability — **done** (env soft-probe) |
 | **M115** | OpenAPI schemas for Rewrap request/response — **done** |
 | **M116** | Add /v1/keygen endpoint — **done** |
 | **M117** | Add /v1/hash endpoint — **done** |

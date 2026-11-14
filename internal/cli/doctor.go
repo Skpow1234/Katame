@@ -3,8 +3,10 @@ package cli
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 
+	"github.com/Skpow1234/Katame/internal/config"
 	"github.com/Skpow1234/Katame/internal/keysource"
 	"github.com/Skpow1234/Katame/internal/kms"
 	"github.com/spf13/cobra"
@@ -76,7 +78,62 @@ func runDoctorChecks() []doctorCheck {
 			Details: detail,
 		})
 	}
+	checks = append(checks, doctorPluginDirCheck())
+	checks = append(checks, doctorKMSCredCheck())
 	return checks
+}
+
+func doctorPluginDirCheck() doctorCheck {
+	dir := os.Getenv("KATAME_PLUGIN_DIR")
+	if dir == "" {
+		if c := config.Get(); c != nil {
+			dir = c.PluginDir
+		}
+	}
+	if dir == "" {
+		return doctorCheck{Name: "plugin dir", OK: true, Details: "not set"}
+	}
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return doctorCheck{Name: "plugin dir", OK: false, Details: fmt.Sprintf("%s: %v", dir, err)}
+	}
+	var execs []string
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		name := e.Name()
+		info, err := e.Info()
+		if err != nil {
+			continue
+		}
+		mode := info.Mode()
+		if mode&0o111 != 0 || filepath.Ext(name) == ".exe" {
+			execs = append(execs, name)
+		}
+	}
+	if len(execs) == 0 {
+		return doctorCheck{Name: "plugin dir", OK: true, Details: fmt.Sprintf("%s (no executables found)", dir)}
+	}
+	return doctorCheck{Name: "plugin dir", OK: true, Details: fmt.Sprintf("%s: %v", dir, execs)}
+}
+
+func doctorKMSCredCheck() doctorCheck {
+	// Soft probe: report which cloud credential env vars are present (no network).
+	var present []string
+	for _, k := range []string{
+		"AWS_ACCESS_KEY_ID", "AWS_PROFILE", "AWS_REGION",
+		"GOOGLE_APPLICATION_CREDENTIALS", "CLOUDSDK_CORE_PROJECT",
+		"AZURE_CLIENT_ID", "AZURE_TENANT_ID", "AZURE_CLIENT_SECRET",
+	} {
+		if os.Getenv(k) != "" {
+			present = append(present, k)
+		}
+	}
+	if len(present) == 0 {
+		return doctorCheck{Name: "kms credentials", OK: true, Details: "no cloud credential env vars detected (mock still works)"}
+	}
+	return doctorCheck{Name: "kms credentials", OK: true, Details: fmt.Sprintf("env set: %v", present)}
 }
 
 func doctorOK(checks []doctorCheck) bool {

@@ -51,6 +51,7 @@ func newRotateKeyCmd() *cobra.Command {
 		hashAlgo     string
 		kdfAlgo      string
 		compressAlgo string
+		dryRun       bool
 	)
 
 	cmd := &cobra.Command{
@@ -86,6 +87,20 @@ is preserved from the input unless overridden.`,
 			}
 			if outFile == "" {
 				outFile = inFile
+			}
+			if dryRun {
+				out := map[string]any{
+					"dry_run": true,
+					"in":      inFile,
+					"out":     outFile,
+					"cipher":  cipherName,
+					"hash":    hashAlgo,
+				}
+				if flagJSON {
+					return printer.JSON(out)
+				}
+				printer.Human("dry-run: would rotate-key %s → %s", inFile, outFile)
+				return nil
 			}
 
 			localIn, cleanup, err := resolveBundlePath(inFile)
@@ -317,6 +332,7 @@ is preserved from the input unless overridden.`,
 	cmd.Flags().StringVar(&hashAlgo, "hash", "", "plaintext hash algorithm (default: preserve from input)")
 	cmd.Flags().StringVar(&kdfAlgo, "kdf", "", "KDF algorithm for password mode (default: preserve from input)")
 	cmd.Flags().StringVar(&compressAlgo, "compress", "", "compression algorithm (default: preserve from input)")
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "validate options and print the plan without rewriting the bundle")
 
 	return cmd
 }

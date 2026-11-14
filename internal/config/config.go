@@ -46,18 +46,23 @@ type Profile struct {
 	KmsProvider    string   `mapstructure:"kms_provider"`
 	KmsKeyID       string   `mapstructure:"kms_key_id"`
 	PluginDir      string   `mapstructure:"plugin_dir"`
+	PolicyFile     string   `mapstructure:"policy_file"`
 }
 
 // ConfigFile represents the root config file structure (optional base + profiles).
 type ConfigFile struct {
-	AuditLog        string             `mapstructure:"audit_log"`
-	Cipher          string             `mapstructure:"cipher"`
-	ChunkSize       int                `mapstructure:"chunk_size"`
-	OutputDir       string             `mapstructure:"output_dir"`
-	DefaultKeyPath  string             `mapstructure:"default_key_path"`
-	DefaultPubPath  string             `mapstructure:"default_pubkey_path"`
-	Recipients      []string           `mapstructure:"recipients"`
-	Profiles        map[string]Profile `mapstructure:"profiles"`
+	AuditLog       string             `mapstructure:"audit_log"`
+	Cipher         string             `mapstructure:"cipher"`
+	ChunkSize      int                `mapstructure:"chunk_size"`
+	OutputDir      string             `mapstructure:"output_dir"`
+	DefaultKeyPath string             `mapstructure:"default_key_path"`
+	DefaultPubPath string             `mapstructure:"default_pubkey_path"`
+	Recipients     []string           `mapstructure:"recipients"`
+	KmsProvider    string             `mapstructure:"kms_provider"`
+	KmsKeyID       string             `mapstructure:"kms_key_id"`
+	PluginDir      string             `mapstructure:"plugin_dir"`
+	PolicyFile     string             `mapstructure:"policy_file"`
+	Profiles       map[string]Profile `mapstructure:"profiles"`
 }
 
 // DefaultEffective returns the built-in default effective config.
@@ -166,6 +171,9 @@ func readAndMerge(path, profile string, base *EffectiveConfig) error {
 	if v.IsSet("plugin_dir") {
 		base.PluginDir = v.GetString("plugin_dir")
 	}
+	if v.IsSet("policy_file") {
+		base.PolicyFile = v.GetString("policy_file")
+	}
 
 	// Apply profile overrides.
 	if profile != "" && v.IsSet("profiles") {
@@ -179,6 +187,10 @@ func readAndMerge(path, profile string, base *EffectiveConfig) error {
 			}
 			if v, ok := p["chunk_size"].(int); ok && v > 0 {
 				base.ChunkSize = v
+			} else if v, ok := p["chunk_size"].(int64); ok && v > 0 {
+				base.ChunkSize = int(v)
+			} else if v, ok := p["chunk_size"].(float64); ok && v > 0 {
+				base.ChunkSize = int(v)
 			}
 			if v, ok := p["output_dir"].(string); ok && v != "" {
 				base.OutputDir = v
@@ -205,6 +217,9 @@ func readAndMerge(path, profile string, base *EffectiveConfig) error {
 			}
 			if v, ok := p["plugin_dir"].(string); ok && v != "" {
 				base.PluginDir = v
+			}
+			if v, ok := p["policy_file"].(string); ok && v != "" {
+				base.PolicyFile = v
 			}
 		}
 	}

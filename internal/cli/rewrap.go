@@ -30,6 +30,7 @@ func newRewrapCmd() *cobra.Command {
 		kmsProvider string
 		fromKeyID   string
 		toKeyID     string
+		dryRun      bool
 	)
 
 	cmd := &cobra.Command{
@@ -62,6 +63,21 @@ The new manifest invalidates any prior signature; re-sign with 'katame sign'.`,
 			}
 			if toKeyID == "" {
 				return fmt.Errorf("--to-kms-key-id is required")
+			}
+			if dryRun {
+				out := map[string]any{
+					"dry_run":      true,
+					"in":           inFile,
+					"out":          outFile,
+					"kms_provider": kmsProvider,
+					"from_key_id":  fromKeyID,
+					"to_key_id":    toKeyID,
+				}
+				if flagJSON {
+					return printer.JSON(out)
+				}
+				printer.Human("dry-run: would rewrap %s → %s (%s %s→%s)", inFile, outFile, kmsProvider, fromKeyID, toKeyID)
+				return nil
 			}
 
 			localIn, cleanup, err := resolveBundlePath(inFile)
@@ -171,6 +187,7 @@ The new manifest invalidates any prior signature; re-sign with 'katame sign'.`,
 	cmd.Flags().StringVar(&kmsProvider, "kms-provider", "", "KMS provider for both unwrap and rewrap (aws|gcp|azure|mock)")
 	cmd.Flags().StringVar(&fromKeyID, "from-kms-key-id", "", "expected KMS key ID currently wrapping the DEK (optional sanity check)")
 	cmd.Flags().StringVar(&toKeyID, "to-kms-key-id", "", "new KMS key ID to wrap the DEK under (required)")
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "validate options and print the plan without rewriting the bundle")
 
 	return cmd
 }

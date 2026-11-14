@@ -119,6 +119,52 @@ profiles:
 	}
 }
 
+func TestLoad_PolicyFileAndProfile(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "katame.yaml")
+	content := []byte(`policy_file: /etc/katame/default.yaml
+profiles:
+  prod:
+    policy_file: /etc/katame/prod.yaml
+    recipients:
+      - alice.pem
+`)
+	if err := os.WriteFile(path, content, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	SetLoaded(nil)
+	cfg, err := Load(path, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.PolicyFile != "/etc/katame/default.yaml" {
+		t.Fatalf("root policy_file=%q", cfg.PolicyFile)
+	}
+	SetLoaded(nil)
+	cfg, err = Load(path, "prod")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.PolicyFile != "/etc/katame/prod.yaml" {
+		t.Fatalf("prod policy_file=%q", cfg.PolicyFile)
+	}
+	if len(cfg.Recipients) != 1 || cfg.Recipients[0] != "alice.pem" {
+		t.Fatalf("recipients=%v", cfg.Recipients)
+	}
+}
+
+func TestLoad_MalformedYAML(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "bad.yaml")
+	if err := os.WriteFile(path, []byte("cipher: [\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	SetLoaded(nil)
+	if _, err := Load(path, ""); err == nil {
+		t.Fatal("expected malformed YAML error")
+	}
+}
+
 func TestGet_SetLoaded(t *testing.T) {
 	SetLoaded(nil)
 	if Get() != nil {

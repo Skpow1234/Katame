@@ -31,6 +31,7 @@ Core CLI, streaming AEAD, integrity/audit, PQ crypto, cloud+KMS, batch/parallel,
 - **M251–M252 / M256:** optional native SoftHSM (`-tags katame_pkcs11`) and YubiKey PIV (`-tags katame_piv`); `ResolveSigner`; doctor reports shim vs native details
 - **M115–M132 (partial):** serve `/readyz`, `/v1/{keygen,hash,verify-integrity,attest}`, `X-Request-Id`, `error_code`, principal rate limits, protect concurrency cap, OpenAPI Rewrap + CI lint; deferred multipart/OTel/KMS ctx
 - **M230–M233:** release ships `libkatame` archives, Python wheels with vendored lib + `.pyi`, WASM tarball / optional npm publish
+- **M81–M98 / M103–M106 / M113–M114:** config→protect wiring, `policy_file`, dry-run, completions, `keygen --list-algos`, doctor probes, CLI tests
 
 ## Backlog (1000+)
 

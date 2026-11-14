@@ -37,8 +37,10 @@ func NewRootCmd() *cobra.Command {
 		Version: Version,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// Load config (optional): --config or KATAME_CONFIG, then ~/.katame.yaml, ./.katame.yaml.
-			// Profile: --profile or KATAME_PROFILE. Errors are ignored so commands run with defaults.
-			_, _ = config.Load(flagConfig, flagProfile)
+			// Profile: --profile or KATAME_PROFILE. Missing files are OK; malformed YAML fails closed.
+			if _, err := config.Load(flagConfig, flagProfile); err != nil {
+				return fmt.Errorf("config load failed: %w", err)
+			}
 			// Precedence: CLI flags > env vars > config file > built-in defaults.
 			root := cmd.Root()
 			if root != nil && root.PersistentFlags().Changed("audit-log") {
