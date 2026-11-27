@@ -20,7 +20,7 @@ require (
 	github.com/cloudflare/circl v1.6.3
 	github.com/go-piv/piv-go/v2 v2.6.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/klauspost/compress v1.20.4
+	github.com/klauspost/compress v1.20.5
 	github.com/miekg/pkcs11 v1.1.2
 	github.com/open-policy-agent/opa v1.22.2
 	github.com/rs/zerolog v1.34.0
